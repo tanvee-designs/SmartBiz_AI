@@ -3,3 +3,4 @@ uvicorn
 sqlalchemy
 google-genai
 python-dotenv
+email-validator
