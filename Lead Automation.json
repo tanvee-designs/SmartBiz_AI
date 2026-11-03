@@ -1,0 +1,169 @@
+{
+  "name": "SmartBiz AI - Lead Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "smartbiz-new-lead",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        0
+      ],
+      "id": "c4283f11-e824-4181-9667-5490dc2fed01",
+      "name": "Webhook",
+      "webhookId": "3694dd08-9e94-4759-9ea6-fd5819a380ba"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        144
+      ],
+      "id": "692aad23-3c1e-4f90-82fc-9d75cd4bc3dd",
+      "name": "Send a message",
+      "webhookId": "0d26e939-b192-40fb-bc95-697c5ef2e3a9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6713992e-6cce-4c26-b99f-662c8c09a3c9",
+              "name": "headers.user-agent",
+              "value": "={{ $json.headers.user-agent }}",
+              "type": "string"
+            },
+            {
+              "id": "bf7acb81-efc0-49a8-92b7-102fb5b243d7",
+              "name": "headers.content-type",
+              "value": "={{ $json.headers.content-type }}",
+              "type": "string"
+            },
+            {
+              "id": "e0305a10-35e4-442d-966e-ebca7f12832c",
+              "name": "headers.host",
+              "value": "={{ $json.headers.host }}",
+              "type": "string"
+            },
+            {
+              "id": "1a3087ba-669a-4d20-984d-29f3111d7ea5",
+              "name": "headers.content-length",
+              "value": "={{ $json.headers.content-length }}",
+              "type": "string"
+            },
+            {
+              "id": "f3634e8b-0657-4efe-ae66-9b2d05991777",
+              "name": "headers.expect",
+              "value": "={{ $json.headers.expect }}",
+              "type": "string"
+            },
+            {
+              "id": "823eee28-e326-4d4d-83c3-e4ed4e5cd7d7",
+              "name": "headers.connection",
+              "value": "={{ $json.headers.connection }}",
+              "type": "string"
+            },
+            {
+              "id": "a2eab026-7f34-4b27-aff5-e267c82cf9fb",
+              "name": "body.email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "1d2a1e0a-86e4-4f49-82ec-1ca54db964ba",
+              "name": "body.company",
+              "value": "={{ $json.body.company }}",
+              "type": "string"
+            },
+            {
+              "id": "d5d05d2d-ab8f-434c-aff7-408160b57749",
+              "name": "body.name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "544da0e0-0e6a-42b4-b3ab-f6dd1a0d0a25",
+              "name": "body.phone",
+              "value": "={{ $json.body.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "e67c251d-0b65-4bb7-8651-ef6057ff5a92",
+              "name": "webhookUrl",
+              "value": "={{ $json.webhookUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "1d58b8f5-e152-4df3-a3c6-456bf826780b",
+              "name": "executionMode",
+              "value": "={{ $json.executionMode }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        480,
+        384
+      ],
+      "id": "7741b97b-4e5c-4fde-9fc4-94f32c6d4cff",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -80,
+        176
+      ],
+      "id": "74066735-8d9d-42ef-a769-d7ba0d79ca15",
+      "name": "Create spreadsheet"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "98311a94-9524-4206-a550-5ddc26b51868",
+  "meta": {
+    "instanceId": "b2f88b12f745b649c744d0488b841fd884b6cee45e94169659ce08de0c8541dc"
+  },
+  "nodeGroups": [],
+  "id": "H0ATkDGUqD6WEyts",
+  "tags": []
+}
