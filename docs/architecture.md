@@ -60,3 +60,19 @@
 | type | TEXT | DEFAULT 'info' | Type |
 | is_read | BOOLEAN | DEFAULT 0 | Read Status |
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Created At |
+## 2. System Architecture Diagram (High Level)
+
+```mermaid
+graph TD
+    User([User / Client]) -->|Fills Form| Frontend(Web Dashboard / HTML & JS)
+    Frontend -->|POST /api/leads| Backend(FastAPI Backend)
+    Backend -->|Save Data| DB[(SQLite Database)]
+    
+    Backend -->|Trigger Webhook| n8n(n8n Automation Engine)
+    n8n -->|Gmail API| Email[Automated Welcome Email]
+    n8n -->|Google Sheets API| Sheets[Google Sheets Database]
+    
+    Backend -->|Request AI Report| AI(AI Module / Python + Gemini)
+    AI -->|Fetch Data| DB
+    AI -->|Generate Insight| Backend
+    Backend -->|Show Notification| Frontend
