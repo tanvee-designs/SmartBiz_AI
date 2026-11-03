@@ -1,4 +1,5 @@
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -10,6 +11,13 @@ from n8n_client import send_lead_to_n8n
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SmartBiz_AI")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
