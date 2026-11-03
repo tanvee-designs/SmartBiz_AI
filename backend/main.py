@@ -1,10 +1,11 @@
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 import models
 import schemas
 from database import Base, engine, get_db
+from n8n_client import send_lead_to_n8n
 
 Base.metadata.create_all(bind=engine)
 
@@ -27,7 +28,11 @@ def health_check():
     status_code=status.HTTP_201_CREATED,
     responses={409: {"description": "Lead with this email already exists"}},
 )
-def create_lead(lead: schemas.LeadCreate, db: Session = Depends(get_db)):
+def create_lead(
+    lead: schemas.LeadCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     email = lead.email.lower()
 
     existing = (
@@ -52,5 +57,8 @@ def create_lead(lead: schemas.LeadCreate, db: Session = Depends(get_db)):
     db.add(new_lead)
     db.commit()
     db.refresh(new_lead)
+
+    lead_data = schemas.LeadResponse.model_validate(new_lead).model_dump(mode="json")
+    background_tasks.add_task(send_lead_to_n8n, lead_data)
 
     return new_lead
