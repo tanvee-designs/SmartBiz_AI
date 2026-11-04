@@ -353,7 +353,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 <div class="rgrid"><div class="card rp"><h2 data-i="rh_ins"></h2><ul id="rIns"></ul></div><div class="card rp"><h2 data-i="rh_rec"></h2><ul id="rRec"></ul></div></div>
 <div class="rgrid"><div class="card"><h2 data-i="rh_src"></h2><div class="hb" id="rSrc"></div></div><div class="card"><h2 data-i="rh_st"></h2><div class="hb" id="rSt"></div></div></div></div>
 </div></div>
-<p class="foot" data-i="foot"></p>
+<p class="foot" id="srcNote"></p>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
@@ -401,7 +401,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     lim15:"15 leads",wf3:"3 core workflows",wf6:"All 6 workflows",ai_s:"Summary only",ai_f:"Full insights",team1:"1 user",team5:"Up to 5 users",sup_c:"Community support",sup_p:"Priority support",
     t_limit:"Free plan limit reached (15 leads). Upgrade to add more.",t_prem:"This workflow is a Premium feature",t_up:"Premium activated",t_dn:"Switched to Free plan",t_rs:"Demo restarted: new 7-day trial",
     g_t:"Premium report",g_s:"Upgrade to unlock insights, recommendations and charts.",usage_f:"{n} of 15 leads used on the Free plan",usage_p:"Unlimited leads",pl_free:"Free",
-    m_201:"Lead saved successfully",m_409:"This email already exists. Use a different email.",m_422:"Invalid data. Please check the form and try again.",m_net:"Cannot reach the backend. Start it with: cd backend, then uvicorn main:app --reload",m_err:"Unexpected server response"},
+    m_201:"Lead saved successfully",m_409:"This email already exists. Use a different email.",m_422:"Invalid data. Please check the form and try again.",m_net:"Cannot reach the backend. Start it with: cd backend, then uvicorn main:app --reload",m_err:"Unexpected server response",foot_live:"Live data from the backend",foot_demo:"Demo data · backend offline",m_off:"Backend offline. Showing demo data."},
   bn:{tab1:"ড্যাশবোর্ড",tab2:"ওয়ার্কফ্লো",tab3:"লিড",tab4:"AI রিপোর্ট",
     gm:"শুভ সকাল",ga:"শুভ অপরাহ্ন",ge:"শুভ সন্ধ্যা",
     sub:"আপনার ব্যবসার অটোমেশন আজ কেমন চলছে, দেখুন।",run:"এখনই ওয়ার্কফ্লো চালান",
@@ -444,9 +444,9 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     lim15:"১৫টি লিড",wf3:"৩টি মূল ওয়ার্কফ্লো",wf6:"সব ৬টি ওয়ার্কফ্লো",ai_s:"শুধু সারাংশ",ai_f:"পূর্ণ ইনসাইট",team1:"১ জন",team5:"সর্বোচ্চ ৫ জন",sup_c:"কমিউনিটি সাপোর্ট",sup_p:"অগ্রাধিকার সাপোর্ট",
     t_limit:"ফ্রি প্ল্যানে সীমা শেষ (১৫টি লিড)। আরও যোগ করতে আপগ্রেড করুন।",t_prem:"এই ওয়ার্কফ্লো প্রিমিয়াম সুবিধা",t_up:"প্রিমিয়াম চালু হয়েছে",t_dn:"ফ্রি প্ল্যানে ফিরে এসেছেন",t_rs:"ডেমো রিস্টার্ট: নতুন ৭ দিনের ট্রায়াল",
     g_t:"প্রিমিয়াম রিপোর্ট",g_s:"ইনসাইট, সুপারিশ ও চার্ট খুলতে আপগ্রেড করুন।",usage_f:"ফ্রি প্ল্যানে {n}/১৫টি লিড ব্যবহৃত",usage_p:"সীমাহীন লিড",pl_free:"ফ্রি",
-    m_201:"লিড সফলভাবে সংরক্ষিত হয়েছে",m_409:"এই ইমেইল আগে থেকেই আছে। অন্য ইমেইল দিন।",m_422:"ডেটা সঠিক নয়। ফর্ম দেখে আবার চেষ্টা করুন।",m_net:"ব্যাকএন্ডে পৌঁছানো যাচ্ছে না। cd backend, তারপর uvicorn main:app --reload চালু করুন।",m_err:"সার্ভার অপ্রত্যাশিত উত্তর দিয়েছে"}};
+    m_201:"লিড সফলভাবে সংরক্ষিত হয়েছে",m_409:"এই ইমেইল আগে থেকেই আছে। অন্য ইমেইল দিন।",m_422:"ডেটা সঠিক নয়। ফর্ম দেখে আবার চেষ্টা করুন।",m_net:"ব্যাকএন্ডে পৌঁছানো যাচ্ছে না। cd backend, তারপর uvicorn main:app --reload চালু করুন।",m_err:"সার্ভার অপ্রত্যাশিত উত্তর দিয়েছে",foot_live:"ব্যাকএন্ড থেকে আসল ডেটা",foot_demo:"ডেমো ডেটা · ব্যাকএন্ড বন্ধ",m_off:"ব্যাকএন্ড বন্ধ। ডেমো ডেটা দেখানো হচ্ছে।"}};
   var lang="en";
-  var USE_BACKEND=true,API_URL="http://127.0.0.1:8000/api/leads"; // set USE_BACKEND=false for offline demo
+  var USE_BACKEND=true,API_URL="http://127.0.0.1:8000/api/leads",SEND_SOURCE=false,live=false; // SEND_SOURCE=true once backend accepts "source" // set USE_BACKEND=false for offline demo
   try{var sv=localStorage.getItem("sb-lang");if(sv==="bn")lang="bn"}catch(e){}
   var $=function(i){return document.getElementById(i)};
   var tx=function(k){return T[lang][k]};
@@ -533,15 +533,15 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var q=$("lQ").value.trim().toLowerCase(),a=$("lS").value,b=$("lO").value;
     var r=leads.filter(function(l){return(a===""||l.t==a)&&(b===""||l.s==b)&&(!q||(l.n+l.e+l.p).toLowerCase().indexOf(q)>-1)}).sort(function(x,y){return y.id-x.id});
     $("lb").innerHTML=r.length?r.map(function(l){
-      return "<tr><td><strong>"+esc(l.n)+"</strong>"+(l.c?"<br><span class='mut'>"+esc(l.c)+"</span>":"")+"</td><td>"+esc(l.e)+"<br><span class='mut'>"+N(l.p)+"</span></td><td>"+tx(IN[l.i])+"</td><td>"+tx(SO[l.s])+"</td><td><select data-id='"+l.id+"' aria-label='"+tx("lh5")+"'>"+ST.map(function(k,i){return "<option value='"+i+"'"+(i===l.t?" selected":"")+">"+tx(k)+"</option>"}).join("")+"</select></td><td>"+(l.d?N(l.d)+tx("dago"):tx("dnow"))+"</td></tr>"}).join(""):"<tr><td colspan='6' class='mut'>"+tx("none2")+"</td></tr>";
+      return "<tr><td><strong>"+esc(l.n)+"</strong>"+(l.c?"<br><span class='mut'>"+esc(l.c)+"</span>":"")+"</td><td>"+esc(l.e)+"<br><span class='mut'>"+N(l.p)+"</span></td><td>"+(IN[l.i]?tx(IN[l.i]):"—")+"</td><td>"+tx(SO[l.s])+"</td><td><select data-id='"+l.id+"' aria-label='"+tx("lh5")+"'>"+ST.map(function(k,i){return "<option value='"+i+"'"+(i===l.t?" selected":"")+">"+tx(k)+"</option>"}).join("")+"</select></td><td>"+(l.d?N(l.d)+tx("dago"):tx("dnow"))+"</td></tr>"}).join(""):"<tr><td colspan='6' class='mut'>"+tx("none2")+"</td></tr>";
   }
   function bars(keys,arr,tot){return keys.map(function(k,i){var p=tot?Math.round(arr[i]/tot*100):0;return "<div><em>"+tx(k)+"</em><span style='width:"+Math.max(p,14)+"%'>"+N(arr[i])+"</span></div>"}).join("")}
   function li(ks,o){return ks.map(function(k){return "<li>"+F(tx(k),o)+"</li>"}).join("")}
   function drawReport(){
     var s=stats(),cs=SO.map(function(){return 0}),ci=IN.map(function(){return 0}),ct=[0,0,0,0];
-    leads.forEach(function(l){cs[l.s]++;ci[l.i]++;ct[l.t]++});
+    leads.forEach(function(l){cs[l.s]++;if(l.i>=0)ci[l.i]++;ct[l.t]++});
     var ts=cs.indexOf(Math.max.apply(null,cs)),ti=ci.indexOf(Math.max.apply(null,ci));
-    var o={n:N(s.n),c:N(s.c),r:N(s.rate),rev:BDT(s.rev),src:tx(SO[ts]),sh:N(s.n?Math.round(cs[ts]/s.n*100):0),int:tx(IN[ti]),p:N(ct[0]+ct[1]),avg:BDT(s.c?Math.round(s.rev/s.c):0)};
+    var o={n:N(s.n),c:N(s.c),r:N(s.rate),rev:BDT(s.rev),src:tx(SO[ts]),sh:N(s.n?Math.round(cs[ts]/s.n*100):0),int:Math.max.apply(null,ci)?tx(IN[ti]):"—",p:N(ct[0]+ct[1]),avg:BDT(s.c?Math.round(s.rev/s.c):0)};
     $("rSum").textContent=F(tx("r_sum"),o);
     $("rIns").innerHTML=li(["r_i1","r_i2","r_i3"],o);$("rRec").innerHTML=li(["r_c1","r_c2","r_c3"],o);
     $("rSrc").innerHTML=bars(SO,cs,s.n);$("rSt").innerHTML=bars(ST,ct,s.n);
@@ -568,7 +568,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var id=leads.reduce(function(m,l){return Math.max(m,l.id)},0)+1,co=$("fC").value.trim();
     if(USE_BACKEND){
       try{
-        var res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:n,email:e,phone:p11,company:co})});
+        var res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(SEND_SOURCE?{name:n,email:e,phone:p11,company:co,source:["website","facebook","google_forms","linkedin","referral","email","other"][+$("fS").value]}:{name:n,email:e,phone:p11,company:co})});
         var body=null;try{body=await res.json()}catch(x){}
         if(res.status===409){setErr("fE","m_409");api(409,"Duplicate email",body||{});say(tx("m_409"));btn.disabled=false;return}
         if(res.status===422){var d=body&&body.detail,det=Array.isArray(d)&&d[0]?(d[0].loc?d[0].loc.slice(-1)[0]+": ":"")+d[0].msg:"";api(422,"Invalid data",{detail:d});say(tx("m_422")+(det?" ("+det+")":""));btn.disabled=false;return}
@@ -576,7 +576,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
         api(201,"Lead created",body||{});
       }catch(err){api(0,"Network error",{hint:"cd backend && uvicorn main:app --reload"});say(tx("m_net"));btn.disabled=false;return}
     }else api(201,"Lead created (local demo)",{id:id});
-    leads.push({id:id,n:n,e:e,p:p11,c:co,i:$("fI").value===""?6:+$("fI").value,s:+$("fS").value,t:0,v:0,d:0});
+    if(!(USE_BACKEND&&await loadLeads()))leads.push({id:id,n:n,e:e,p:p11,c:co,i:$("fI").value===""?6:+$("fI").value,s:+$("fS").value,t:0,v:0,d:0});
     $("lf").reset();all();say(tx("m_201"));btn.disabled=false;
   };
   $("lb").onchange=function(e){var id=+e.target.dataset.id;leads.forEach(function(l){if(l.id===id){l.t=+e.target.value;if(l.t===3&&!l.v)l.v=25000}});all();say(tx("t_st"))};
@@ -608,6 +608,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     $("planBanner").innerHTML="<div><strong>"+tx(t)+"</strong><br><span class='mut'>"+F(tx(t+"_s"),{d:N(d)})+"</span></div>"+(e==="trial"?"<div class='meter'><div class='bar a'><i style='width:"+((8-d)/7*100)+"%'></i></div><span class='mut'>"+F(tx("tr_d"),{a:N(8-d)})+"</span></div>":"")+(e==="premium"?"":"<button class='go' type='button' data-go='plans'>"+tx(e==="trial"?"viewp":"upg")+"</button>");
     $("rPro").classList.toggle("locked",!isPro());
     $("usage").textContent=isPro()?tx("usage_p"):F(tx("usage_f"),{n:N(leads.length)});
+    $("srcNote").textContent=tx(live?"foot_live":"foot_demo");
   }
   function cell(v){return v==="y"?"<span class='yes' aria-label='yes'>✓</span>":v==="n"?"<span class='no2' aria-label='no'>✕</span>":tx(v)}
   function drawPlans(){
@@ -628,6 +629,22 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   applyPlan();
   stamp();route();
   all();
+
+  function mapLead(o){
+    var st=String(o.status||"new").toLowerCase(),sr=String(o.source||"").toLowerCase().replace(/[\s_-]/g,"");
+    var t=/convert|won|closed/.test(st)?3:/qualif/.test(st)?2:/contact/.test(st)?1:0;
+    var s=sr.indexOf("face")>-1?1:sr.indexOf("google")>-1?2:sr.indexOf("linked")>-1?3:sr.indexOf("refer")>-1?4:sr==="email"?5:(sr==="website"||sr==="web")?0:6;
+    var ca=String(o.created_at||""),dt=new Date(/Z|[+-]\d\d:?\d\d$/.test(ca)?ca:ca+"Z"),d=isNaN(dt)?0:Math.max(0,Math.floor((Date.now()-dt)/864e5));
+    return{id:o.id,n:o.name||"",e:String(o.email||"").toLowerCase(),p:String(o.phone||""),c:o.company||"",i:-1,s:s,t:t,v:+(o.value||o.amount||0)||0,d:d};
+  }
+  async function loadLeads(){
+    try{
+      var r=await fetch(API_URL);if(!r.ok)throw new Error(r.status);
+      var data=await r.json();if(!Array.isArray(data))throw new Error("bad");
+      leads=data.map(mapLead);live=true;all();return true;
+    }catch(err){live=false;all();return false}
+  }
+  if(USE_BACKEND)loadLeads().then(function(ok){if(!ok)say(tx("m_off"))});
 
   function setLang(l){lang=l;try{localStorage.setItem("sb-lang",l)}catch(e){}all()}
   $("bEn").onclick=function(){setLang("en")};$("bBn").onclick=function(){setLang("bn")};
