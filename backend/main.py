@@ -83,3 +83,27 @@ def list_leads(
     if lead_status:
         query = query.filter(models.Lead.status == lead_status)
     return query.order_by(models.Lead.created_at.desc()).all()
+
+
+@app.patch(
+    "/api/leads/{lead_id}",
+    response_model=schemas.LeadResponse,
+    responses={404: {"description": "Lead not found"}},
+)
+def update_lead_status(
+    lead_id: int,
+    payload: schemas.LeadStatusUpdate,
+    db: Session = Depends(get_db),
+):
+    lead = db.query(models.Lead).filter(models.Lead.id == lead_id).first()
+    if not lead:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Lead not found",
+        )
+
+    lead.status = payload.status
+    db.commit()
+    db.refresh(lead)
+
+    return lead
