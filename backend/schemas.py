@@ -1,7 +1,9 @@
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
+LeadStatus = Literal["new", "contacted", "converted", "lost"]
 
 
 class LeadCreate(BaseModel):
@@ -11,6 +13,10 @@ class LeadCreate(BaseModel):
     company: Optional[str] = Field(default=None, max_length=150)
     message: Optional[str] = None
     source: Optional[str] = Field(default="website", max_length=50)
+
+
+class LeadStatusUpdate(BaseModel):
+    status: LeadStatus
 
 
 class LeadResponse(BaseModel):
