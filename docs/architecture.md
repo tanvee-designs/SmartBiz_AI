@@ -3,7 +3,6 @@
 ## 1. Database Schema (SQLite)
 
 ### Table 1: `leads`
-
 | Column | Type | Constraints | Description |
 |---|---|---|---|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique ID |
@@ -16,7 +15,6 @@
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Created At |
 
 ### Table 2: `customers`
-
 | Column | Type | Constraints | Description |
 |---|---|---|---|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique ID |
@@ -28,7 +26,6 @@
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Created At |
 
 ### Table 3: `email_logs`
-
 | Column | Type | Constraints | Description |
 |---|---|---|---|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique ID |
@@ -40,7 +37,6 @@
 | error_message| TEXT | NULLABLE | Error Message |
 
 ### Table 4: `reports`
-
 | Column | Type | Constraints | Description |
 |---|---|---|---|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique ID |
@@ -50,7 +46,6 @@
 | generated_at| DATETIME | DEFAULT CURRENT_TIMESTAMP | Generated At |
 
 ### Table 5: `notifications`
-
 | Column | Type | Constraints | Description |
 |---|---|---|---|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique ID |
@@ -60,6 +55,9 @@
 | type | TEXT | DEFAULT 'info' | Type |
 | is_read | BOOLEAN | DEFAULT 0 | Read Status |
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | Created At |
+
+---
+
 ## 2. System Architecture Diagram (High Level)
 
 ```mermaid
