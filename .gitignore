@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+myenv/
 env/
 
 # Database
@@ -16,12 +17,12 @@ env/
 # Node (frontend if needed)
 node_modules/
 
-# n8n
-n8n/*.json
-
 # IDE
 .vscode/
 .idea/
+
+# Archives
+*.zip
 
 # OS
 .DS_Store
