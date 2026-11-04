@@ -3,7 +3,7 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-LeadStatus = Literal["new", "contacted", "converted", "lost"]
+LeadStatus = Literal["new", "contacted", "qualified", "converted", "lost"]
 
 
 class LeadCreate(BaseModel):
@@ -29,5 +29,18 @@ class LeadResponse(BaseModel):
     company: Optional[str] = None
     message: Optional[str] = None
     source: Optional[str] = None
+    status: str
+    created_at: datetime
+
+
+class EmailLogResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    lead_id: int
+    to_email: str
+    subject: str
+    body: str
+    generated_by: str
     status: str
     created_at: datetime

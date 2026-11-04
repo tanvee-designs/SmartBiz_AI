@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import Base, engine, get_db
+from generate_email import generate_welcome_email
 from n8n_client import send_lead_to_n8n
 
 Base.metadata.create_all(bind=engine)
@@ -107,3 +108,70 @@ def update_lead_status(
     db.refresh(lead)
 
     return lead
+
+
+# ---- Day 3: Welcome Email Automation (Member 3 module) ----
+
+
+@app.post(
+    "/automation/welcome-email/{lead_id}",
+    responses={404: {"description": "Lead not found"}},
+)
+def create_welcome_email(lead_id: int, db: Session = Depends(get_db)):
+    lead = db.query(models.Lead).filter(models.Lead.id == lead_id).first()
+    if not lead:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Lead not found",
+        )
+
+    result = generate_welcome_email(
+        {
+            "name": lead.name,
+            "email": lead.email,
+            "company": lead.company,
+            "phone": lead.phone,
+        }
+    )
+
+    log = models.EmailLog(
+        lead_id=lead.id,
+        to_email=lead.email,
+        subject=result["subject"],
+        body=result["body"],
+        generated_by=result["source"],
+    )
+    db.add(log)
+    db.commit()
+    db.refresh(log)
+
+    return {"log_id": log.id, "to": lead.email, **result}
+
+
+@app.patch(
+    "/email-logs/{log_id}/status",
+    response_model=schemas.EmailLogResponse,
+    responses={404: {"description": "Log not found"}},
+)
+def update_email_status(
+    log_id: int,
+    new_status: Literal["pending", "sent", "failed"] = Query(alias="status"),
+    db: Session = Depends(get_db),
+):
+    log = db.query(models.EmailLog).filter(models.EmailLog.id == log_id).first()
+    if not log:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Log not found",
+        )
+
+    log.status = new_status
+    db.commit()
+    db.refresh(log)
+
+    return log
+
+
+@app.get("/email-logs", response_model=List[schemas.EmailLogResponse])
+def list_email_logs(db: Session = Depends(get_db)):
+    return db.query(models.EmailLog).order_by(models.EmailLog.created_at.desc()).all()
