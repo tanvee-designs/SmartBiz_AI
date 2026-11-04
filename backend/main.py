@@ -1,4 +1,6 @@
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, status
+from typing import List, Optional
+
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -70,3 +72,14 @@ def create_lead(
     background_tasks.add_task(send_lead_to_n8n, lead_data)
 
     return new_lead
+
+
+@app.get("/api/leads", response_model=List[schemas.LeadResponse])
+def list_leads(
+    lead_status: Optional[str] = Query(default=None, alias="status"),
+    db: Session = Depends(get_db),
+):
+    query = db.query(models.Lead)
+    if lead_status:
+        query = query.filter(models.Lead.status == lead_status)
+    return query.order_by(models.Lead.created_at.desc()).all()

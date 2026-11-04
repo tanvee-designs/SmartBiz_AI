@@ -64,3 +64,30 @@
 - 201: "Thank you, your request was received"
 - 409: "This email is already registered"
 - 422: ask the user to correct the form fields
+
+
+### 2.2 List Leads (সব লিডের তালিকা)
+- **Method:** `GET`
+- **URL:** `/api/leads`
+- **Optional query:** `status` (for example `/api/leads?status=new` returns only leads with that status)
+- **Order:** newest lead first
+- **Request Body:** none
+
+**Success Response (200 OK):** a list of leads (an empty list `[]` when nothing matches)
+```json
+[
+  {
+    "id": 5,
+    "name": "Farhan Hasan",
+    "email": "farhan@example.com",
+    "phone": "01512345678",
+    "company": "Farhan Tech",
+    "message": null,
+    "source": "website",
+    "status": "new",
+    "created_at": "2026-11-03T08:05:43.967356"
+  }
+]
+```
+
+**Frontend tip:** show `created_at` as a readable date, and show `message` only when it is not `null`.
