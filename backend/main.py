@@ -202,7 +202,6 @@ def generate_ai_report(db: Session = Depends(get_db)):
         summary=result.get("summary"),
         insights=json.dumps(result.get("insights", []), ensure_ascii=False),
         recommendations=json.dumps(result.get("recommendations", []), ensure_ascii=False),
-        content=json.dumps(result, ensure_ascii=False, default=str),
     )
     db.add(new_report)
     db.commit()
