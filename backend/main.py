@@ -298,7 +298,7 @@ def generate_ai_report(
 
     result = generate_business_report(leads, logs)
 
-        new_report = models.Report(
+    new_report = models.Report(
         report_type="ai_report",
         title=(result.get("title") or "AI Business Report")[:200],
         summary=result.get("summary") or "",
