@@ -4,7 +4,7 @@ import json
 from datetime import datetime, timedelta
 from typing import List, Optional, Literal
 
-# ai_module / generate_report / n8n_client import-এর জন্য path fix
+# ai_module / generate_report / generate_email / n8n_client import-এর জন্য path fix
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -25,6 +25,11 @@ try:
     from generate_report import generate_business_report
 except Exception:
     generate_business_report = None
+
+try:
+    from generate_email import generate_welcome_email
+except Exception:
+    generate_welcome_email = None
 
 try:
     from n8n_client import send_lead_to_n8n
@@ -70,7 +75,6 @@ def create_lead(lead: schemas.LeadCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_lead)
 
-    # Optional: n8n-এ পাঠাও
     if send_lead_to_n8n:
         try:
             send_lead_to_n8n(new_lead)
@@ -345,7 +349,6 @@ def create_follow_up(payload: schemas.FollowUpCreate, db: Session = Depends(get_
     if not lead:
         raise HTTPException(404, "Lead not found")
 
-    # Duplicate prevention: ২৪ ঘণ্টার ভিতরে একই lead + channel
     recent_cutoff = datetime.utcnow() - timedelta(hours=24)
     duplicate = (
         db.query(models.FollowUp)
@@ -401,17 +404,18 @@ def create_welcome_email(lead_id: int, db: Session = Depends(get_db)):
     if not lead:
         raise HTTPException(404, "Lead not found")
 
-    try:
-        from ai_module.email_generator import generate_welcome_email
-    except Exception as e:
-        raise HTTPException(500, f"email_generator module not found: {e}")
+    if generate_welcome_email is None:
+        raise HTTPException(500, "generate_email module not found")
 
-    result = generate_welcome_email({
-        "name": lead.name,
-        "email": lead.email,
-        "company": lead.company,
-        "phone": lead.phone,
-    })
+    try:
+        result = generate_welcome_email({
+            "name": lead.name,
+            "email": lead.email,
+            "company": lead.company,
+            "phone": lead.phone,
+        })
+    except Exception as e:
+        raise HTTPException(500, f"Email generation failed: {e}")
 
     log = models.EmailLog(
         lead_id=lead.id,
@@ -424,4 +428,11 @@ def create_welcome_email(lead_id: int, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(log)
 
-    return {"log_id": log.id, "to": lead.email, **result}
+    return {
+        "log_id": log.id,
+        "to": lead.email,
+        "subject": result["subject"],
+        "body": result["body"],
+        "html": result.get("html", result["body"]),
+        "source": result.get("source", "template"),
+    }
