@@ -18,7 +18,7 @@ import models
 import schemas
 
 from database import Base, engine, get_db
-from generate_email import generate_welcome_email
+from generate_report import generate_business_report
 from n8n_client import send_lead_to_n8n
 
 
@@ -284,7 +284,30 @@ def list_reports(
         .order_by(models.Report.created_at.desc())
         .all()
     )
+@app.post(
+    "/api/reports/generate",
+    response_model=schemas.ReportResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def generate_ai_report(
+    db: Session = Depends(get_db),
+):
+    """AI দিয়ে Business Report বানিয়ে reports টেবিলে save করে।"""
+    leads = db.query(models.Lead).all()
+    logs = db.query(models.EmailLog).all()
 
+    result = generate_business_report(leads, logs)
+
+    new_report = models.Report(
+        report_type="ai_report",
+        content=json.dumps(result, ensure_ascii=False),
+    )
+
+    db.add(new_report)
+    db.commit()
+    db.refresh(new_report)
+
+    return new_report
 
 # ==================================================
 # NOTIFICATION APIs
