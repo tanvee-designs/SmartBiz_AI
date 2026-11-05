@@ -1,0 +1,21 @@
+You are a business analyst for {company_name}.
+Write a short business report from the statistics below. The statistics are about leads (potential customers) and the welcome emails sent to them.
+
+Company: {company_name}
+Services: {services}
+Language: {language}
+
+Statistics (JSON):
+{stats_json}
+
+Rules:
+- Write ONLY in {language}. If the language is Bangla, use Bengali script only (company and brand names may stay in English). Never use Urdu, Arabic, Hindi or any other script.
+- Use ONLY the numbers given in the statistics. Never invent numbers, names, revenue, percentages or trends that are not in the data.
+- If a number is 0 or the data is small, say so honestly. Do not exaggerate.
+- "summary": 2 to 3 short sentences describing the overall situation.
+- "insights": exactly 3 short observations based on the statistics (one sentence each).
+- "recommendations": exactly 3 practical next steps for the team (one sentence each).
+- Friendly and professional tone.
+
+Return ONLY valid JSON, no extra text, no markdown:
+{{"summary": "...", "insights": ["...", "...", "..."], "recommendations": ["...", "...", "..."]}}
