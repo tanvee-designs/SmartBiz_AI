@@ -1,10 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, Text, DateTime
 
 from database import Base
 
 
+# ============================================================
+# LEAD
+# ============================================================
 class Lead(Base):
     __tablename__ = "leads"
 
@@ -15,12 +18,14 @@ class Lead(Base):
     company = Column(String(150), nullable=True)
     message = Column(Text, nullable=True)
     source = Column(String(50), default="website")
-    interest = Column(String(200), nullable=True)
-    value = Column(Float, default=0)
     status = Column(String(30), default="new")
+    last_contacted_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+# ============================================================
+# CUSTOMER
+# ============================================================
 class Customer(Base):
     __tablename__ = "customers"
 
@@ -33,18 +38,39 @@ class Customer(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+# ============================================================
+# FOLLOW-UP
+# ============================================================
+class FollowUp(Base):
+    __tablename__ = "follow_ups"
+
+    id = Column(Integer, primary_key=True, index=True)
+    lead_id = Column(Integer, nullable=False, index=True)
+    channel = Column(String(30), default="email", index=True)
+    status = Column(String(30), default="sent")
+    message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+# ============================================================
+# REPORT
+# ============================================================
 class Report(Base):
     __tablename__ = "reports"
 
     id = Column(Integer, primary_key=True, index=True)
-    report_type = Column(String(50), default="ai_report")
-    title = Column(String(200), nullable=False)
-    summary = Column(Text, nullable=False)
-    insights = Column(Text, default="[]")
-    recommendations = Column(Text, default="[]")
+    report_type = Column(String(50), nullable=False, default="ai_report")
+    title = Column(String(200), nullable=True)
+    summary = Column(Text, nullable=True)
+    insights = Column(Text, nullable=True)
+    recommendations = Column(Text, nullable=True)
+    content = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+# ============================================================
+# NOTIFICATION
+# ============================================================
 class Notification(Base):
     __tablename__ = "notifications"
 
@@ -54,25 +80,17 @@ class Notification(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+# ============================================================
+# EMAIL LOG (Member 3-এর welcome email automation)
+# ============================================================
 class EmailLog(Base):
     __tablename__ = "email_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    lead_id = Column(Integer, ForeignKey("leads.id"), nullable=False, index=True)
+    lead_id = Column(Integer, nullable=False, index=True)
     to_email = Column(String(150), nullable=False)
     subject = Column(String(255), nullable=False)
     body = Column(Text, nullable=False)
-    generated_by = Column(String(20), default="ai")
+    generated_by = Column(String(50), default="template")
     status = Column(String(20), default="pending")
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-
-class FollowUp(Base):
-    __tablename__ = "follow_ups"
-
-    id = Column(Integer, primary_key=True, index=True)
-    lead_id = Column(Integer, ForeignKey("leads.id"), nullable=False, index=True)
-    channel = Column(String(20), default="email")
-    note = Column(Text, nullable=True)
-    status = Column(String(20), default="sent")
     created_at = Column(DateTime, default=datetime.utcnow)
