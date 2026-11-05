@@ -60,3 +60,14 @@ class EmailLog(Base):
     generated_by = Column(String(20), default="ai")
     status = Column(String(20), default="pending")
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class FollowUp(Base):
+    __tablename__ = "follow_ups"
+
+    id = Column(Integer, primary_key=True, index=True)
+    lead_id = Column(Integer, ForeignKey("leads.id"), nullable=False, index=True)
+    channel = Column(String(20), default="email")
+    note = Column(Text, nullable=True)
+    status = Column(String(20), default="sent")
+    created_at = Column(DateTime, default=datetime.utcnow)

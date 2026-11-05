@@ -103,3 +103,30 @@ class EmailLogResponse(BaseModel):
     generated_by: str
     status: str
     created_at: datetime
+
+
+
+
+# ---------------- FOLLOW-UP SCHEMAS ----------------
+
+class FollowUpCreate(BaseModel):
+    lead_id: int
+    channel: str = Field(default="email", max_length=20)
+    note: Optional[str] = None
+    status: Literal["sent", "failed"] = "sent"
+
+
+class FollowUpResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    lead_id: int
+    channel: str
+    note: Optional[str] = None
+    status: str
+    created_at: datetime
+
+
+class DueFollowUpResponse(LeadResponse):
+    last_contact_at: datetime
+    days_since_contact: int

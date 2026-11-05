@@ -200,6 +200,39 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 .prowrap{position:relative}.prowrap.locked>.rgrid{filter:blur(7px);pointer-events:none;user-select:none}
 .gate{display:none}.prowrap.locked>.gate{display:flex;position:absolute;inset:0;z-index:2;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
 @media (prefers-reduced-motion:reduce){.rope{transform:none}.banner,.reveal,.heli{opacity:1;transform:none}.paper-wrap{grid-template-rows:1fr}}
+.go.alt{background:var(--card);color:var(--ink);border:1px solid var(--bd)}
+.rc-ov{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(10,10,16,.42);backdrop-filter:blur(7px);opacity:0;transition:opacity .3s}
+.rc-ov[hidden]{display:none}.rc-ov.on{opacity:1}
+.rc-box{position:relative;width:min(390px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;border-radius:24px;padding:18px 18px 16px;background-color:var(--bg);background-image:linear-gradient(rgba(127,127,140,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(127,127,140,.12) 1px,transparent 1px);background-size:22px 22px;border:1px solid var(--bd);box-shadow:0 30px 70px rgba(0,0,0,.35);transform:translateY(14px) scale(.98);transition:transform .35s var(--ease)}
+.rc-ov.on .rc-box{transform:none}
+.rc-x{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--bd);background:var(--card);cursor:pointer;font-size:1.1rem;line-height:1;z-index:3}
+.rc-head{display:none;margin:0 36px 12px 2px}.rc-ov.done .rc-head{display:block}
+.rc-head b{display:block;font-size:.98rem}.rc-head span{color:var(--muted);font-size:.78rem}
+.rc-slot{margin:0 auto;width:90%;height:32px;max-height:34px;border-radius:12px;background:linear-gradient(180deg,var(--card),var(--soft));border:1px solid var(--bd);box-shadow:0 10px 20px rgba(0,0,0,.18),var(--sh);display:flex;justify-content:space-between;align-items:flex-end;padding:0 16px 8px;position:relative;z-index:3;transition:max-height .4s,opacity .4s,margin .4s}
+.rc-slot i{width:28px;height:3px;border-radius:2px;background:var(--ink);opacity:.9}
+.rc-ov.done .rc-slot{max-height:0;opacity:0;border-width:0;padding:0;margin:0 auto}
+.rc-clip{position:relative;margin-top:-6px;overflow:hidden;height:min(410px,54vh);padding-bottom:24px}
+.rc-ov.done .rc-clip{overflow-y:auto}
+.rc-feed{width:80%;margin:0 auto;height:0;overflow:hidden;background:var(--card);box-shadow:0 14px 22px -6px rgba(0,0,0,.32),0 0 0 1px var(--bd);position:relative;z-index:1}
+.rc-paper{width:100%;color:var(--ink);background:var(--card);font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;line-height:1.5;padding:12px 14px 16px}
+.rc-ov.tear .rc-feed{animation:rcTear .7s ease both}
+@keyframes rcTear{20%{transform:translateY(0) rotate(-.8deg)}45%{transform:translateY(5px) rotate(.8deg)}70%{transform:translateY(0) rotate(-.4deg)}100%{transform:translateY(0)}}
+.rc-ban{height:62px;border-radius:6px;margin-bottom:10px;background:linear-gradient(135deg,var(--amber),#C9792A 60%,#7A3F12);display:grid;place-items:center;color:#fff;font-weight:700;letter-spacing:.16em;font-size:10px}
+.rc-t{text-align:center;font-weight:700;font-size:15px}
+.rc-s{text-align:center;color:var(--muted);font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+.rc-sep{border-top:1px dashed var(--muted);opacity:.6;margin:9px 0}
+.rc-r{display:flex;justify-content:space-between;gap:10px}.rc-r span{color:var(--muted)}
+.rc-h{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;text-transform:uppercase;margin-bottom:3px}
+.rc-p{margin:0;white-space:pre-wrap;word-break:break-word;font-family:inherit}
+.rc-tot{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;font-weight:700}
+.rc-bc{height:26px;margin:10px 0 4px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 4px,var(--ink) 4px 5px,transparent 5px 8px,var(--ink) 8px 11px,transparent 11px 13px)}
+.rc-f{text-align:center;color:var(--muted);font-size:10px}
+.rc-bar{margin-top:14px;display:flex;justify-content:center}
+.rc-pill{padding:9px 18px;border-radius:99px;background:rgba(240,169,78,.38);font-weight:600;font-size:.8rem;font-variant-numeric:tabular-nums}
+.rc-ov.done .rc-bar{display:none}
+.rc-act{display:none;flex-wrap:wrap;gap:8px;margin-top:14px}.rc-ov.done .rc-act{display:flex}
+.rc-act button{flex:1 1 40%;padding:11px 12px;border-radius:99px;border:1px solid var(--bd);font-weight:600;font-size:.82rem;cursor:pointer;background:var(--card);color:var(--ink)}
+.rc-act button.p{background:var(--pill);color:var(--pill-ink);border:0}
 @media (max-width:480px){.fg{grid-template-columns:1fr}.paper-inner{padding:24px 20px 14px}}
 @media (max-width:1000px){.grid2,.rgrid{grid-template-columns:1fr}}
 @keyframes drift{to{transform:translate3d(4%,3%,0) scale(1.12)}}
@@ -346,14 +379,24 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 </div>
 <div class="view" id="v-plans"><header class="head"><div><h1 data-i="pl_t"></h1><p data-i="pl_s"></p></div></header><div id="pl"></div></div>
 <div class="view" id="v-reports">
-<header class="head"><div><h1 data-i="rp_t"></h1><p data-i="rp_s"></p></div><button class="go" id="rGen" type="button" data-i="gen"></button></header>
+<header class="head"><div><h1 data-i="rp_t"></h1><p data-i="rp_s"></p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="go alt" id="rDl" type="button" data-i="dl"></button><button class="go" id="rGen" type="button" data-i="gen"></button></div></header>
 <div id="rBody" style="transition:opacity .3s">
-<div class="card rp"><h2><span data-i="rh_sum"></span><span class="mut"><span data-i="gen_at"></span> <span id="rTime"></span></span></h2><p id="rSum" style="margin:10px 0 8px;font-size:1rem"></p><span class="chip" data-i="rb" style="background:var(--soft);color:var(--muted)"></span></div>
+<div class="card rp"><h2><span data-i="rh_sum"></span><span class="mut"><span data-i="gen_at"></span> <span id="rTime"></span></span></h2><p id="rSum" style="margin:10px 0 8px;font-size:1rem"></p><span class="chip" id="rBadge" style="background:var(--soft);color:var(--muted)"></span></div>
 <div id="rPro" class="prowrap"><div class="gate"><b data-i="g_t"></b><span class="mut" data-i="g_s"></span><button class="go" type="button" data-go="plans" data-i="upg"></button></div>
 <div class="rgrid"><div class="card rp"><h2 data-i="rh_ins"></h2><ul id="rIns"></ul></div><div class="card rp"><h2 data-i="rh_rec"></h2><ul id="rRec"></ul></div></div>
 <div class="rgrid"><div class="card"><h2 data-i="rh_src"></h2><div class="hb" id="rSrc"></div></div><div class="card"><h2 data-i="rh_st"></h2><div class="hb" id="rSt"></div></div></div></div>
 </div></div>
 <p class="foot" id="srcNote"></p>
+</div>
+<div class="rc-ov" id="rcOv" hidden>
+ <div class="rc-box" role="dialog" aria-modal="true" aria-labelledby="rcT">
+  <button class="rc-x" id="rcX" type="button" aria-label="Close">×</button>
+  <div class="rc-head"><b id="rcT" data-i="rc_done"></b><span data-i="rc_sub"></span></div>
+  <div class="rc-slot" aria-hidden="true"><i></i><i></i></div>
+  <div class="rc-clip"><div class="rc-feed" id="rcFeed"><div class="rc-paper" id="rcPaper"></div></div></div>
+  <div class="rc-bar"><span class="rc-pill" id="rcPill" aria-live="polite"></span></div>
+  <div class="rc-act"><button class="p" id="rcDl" type="button" data-i="rc_dl"></button><button id="rcPr" type="button" data-i="rc_pr"></button><button id="rcCl" type="button" data-i="rc_cl"></button></div>
+ </div>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
@@ -379,7 +422,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     ld_t:"Lead collection form",ld_s:"The API validates name, email, phone and interest and checks duplicates before saving.",f_n:"Full name",f_e:"Email",f_p:"Phone",f_i:"Interest",f_s:"Source",save:"Save lead",
     v_name:"Enter a name",v_email:"Enter a valid email",v_phone:"Use 11 digits, e.g. 01712345678",v_dup:"Duplicate: this email or phone already exists",t_saved:"Lead saved to database",t_dup:"Duplicate found, lead not saved",t_st:"Status updated",
     api_t:"API response",ll:"Lead records",fso:"All sources",lh1:"Name",lh2:"Contact",lh5:"Status",lh6:"Added",dago:"d ago",dnow:"Today",none2:"No leads found",
-    so_web:"Website",so_fb:"Facebook",so_gf:"Google Forms",i_aut:"Automation",i_ai:"AI Reports",i_dash:"Dashboard",i_cons:"Consulting",sn:"New",sc:"Contacted",sq:"Qualified",sw:"Converted",
+    so_web:"Website",so_fb:"Facebook",so_gf:"Google Forms",i_aut:"Automation",i_ai:"AI Reports",i_dash:"Dashboard",i_cons:"Consulting",sn:"New",sc:"Contacted",sq:"Qualified",sw:"Converted",sl:"Lost",
     wf_t:"System architecture",wf_s:"How a lead travels from first contact to your dashboard.",
     ar1t:"Potential customers",ar2t:"Lead collection form",ar3t:"Backend API",ar4t:"Database",ar5t:"Dashboard",
     ar1d:"Visitors arrive from your website, Facebook and Google Forms.",ar2d:"Captures name, email, phone and interest.",ar3d:"Validates every lead and checks for duplicates.",ar4d:"Stores lead records safely for reports and follow-ups.",ar5d:"Shows total leads, conversion, revenue and charts.",
@@ -401,7 +444,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     lim15:"15 leads",wf3:"3 core workflows",wf6:"All 6 workflows",ai_s:"Summary only",ai_f:"Full insights",team1:"1 user",team5:"Up to 5 users",sup_c:"Community support",sup_p:"Priority support",
     t_limit:"Free plan limit reached (15 leads). Upgrade to add more.",t_prem:"This workflow is a Premium feature",t_up:"Premium activated",t_dn:"Switched to Free plan",t_rs:"Demo restarted: new 7-day trial",
     g_t:"Premium report",g_s:"Upgrade to unlock insights, recommendations and charts.",usage_f:"{n} of 15 leads used on the Free plan",usage_p:"Unlimited leads",pl_free:"Free",
-    m_201:"Lead saved successfully",m_409:"This email already exists. Use a different email.",m_422:"Invalid data. Please check the form and try again.",m_net:"Cannot reach the backend. Start it with: cd backend, then uvicorn main:app --reload",m_err:"Unexpected server response",foot_live:"Live data from the backend",foot_demo:"Demo data · backend offline",m_off:"Backend offline. Showing demo data."},
+    m_201:"Lead saved successfully",m_409:"This email already exists. Use a different email.",m_422:"Invalid data. Please check the form and try again.",m_net:"Cannot reach the backend. Start it with: cd backend, then uvicorn main:app --reload",m_err:"Unexpected server response",foot_live:"Live data from the backend",foot_demo:"Demo data · backend offline",m_off:"Backend offline. Showing demo data.",t_demo:"Demo Feature",m_pf:"Could not update status",m_404:"Lead not found",rb_live:"AI report from the backend",m_rep_off:"No backend report yet. Showing the demo report.",dl:"Download report",rc_print:"Printing {p}%",rc_done:"Report ready",rc_sub:"Detached from the printer. Download or print it.",rc_dl:"Download",rc_pr:"Print / Save PDF",rc_cl:"Close",rc_off:"Official report",rc_no:"Report no.",rc_dt:"Date",rc_ty:"Type",rc_sr:"Data",rc_m:"Metric",rc_v:"Value",rc_top:"Top source",rc_thx:"Thank you for using SmartBiz AI",rc_saved:"Report downloaded"},
   bn:{tab1:"ড্যাশবোর্ড",tab2:"ওয়ার্কফ্লো",tab3:"লিড",tab4:"AI রিপোর্ট",
     gm:"শুভ সকাল",ga:"শুভ অপরাহ্ন",ge:"শুভ সন্ধ্যা",
     sub:"আপনার ব্যবসার অটোমেশন আজ কেমন চলছে, দেখুন।",run:"এখনই ওয়ার্কফ্লো চালান",
@@ -422,7 +465,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     ld_t:"লিড কালেকশন ফর্ম",ld_s:"সেভ করার আগে API নাম, ইমেইল, ফোন ও আগ্রহ যাচাই করে এবং ডুপ্লিকেট দেখে।",f_n:"পুরো নাম",f_e:"ইমেইল",f_p:"ফোন",f_i:"আগ্রহ",f_s:"উৎস",save:"লিড সংরক্ষণ করুন",
     v_name:"নাম লিখুন",v_email:"সঠিক ইমেইল দিন",v_phone:"১১ সংখ্যার ফোন নম্বর দিন, যেমন 01712345678",v_dup:"ডুপ্লিকেট: এই ইমেইল বা ফোন আগে থেকেই আছে",t_saved:"লিড ডাটাবেসে সংরক্ষিত হয়েছে",t_dup:"ডুপ্লিকেট পাওয়া গেছে, সেভ হয়নি",t_st:"অবস্থা আপডেট হয়েছে",
     api_t:"API রেসপন্স",ll:"লিড রেকর্ড",fso:"সব উৎস",lh1:"নাম",lh2:"যোগাযোগ",lh5:"অবস্থা",lh6:"যোগ হয়েছে",dago:" দিন আগে",dnow:"আজ",none2:"কোনো লিড পাওয়া যায়নি",
-    so_web:"ওয়েবসাইট",so_fb:"ফেসবুক",so_gf:"Google Forms",i_aut:"অটোমেশন",i_ai:"AI রিপোর্ট",i_dash:"ড্যাশবোর্ড",i_cons:"পরামর্শ",sn:"নতুন",sc:"যোগাযোগ হয়েছে",sq:"যোগ্য",sw:"কনভার্টেড",
+    so_web:"ওয়েবসাইট",so_fb:"ফেসবুক",so_gf:"Google Forms",i_aut:"অটোমেশন",i_ai:"AI রিপোর্ট",i_dash:"ড্যাশবোর্ড",i_cons:"পরামর্শ",sn:"নতুন",sc:"যোগাযোগ হয়েছে",sq:"যোগ্য",sw:"কনভার্টেড",sl:"হারানো",
     wf_t:"সিস্টেম আর্কিটেকচার",wf_s:"লিড প্রথম যোগাযোগ থেকে ড্যাশবোর্ডে কীভাবে পৌঁছায়।",
     ar1t:"সম্ভাব্য গ্রাহক",ar2t:"লিড কালেকশন ফর্ম",ar3t:"ব্যাকএন্ড API",ar4t:"ডাটাবেস",ar5t:"ড্যাশবোর্ড",
     ar1d:"ওয়েবসাইট, ফেসবুক ও Google Forms থেকে সম্ভাব্য গ্রাহক আসে।",ar2d:"নাম, ইমেইল, ফোন ও আগ্রহ সংগ্রহ করে।",ar3d:"প্রতিটি লিড যাচাই করে ও ডুপ্লিকেট দেখে।",ar4d:"রিপোর্ট ও ফলো-আপের জন্য লিড রেকর্ড নিরাপদে রাখে।",ar5d:"মোট লিড, কনভার্শন, আয় ও চার্ট দেখায়।",
@@ -444,7 +487,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     lim15:"১৫টি লিড",wf3:"৩টি মূল ওয়ার্কফ্লো",wf6:"সব ৬টি ওয়ার্কফ্লো",ai_s:"শুধু সারাংশ",ai_f:"পূর্ণ ইনসাইট",team1:"১ জন",team5:"সর্বোচ্চ ৫ জন",sup_c:"কমিউনিটি সাপোর্ট",sup_p:"অগ্রাধিকার সাপোর্ট",
     t_limit:"ফ্রি প্ল্যানে সীমা শেষ (১৫টি লিড)। আরও যোগ করতে আপগ্রেড করুন।",t_prem:"এই ওয়ার্কফ্লো প্রিমিয়াম সুবিধা",t_up:"প্রিমিয়াম চালু হয়েছে",t_dn:"ফ্রি প্ল্যানে ফিরে এসেছেন",t_rs:"ডেমো রিস্টার্ট: নতুন ৭ দিনের ট্রায়াল",
     g_t:"প্রিমিয়াম রিপোর্ট",g_s:"ইনসাইট, সুপারিশ ও চার্ট খুলতে আপগ্রেড করুন।",usage_f:"ফ্রি প্ল্যানে {n}/১৫টি লিড ব্যবহৃত",usage_p:"সীমাহীন লিড",pl_free:"ফ্রি",
-    m_201:"লিড সফলভাবে সংরক্ষিত হয়েছে",m_409:"এই ইমেইল আগে থেকেই আছে। অন্য ইমেইল দিন।",m_422:"ডেটা সঠিক নয়। ফর্ম দেখে আবার চেষ্টা করুন।",m_net:"ব্যাকএন্ডে পৌঁছানো যাচ্ছে না। cd backend, তারপর uvicorn main:app --reload চালু করুন।",m_err:"সার্ভার অপ্রত্যাশিত উত্তর দিয়েছে",foot_live:"ব্যাকএন্ড থেকে আসল ডেটা",foot_demo:"ডেমো ডেটা · ব্যাকএন্ড বন্ধ",m_off:"ব্যাকএন্ড বন্ধ। ডেমো ডেটা দেখানো হচ্ছে।"}};
+    m_201:"লিড সফলভাবে সংরক্ষিত হয়েছে",m_409:"এই ইমেইল আগে থেকেই আছে। অন্য ইমেইল দিন।",m_422:"ডেটা সঠিক নয়। ফর্ম দেখে আবার চেষ্টা করুন।",m_net:"ব্যাকএন্ডে পৌঁছানো যাচ্ছে না। cd backend, তারপর uvicorn main:app --reload চালু করুন।",m_err:"সার্ভার অপ্রত্যাশিত উত্তর দিয়েছে",foot_live:"ব্যাকএন্ড থেকে আসল ডেটা",foot_demo:"ডেমো ডেটা · ব্যাকএন্ড বন্ধ",m_off:"ব্যাকএন্ড বন্ধ। ডেমো ডেটা দেখানো হচ্ছে।",t_demo:"ডেমো ফিচার",m_pf:"স্ট্যাটাস আপডেট করা যায়নি",m_404:"লিড পাওয়া যায়নি",rb_live:"ব্যাকএন্ড থেকে AI রিপোর্ট",m_rep_off:"ব্যাকএন্ডে এখনো রিপোর্ট নেই। ডেমো রিপোর্ট দেখানো হচ্ছে।",dl:"রিপোর্ট ডাউনলোড",rc_print:"ছাপা হচ্ছে {p}%",rc_done:"রিপোর্ট প্রস্তুত",rc_sub:"প্রিন্টার থেকে ছিঁড়ে নেওয়া হয়েছে। ডাউনলোড বা প্রিন্ট করুন।",rc_dl:"ডাউনলোড",rc_pr:"প্রিন্ট / PDF সেভ",rc_cl:"বন্ধ করুন",rc_off:"অফিশিয়াল রিপোর্ট",rc_no:"রিপোর্ট নং",rc_dt:"তারিখ",rc_ty:"ধরন",rc_sr:"ডেটা",rc_m:"মেট্রিক",rc_v:"মান",rc_top:"সেরা উৎস",rc_thx:"SmartBiz AI ব্যবহারের জন্য ধন্যবাদ",rc_saved:"রিপোর্ট ডাউনলোড হয়েছে"}};
   var lang="en";
   var USE_BACKEND=true,API_URL="http://127.0.0.1:8000/api/leads",SEND_SOURCE=false,live=false; // SEND_SOURCE=true once backend accepts "source" // set USE_BACKEND=false for offline demo
   try{var sv=localStorage.getItem("sb-lang");if(sv==="bn")lang="bn"}catch(e){}
@@ -501,7 +544,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     }).join(""):"<tr><td colspan='5' class='mut'>"+tx("none")+"</td></tr>";
   }
   var VS=["dash","workflows","leads","reports","plans"];
-  var SO=["so_web","so_fb","so_gf","so_li","so_ref","so_em","so_oth"],IN=["i_aut","i_ai","i_dash","i_cons","i_dm","i_web","i_oth"],ST=["sn","sc","sq","sw"];
+  var SO=["so_web","so_fb","so_gf","so_li","so_ref","so_em","so_oth"],IN=["i_aut","i_ai","i_dash","i_cons","i_dm","i_web","i_oth"],ST=["sn","sc","sq","sw","sl"];
   var AT=["Website · Facebook · Google Forms","Name · Email · Phone · Interest","FastAPI · Python","SQLite · PostgreSQL","Leads · Conversion · Revenue · Charts"];
   var leads=[["Rafia Ahmed","rafia@boutique.com","01712345601",0,1,0,0,0],["Tanvir Hasan","tanvir@thelec.com","01812345602",1,0,1,0,0],["Nusrat Jahan","nusrat@bakery.com","01912345603",0,2,3,28000,1],["Sakib Rahman","sakib@traders.com","01612345604",2,1,0,0,1],["Mita Das","mita@fashion.com","01512345605",3,0,2,0,2],["Imran Hossain","imran@shop.com","01712345606",0,0,3,45000,2],["Farhana Akter","farhana@mail.com","01812345607",1,1,1,0,3],["Rakib Islam","rakib@store.com","01912345608",2,2,3,18500,4],["Sadia Khan","sadia@mail.com","01612345609",0,0,2,0,4],["Arif Chowdhury","arif@agro.com","01512345610",3,1,0,0,5],["Tasnia Noor","tasnia@mail.com","01712345611",1,2,3,32000,5],["Jamal Uddin","jamal@mail.com","01812345612",0,0,1,0,6]].map(function(a,i){return{id:i+1,n:a[0],e:a[1],p:a[2],i:a[3],s:a[4],t:a[5],v:a[6],d:a[7]}});
   var reduced=matchMedia("(prefers-reduced-motion:reduce)").matches;
@@ -537,13 +580,42 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   }
   function bars(keys,arr,tot){return keys.map(function(k,i){var p=tot?Math.round(arr[i]/tot*100):0;return "<div><em>"+tx(k)+"</em><span style='width:"+Math.max(p,14)+"%'>"+N(arr[i])+"</span></div>"}).join("")}
   function li(ks,o){return ks.map(function(k){return "<li>"+F(tx(k),o)+"</li>"}).join("")}
+  var repData=null,REP_URL=API_URL.replace(/\/leads$/,"/reports");
+  function pick(o,ks){for(var i=0;i<ks.length;i++){if(o[ks[i]]!=null&&o[ks[i]]!=="")return o[ks[i]]}return null}
+  function toList(v){
+    if(v==null)return [];
+    if(Array.isArray(v))return v.map(function(x){return typeof x==="string"?x:JSON.stringify(x)});
+    if(typeof v==="object")return Object.keys(v).map(function(k){return k+": "+(typeof v[k]==="string"?v[k]:JSON.stringify(v[k]))});
+    return String(v).split(/\n+/).map(function(x){return x.replace(/^\s*[-*\u2022\d.)]+\s*/,"").trim()}).filter(Boolean);
+  }
+  function renderRep(d){
+    var c=pick(d,["content","summary","report","text"]),when=pick(d,["created_at","generated_at","date"]),r=$("rSum");
+    r.style.whiteSpace="pre-wrap";
+    r.textContent=c==null?JSON.stringify(d,null,2):(typeof c==="string"?c:JSON.stringify(c,null,2));
+    var dt=when?new Date(/Z|[+-]\d\d:?\d\d$/.test(String(when))?when:when+"Z"):null;
+    if(dt&&!isNaN(dt))$("rTime").textContent=dt.toLocaleString(lang==="bn"?"bn-BD":"en-US",{dateStyle:"medium",timeStyle:"short"});
+  }
+  function repTs(x){var c=String(x.created_at||""),t=new Date(/Z|[+-]\d\d:?\d\d$/.test(c)?c:c+"Z").getTime();return isNaN(t)?(+x.id||0):t}
+  async function loadReport(){
+    try{
+      var r=await fetch(REP_URL);if(!r.ok)throw new Error(r.status);
+      var d=await r.json();
+      if(Array.isArray(d))d=d.length?d.reduce(function(a,b){return repTs(b)>=repTs(a)?b:a}):null;
+      if(!d||typeof d!=="object")throw new Error("empty");
+      repData=d;return true;
+    }catch(err){repData=null;return false}
+  }
   function drawReport(){
-    var s=stats(),cs=SO.map(function(){return 0}),ci=IN.map(function(){return 0}),ct=[0,0,0,0];
+    var s=stats(),cs=SO.map(function(){return 0}),ci=IN.map(function(){return 0}),ct=ST.map(function(){return 0});
     leads.forEach(function(l){cs[l.s]++;if(l.i>=0)ci[l.i]++;ct[l.t]++});
     var ts=cs.indexOf(Math.max.apply(null,cs)),ti=ci.indexOf(Math.max.apply(null,ci));
     var o={n:N(s.n),c:N(s.c),r:N(s.rate),rev:BDT(s.rev),src:tx(SO[ts]),sh:N(s.n?Math.round(cs[ts]/s.n*100):0),int:Math.max.apply(null,ci)?tx(IN[ti]):"—",p:N(ct[0]+ct[1]),avg:BDT(s.c?Math.round(s.rev/s.c):0)};
-    $("rSum").textContent=F(tx("r_sum"),o);
-    $("rIns").innerHTML=li(["r_i1","r_i2","r_i3"],o);$("rRec").innerHTML=li(["r_c1","r_c2","r_c3"],o);
+    $("rBadge").textContent=repData?tx("rb_live")+(repData.report_type?" \u00b7 "+repData.report_type:""):tx("rb");
+    $("rIns").parentNode.parentNode.style.display=repData?"none":"";
+    if(repData)renderRep(repData);else{
+      $("rSum").style.whiteSpace="";$("rSum").textContent=F(tx("r_sum"),o);
+      $("rIns").innerHTML=li(["r_i1","r_i2","r_i3"],o);$("rRec").innerHTML=li(["r_c1","r_c2","r_c3"],o);
+    }
     $("rSrc").innerHTML=bars(SO,cs,s.n);$("rSt").innerHTML=bars(ST,ct,s.n);
   }
   function stamp(){$("rTime").textContent=new Date().toLocaleTimeString(lang==="bn"?"bn-BD":"en-US",{hour:"2-digit",minute:"2-digit"})}
@@ -562,7 +634,6 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var ok=setErr("fN",n?"":"v_name");ok=setErr("fE",/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)?"":"v_email")&&ok;ok=setErr("fP",/^(\+?88)?01\d{9}$/.test(p)?"":"v_phone")&&ok;ok=setErr("fS",$("fS").value!==""?"":"v_src")&&ok;
     if(!ok){api(422,"Validation error");var f=$("lf").querySelector(".field.invalid input,.field.invalid select");if(f)f.focus();return}
     var p11=p.slice(-11);
-    if(!isPro()&&leads.length>=LIM){api(402,"Free plan lead limit reached");say(tx("t_limit"));return}
     if(leads.some(function(l){return l.e===e||l.p===p11})){setErr("fE","v_dup");api(409,"Duplicate lead");say(tx("t_dup"));return}
     var btn=$("lf").querySelector("[type=submit]");btn.disabled=true;
     var id=leads.reduce(function(m,l){return Math.max(m,l.id)},0)+1,co=$("fC").value.trim();
@@ -579,9 +650,21 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     if(!(USE_BACKEND&&await loadLeads()))leads.push({id:id,n:n,e:e,p:p11,c:co,i:$("fI").value===""?6:+$("fI").value,s:+$("fS").value,t:0,v:0,d:0});
     $("lf").reset();all();say(tx("m_201"));btn.disabled=false;
   };
-  $("lb").onchange=function(e){var id=+e.target.dataset.id;leads.forEach(function(l){if(l.id===id){l.t=+e.target.value;if(l.t===3&&!l.v)l.v=25000}});all();say(tx("t_st"))};
+  $("lb").onchange=async function(e){
+    var sel=e.target;if(sel.tagName!=="SELECT")return;
+    var id=+sel.dataset.id,idx=+sel.value,lead=leads.filter(function(l){return l.id===id})[0];if(!lead)return;
+    if(USE_BACKEND&&live){
+      sel.disabled=true;
+      try{
+        var r=await fetch(API_URL+"/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status:["new","contacted","qualified","converted","lost"][idx]})});
+        if(!r.ok){all();say(tx(r.status===404?"m_404":r.status===422?"m_422":"m_pf")+" ("+r.status+")");return}
+      }catch(err){all();say(tx("m_net"));return}
+    }
+    lead.t=idx;if(!live&&idx===3&&!lead.v)lead.v=25000;
+    all();say(tx("t_st"));
+  };
   $("lS").onchange=$("lO").onchange=drawLeads;$("lQ").oninput=drawLeads;
-  $("rGen").onclick=function(){var b=this;b.disabled=true;b.textContent=tx("gen_ing");$("rBody").style.opacity=.35;setTimeout(function(){drawReport();stamp();$("rBody").style.opacity=1;b.disabled=false;b.textContent=tx("gen");say(tx("t_rep"))},1300)};
+  $("rGen").onclick=async function(){var b=this;b.disabled=true;b.textContent=tx("gen_ing");$("rBody").style.opacity=.35;var ok=USE_BACKEND?await loadReport():false;if(!ok)await new Promise(function(r){setTimeout(r,900)});drawReport();if(!repData)stamp();$("rBody").style.opacity=1;b.disabled=false;b.textContent=tx("gen");say(tx(ok?"t_rep":"m_rep_off"))};
   function route(){var h=(location.hash||"").slice(1);if(VS.indexOf(h)<0)h="dash";
     VS.forEach(function(v){$("v-"+v).classList.toggle("on",v===h)});
     document.querySelectorAll(".tab").forEach(function(t,i){if(VS[i]===h)t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
@@ -607,7 +690,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     b.innerHTML="<i></i>"+(e==="trial"?F(tx("b_trial"),{d:N(d)}):e==="premium"?"★ "+tx("b_prem"):tx("b_free"));
     $("planBanner").innerHTML="<div><strong>"+tx(t)+"</strong><br><span class='mut'>"+F(tx(t+"_s"),{d:N(d)})+"</span></div>"+(e==="trial"?"<div class='meter'><div class='bar a'><i style='width:"+((8-d)/7*100)+"%'></i></div><span class='mut'>"+F(tx("tr_d"),{a:N(8-d)})+"</span></div>":"")+(e==="premium"?"":"<button class='go' type='button' data-go='plans'>"+tx(e==="trial"?"viewp":"upg")+"</button>");
     $("rPro").classList.toggle("locked",!isPro());
-    $("usage").textContent=isPro()?tx("usage_p"):F(tx("usage_f"),{n:N(leads.length)});
+    $("usage").textContent="";
     $("srcNote").textContent=tx(live?"foot_live":"foot_demo");
   }
   function cell(v){return v==="y"?"<span class='yes' aria-label='yes'>✓</span>":v==="n"?"<span class='no2' aria-label='no'>✕</span>":tx(v)}
@@ -623,8 +706,72 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     $("pl").innerHTML=h;
   }
   $("pl").onclick=function(e){var b=e.target.closest("[data-act]");if(!b)return;var a=b.dataset.act;
-    if(a==="up"){setPlan("premium");say(tx("t_up"))}else if(a==="dn"){setPlan("free");say(tx("t_dn"))}
+    if(a==="up")say(tx("t_demo"));else if(a==="dn"){setPlan("free");say(tx("t_dn"))}
     else{plan="trial";trialStart=Date.now();try{localStorage.setItem("sb-ts",String(trialStart));localStorage.removeItem("sb-plan")}catch(x){}applyPlan();all();say(tx("t_rs"))}};
+  var rcCur=null,rcRaf=0;
+  function fmtDT(d){var lc=lang==="bn"?"bn-BD":"en-US";return d.toLocaleDateString(lc,{year:"numeric",month:"short",day:"numeric"})+", "+d.toLocaleTimeString(lc,{hour:"2-digit",minute:"2-digit"})}
+  function rcModel(){
+    var s=stats(),cs=SO.map(function(){return 0}),ct=ST.map(function(){return 0});
+    leads.forEach(function(l){cs[l.s]++;ct[l.t]++});
+    var ts=cs.indexOf(Math.max.apply(null,cs)),txt;
+    if(repData){var c=pick(repData,["content","summary","report","text"]);txt=c==null?JSON.stringify(repData):typeof c==="string"?c:JSON.stringify(c)}else txt=$("rSum").textContent;
+    var ca=repData&&repData.created_at?String(repData.created_at):"",when=ca?new Date(/Z|[+-]\d\d:?\d\d$/.test(ca)?ca:ca+"Z"):new Date();
+    return{s:s,ct:ct,top:cs[ts]?tx(SO[ts]):"\u2014",txt:txt,no:repData?"SB-"+String(repData.id).padStart(4,"0"):"SB-DEMO",type:repData&&repData.report_type?repData.report_type:"summary",when:isNaN(when)?new Date():when,src:(live||repData)?"foot_live":"foot_demo"};
+  }
+  function rcPaperHTML(m){
+    var s=m.s,row=function(a,b){return "<div class='rc-r'><span>"+a+"</span><b>"+b+"</b></div>"};
+    var h="<div class='rc-ban'>SMARTBIZ AI</div><div class='rc-t'>SmartBiz AI</div><div class='rc-s'>"+tx("rc_off")+"</div><div class='rc-sep'></div>";
+    h+=row(tx("rc_no"),"#"+m.no)+row(tx("rc_dt"),fmtDT(m.when))+row(tx("rc_ty"),esc(m.type))+row(tx("rc_sr"),tx(m.src));
+    h+="<div class='rc-sep'></div><div class='rc-h'><span>"+tx("rc_m")+"</span><span>"+tx("rc_v")+"</span></div>";
+    h+=row(tx("m1"),N(s.n))+row(tx("sw"),N(s.c))+row(tx("m2"),N(s.rate)+"%")+row(tx("rc_top"),m.top);
+    h+="<div class='rc-sep'></div><div class='rc-h'><span>"+tx("rh_st")+"</span><span>#</span></div>"+ST.map(function(k,i){return row(tx(k),N(m.ct[i]))}).join("");
+    h+="<div class='rc-sep'></div><div class='rc-h'><span>"+tx("rh_sum")+"</span></div><p class='rc-p'>"+esc(m.txt)+"</p>";
+    h+="<div class='rc-sep'></div><div class='rc-tot'><span>"+tx("k2")+"</span><span>"+BDT(s.rev)+"</span></div><div class='rc-bc'></div><div class='rc-f'>"+tx("rc_thx")+"</div>";
+    return h;
+  }
+  function rcText(m){
+    var s=m.s,L=["SMARTBIZ AI \u2014 "+tx("rc_off").toUpperCase(),"================================",tx("rc_no")+": #"+m.no,tx("rc_dt")+": "+fmtDT(m.when),tx("rc_ty")+": "+m.type,tx("rc_sr")+": "+tx(m.src),"--------------------------------",
+      tx("m1")+": "+N(s.n),tx("sw")+": "+N(s.c),tx("m2")+": "+N(s.rate)+"%",tx("k2")+": "+BDT(s.rev),tx("rc_top")+": "+m.top,"--------------------------------",tx("rh_st")+":"];
+    ST.forEach(function(k,i){L.push("  "+tx(k)+": "+N(m.ct[i]))});
+    L.push("--------------------------------",tx("rh_sum")+":",m.txt,"================================",tx("rc_thx"));
+    return L.join("\r\n");
+  }
+  function rcDownload(m){
+    var b=new Blob(["\ufeff"+rcText(m)],{type:"text/plain;charset=utf-8"}),a=document.createElement("a");
+    a.href=URL.createObjectURL(b);a.download="SmartBiz_Report_"+new Date().toISOString().slice(0,10)+".txt";
+    document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000);say(tx("rc_saved"));
+  }
+  var RC_PCSS="body{margin:0;background:#fff}.rc-paper{max-width:420px;margin:0 auto;padding:22px;color:#000;font:12.5px/1.55 ui-monospace,Menlo,Consolas,monospace;-webkit-print-color-adjust:exact;print-color-adjust:exact}.rc-ban{height:72px;border-radius:6px;margin-bottom:12px;background:linear-gradient(135deg,#F0A94E,#C9792A 60%,#7A3F12);display:grid;place-items:center;color:#fff;font-weight:700;letter-spacing:.16em;font-size:11px}.rc-t{text-align:center;font-weight:700;font-size:17px}.rc-s{text-align:center;color:#555;font-size:10px;letter-spacing:.2em;text-transform:uppercase}.rc-sep{border-top:1px dashed #777;margin:10px 0}.rc-r{display:flex;justify-content:space-between;gap:12px}.rc-r span{color:#555}.rc-h{display:flex;justify-content:space-between;color:#555;font-size:10px;text-transform:uppercase;margin-bottom:3px}.rc-p{margin:0;white-space:pre-wrap;word-break:break-word;font-family:inherit}.rc-tot{display:flex;justify-content:space-between;font-size:15px;font-weight:700}.rc-bc{height:28px;margin:12px 0 5px;background:repeating-linear-gradient(90deg,#000 0 2px,transparent 2px 4px,#000 4px 5px,transparent 5px 8px,#000 8px 11px,transparent 11px 13px)}.rc-f{text-align:center;color:#555;font-size:10px}";
+  function rcPrint(m){
+    var f=document.createElement("iframe");f.setAttribute("aria-hidden","true");f.style.cssText="position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+    document.body.appendChild(f);
+    var d=f.contentWindow.document;d.open();
+    d.write("<!doctype html><html><head><meta charset='utf-8'><title>SmartBiz Report</title><style>"+RC_PCSS+"</style></head><body><div class='rc-paper'>"+rcPaperHTML(m)+"</div></body></html>");d.close();
+    setTimeout(function(){f.contentWindow.focus();f.contentWindow.print()},300);
+    setTimeout(function(){if(f.parentNode)f.parentNode.removeChild(f)},90000);
+  }
+  function openRc(){
+    var m=rcModel(),ov=$("rcOv"),pp=$("rcPaper"),fd=$("rcFeed"),pill=$("rcPill");rcCur=m;cancelAnimationFrame(rcRaf);
+    pp.innerHTML=rcPaperHTML(m);fd.style.height="0px";fd.style.transform="";fd.style.animation="none";
+    ov.classList.remove("done","tear");ov.hidden=false;void ov.offsetWidth;ov.classList.add("on");
+    document.body.style.overflow="hidden";$("rcX").focus();
+    pill.textContent=F(tx("rc_print"),{p:N(0)});
+    var H=pp.offsetHeight;
+    function fin(){fd.style.height="auto";fd.style.transform="";fd.style.animation="";ov.classList.add("tear");
+      setTimeout(function(){ov.classList.add("done");fd.style.animation="none"},reduced?0:750)}
+    if(reduced){fin();return}
+    var t0=null,D=Math.min(5200,Math.max(3200,H*7));
+    function f(t){if(!t0)t0=t;var p=Math.min((t-t0)/D,1),st=Math.round(p*H/5);
+      fd.style.height=(st*5)+"px";fd.style.transform="translateX("+(st%2?.7:-.7)+"px)";
+      pill.textContent=F(tx("rc_print"),{p:N(Math.round(p*100))});
+      if(p<1)rcRaf=requestAnimationFrame(f);else fin()}
+    rcRaf=requestAnimationFrame(f);
+  }
+  function closeRc(){var ov=$("rcOv");cancelAnimationFrame(rcRaf);ov.classList.remove("on");document.body.style.overflow="";setTimeout(function(){if(!ov.classList.contains("on"))ov.hidden=true},300);$("rDl").focus()}
+  $("rDl").onclick=openRc;$("rcX").onclick=closeRc;$("rcCl").onclick=closeRc;
+  $("rcOv").addEventListener("click",function(e){if(e.target===this)closeRc()});
+  $("rcDl").onclick=function(){rcDownload(rcCur)};$("rcPr").onclick=function(){rcPrint(rcCur)};
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("rcOv").hidden)closeRc()});
   function all(){drawStatic();drawFilters();drawBars();drawWf();drawLog();drawStats();drawLeads();drawReport();drawPlan();drawPlans()}
   applyPlan();
   stamp();route();
@@ -632,7 +779,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 
   function mapLead(o){
     var st=String(o.status||"new").toLowerCase(),sr=String(o.source||"").toLowerCase().replace(/[\s_-]/g,"");
-    var t=/convert|won|closed/.test(st)?3:/qualif/.test(st)?2:/contact/.test(st)?1:0;
+    var t=/lost/.test(st)?4:/convert|won|closed/.test(st)?3:/qualif/.test(st)?2:/contact/.test(st)?1:0;
     var s=sr.indexOf("face")>-1?1:sr.indexOf("google")>-1?2:sr.indexOf("linked")>-1?3:sr.indexOf("refer")>-1?4:sr==="email"?5:(sr==="website"||sr==="web")?0:6;
     var ca=String(o.created_at||""),dt=new Date(/Z|[+-]\d\d:?\d\d$/.test(ca)?ca:ca+"Z"),d=isNaN(dt)?0:Math.max(0,Math.floor((Date.now()-dt)/864e5));
     return{id:o.id,n:o.name||"",e:String(o.email||"").toLowerCase(),p:String(o.phone||""),c:o.company||"",i:-1,s:s,t:t,v:+(o.value||o.amount||0)||0,d:d};
@@ -645,6 +792,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     }catch(err){live=false;all();return false}
   }
   if(USE_BACKEND)loadLeads().then(function(ok){if(!ok)say(tx("m_off"))});
+  if(USE_BACKEND)loadReport().then(function(ok){if(ok)drawReport()});
 
   function setLang(l){lang=l;try{localStorage.setItem("sb-lang",l)}catch(e){}all()}
   $("bEn").onclick=function(){setLang("en")};$("bBn").onclick=function(){setLang("bn")};

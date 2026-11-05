@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 from typing import List, Literal, Optional
 
 from fastapi import (
@@ -483,3 +484,136 @@ def list_email_logs(
         .order_by(models.EmailLog.created_at.desc())
         .all()
     )
+
+
+
+
+# ==================================================
+# CUSTOMER FOLLOW-UP APIs
+# ==================================================
+
+FOLLOW_UP_INTERVAL_DAYS = 3
+
+
+def get_last_contact(db: Session, lead: models.Lead) -> datetime:
+    """Newest sent email or sent follow-up, or the lead creation time."""
+    times = [lead.created_at]
+
+    last_email = (
+        db.query(func.max(models.EmailLog.created_at))
+        .filter(
+            models.EmailLog.lead_id == lead.id,
+            models.EmailLog.status == "sent",
+        )
+        .scalar()
+    )
+    last_follow_up = (
+        db.query(func.max(models.FollowUp.created_at))
+        .filter(
+            models.FollowUp.lead_id == lead.id,
+            models.FollowUp.status == "sent",
+        )
+        .scalar()
+    )
+
+    for value in (last_email, last_follow_up):
+        if value:
+            times.append(value)
+
+    return max(times)
+
+
+@app.get(
+    "/api/follow-ups/due",
+    response_model=List[schemas.DueFollowUpResponse],
+)
+def list_due_follow_ups(
+    days: int = Query(default=FOLLOW_UP_INTERVAL_DAYS, ge=0, le=90),
+    db: Session = Depends(get_db),
+):
+    now = datetime.utcnow()
+    leads = (
+        db.query(models.Lead)
+        .filter(models.Lead.status == "contacted")
+        .all()
+    )
+
+    due = []
+    for lead in leads:
+        last_contact = get_last_contact(db, lead)
+        if now - last_contact >= timedelta(days=days):
+            item = schemas.LeadResponse.model_validate(lead).model_dump()
+            item["last_contact_at"] = last_contact
+            item["days_since_contact"] = (now - last_contact).days
+            due.append(item)
+
+    due.sort(key=lambda entry: entry["last_contact_at"])
+    return due
+
+
+@app.post(
+    "/api/follow-ups",
+    response_model=schemas.FollowUpResponse,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        404: {"description": "Lead not found"},
+        409: {"description": "A follow-up was already sent recently"},
+    },
+)
+def create_follow_up(
+    payload: schemas.FollowUpCreate,
+    db: Session = Depends(get_db),
+):
+    lead = (
+        db.query(models.Lead)
+        .filter(models.Lead.id == payload.lead_id)
+        .first()
+    )
+    if not lead:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Lead not found",
+        )
+
+    if payload.status == "sent":
+        window_start = datetime.utcnow() - timedelta(days=FOLLOW_UP_INTERVAL_DAYS)
+        recent = (
+            db.query(models.FollowUp)
+            .filter(
+                models.FollowUp.lead_id == lead.id,
+                models.FollowUp.status == "sent",
+                models.FollowUp.created_at >= window_start,
+            )
+            .first()
+        )
+        if recent:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="A follow-up was already sent to this lead recently",
+            )
+
+    follow_up = models.FollowUp(
+        lead_id=lead.id,
+        channel=payload.channel,
+        note=payload.note,
+        status=payload.status,
+    )
+    db.add(follow_up)
+    db.commit()
+    db.refresh(follow_up)
+
+    return follow_up
+
+
+@app.get(
+    "/api/follow-ups",
+    response_model=List[schemas.FollowUpResponse],
+)
+def list_follow_ups(
+    lead_id: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    query = db.query(models.FollowUp)
+    if lead_id is not None:
+        query = query.filter(models.FollowUp.lead_id == lead_id)
+    return query.order_by(models.FollowUp.created_at.desc()).all()
