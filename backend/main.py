@@ -402,7 +402,7 @@ def create_welcome_email(lead_id: int, db: Session = Depends(get_db)):
         raise HTTPException(404, "Lead not found")
 
     try:
-        from ai_module.email_generator import generate_welcome_email
+        from generate_email import generate_welcome_email
     except Exception as e:
         raise HTTPException(500, f"email_generator module not found: {e}")
 
