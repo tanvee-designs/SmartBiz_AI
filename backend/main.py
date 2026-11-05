@@ -1,4 +1,4 @@
-
+import json
 from datetime import datetime, timedelta
 from typing import List, Literal, Optional
 
@@ -107,6 +107,8 @@ def create_lead(
         company=lead.company,
         message=lead.message,
         source=lead.source,
+        interest=lead.interest,
+        value=lead.value,
     )
 
     db.add(new_lead)
@@ -256,8 +258,11 @@ def create_report(
     db: Session = Depends(get_db),
 ):
     new_report = models.Report(
-        report_type=report.report_type.strip(),
-        content=report.content,
+        report_type=(report.report_type or "ai_report").strip(),
+        title=report.title.strip(),
+        summary=report.summary,
+        insights=json.dumps(report.insights, ensure_ascii=False),
+        recommendations=json.dumps(report.recommendations, ensure_ascii=False),
     )
 
     db.add(new_report)
@@ -461,8 +466,6 @@ def list_email_logs(
         .order_by(models.EmailLog.created_at.desc())
         .all()
     )
-
-
 
 
 # ==================================================

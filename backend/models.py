@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Float
 
 from database import Base
 
@@ -15,6 +15,8 @@ class Lead(Base):
     company = Column(String(150), nullable=True)
     message = Column(Text, nullable=True)
     source = Column(String(50), default="website")
+    interest = Column(String(200), nullable=True)
+    value = Column(Float, default=0)
     status = Column(String(30), default="new")
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -35,8 +37,11 @@ class Report(Base):
     __tablename__ = "reports"
 
     id = Column(Integer, primary_key=True, index=True)
-    report_type = Column(String(50), nullable=False)
-    content = Column(Text, nullable=False)
+    report_type = Column(String(50), default="ai_report")
+    title = Column(String(200), nullable=False)
+    summary = Column(Text, nullable=False)
+    insights = Column(Text, default="[]")
+    recommendations = Column(Text, default="[]")
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
