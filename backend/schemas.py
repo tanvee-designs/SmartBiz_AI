@@ -26,6 +26,8 @@ class LeadCreate(BaseModel):
     company: Optional[str] = Field(default=None, max_length=150)
     message: Optional[str] = None
     source: LeadSource = "website"
+    interest: Optional[str] = Field(default=None, max_length=200)
+    value: float = Field(default=0, ge=0)
 
 
 class LeadStatusUpdate(BaseModel):
@@ -42,6 +44,8 @@ class LeadResponse(BaseModel):
     company: Optional[str] = None
     message: Optional[str] = None
     source: Optional[str] = None
+    interest: Optional[str] = None
+    value: Optional[float] = 0
     status: str
     last_contacted_at: Optional[datetime] = None
     created_at: datetime
@@ -72,11 +76,11 @@ class CustomerResponse(BaseModel):
 # ---------------- REPORT SCHEMAS ----------------
 
 class ReportCreate(BaseModel):
-    report_type: str = Field(default="ai_report", max_length=50)
     title: str = Field(min_length=2, max_length=200)
     summary: str = Field(min_length=1)
     insights: List[str] = Field(default_factory=list)
     recommendations: List[str] = Field(default_factory=list)
+    report_type: Optional[str] = Field(default="ai_report", max_length=50)
 
 
 class ReportResponse(BaseModel):
@@ -84,8 +88,8 @@ class ReportResponse(BaseModel):
 
     id: int
     report_type: Optional[str] = None
-    title: Optional[str] = None
-    summary: Optional[str] = None
+    title: str
+    summary: str
     insights: List[str] = Field(default_factory=list)
     recommendations: List[str] = Field(default_factory=list)
     created_at: datetime
@@ -138,9 +142,9 @@ class EmailLogResponse(BaseModel):
 
 class FollowUpCreate(BaseModel):
     lead_id: int
-    channel: str = Field(default="email", max_length=20)
-    message: Optional[str] = None
-    status: Literal["sent", "failed", "opened"] = "sent"
+    channel: str = Field(default="email", max_length=30)
+    note: Optional[str] = None
+    status: Literal["sent", "failed"] = "sent"
 
 
 class FollowUpResponse(BaseModel):
@@ -149,6 +153,11 @@ class FollowUpResponse(BaseModel):
     id: int
     lead_id: int
     channel: str
-    message: Optional[str] = None
+    note: Optional[str] = None
     status: str
     created_at: datetime
+
+
+class DueFollowUpResponse(LeadResponse):
+    last_contact_at: datetime
+    days_since_contact: int
