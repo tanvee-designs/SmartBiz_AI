@@ -1,0 +1,225 @@
+{
+  "name": "SmartBiz AI - Notification Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "smartbiz-notification",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c611adcd-4fcc-42e2-8d92-08266f2a1b28",
+      "name": "Webhook",
+      "webhookId": "19ff09f9-c209-4f0b-a718-84980c084eea"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "38f25cbd-3905-42d5-a36f-522ae191102b",
+              "name": "event",
+              "value": "={{ $json.body.event }}",
+              "type": "string"
+            },
+            {
+              "id": "933844ec-10b1-401e-8a28-a810eef53a90",
+              "name": "title",
+              "value": "={{ $json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "24391b4d-2bf6-4372-a161-fc233c56d1be",
+              "name": "message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "2b6f62d0-3c1b-4d38-8633-c5c5a45ca799",
+              "name": "lead_id",
+              "value": "={{ $json.body.lead_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "4f0a9ece-f9d4-4c3c-9697-ddfbc78c1b72",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ String($json.event ?? '').trim() }}",
+                    "rightValue": "\tnew_lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6371eba8-f847-4daa-b850-fdf65252ce6b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "New Lead"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "77acdc78-1b43-40cc-8a27-b96d3a48760c",
+                    "leftValue": "={{ String($json.event ?? '').trim() }}",
+                    "rightValue": "follow_up",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Follow-up"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "070716cf-21b5-41e1-a812-d1983b9a0c34",
+                    "leftValue": "={{ String($json.event ?? '').trim() }}",
+                    "rightValue": "error",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Error"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.5,
+      "position": [
+        528,
+        -320
+      ],
+      "id": "b3a0105b-89dd-48d2-8cf8-7558d4ed6105",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hawaii-wrapping-dice-loud.trycloudflare.com/api/notifications",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "ngrok-skip-browser-warning",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": \"{{ $json.event }}: {{ $json.message }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        464,
+        0
+      ],
+      "id": "1c49d9a8-2926-4c1e-8eb8-929518383d05",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [],
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "bddced4c-10e2-4715-8d01-bfef9bacad46",
+  "meta": {
+    "instanceId": "b2f88b12f745b649c744d0488b841fd884b6cee45e94169659ce08de0c8541dc"
+  },
+  "nodeGroups": [],
+  "id": "DQyoLJUIyTvfDrVu",
+  "tags": []
+}

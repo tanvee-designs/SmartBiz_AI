@@ -1,0 +1,280 @@
+{
+  "name": "SmartBiz AI - Lead Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "smartbiz-new-lead",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        0
+      ],
+      "id": "c4283f11-e824-4181-9667-5490dc2fed01",
+      "name": "Webhook",
+      "webhookId": "3694dd08-9e94-4759-9ea6-fd5819a380ba"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields1').item.json.email }}",
+        "subject": "=New Lead Received - SmartBiz AI",
+        "message": "=<p>Hello,</p>\n<p>A new lead has been received.</p>\n<p>Lead Name: {{ $('Edit Fields1').item.json.name }}</p>\n<p>Email: {{ $('Edit Fields1').item.json.email }}</p>\n<p>Company: {{ $('Edit Fields1').item.json.company }}</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        144
+      ],
+      "id": "692aad23-3c1e-4f90-82fc-9d75cd4bc3dd",
+      "name": "Send a message",
+      "webhookId": "0d26e939-b192-40fb-bc95-697c5ef2e3a9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sD2NdLBIj6CEVpTN",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a2eab026-7f34-4b27-aff5-e267c82cf9fb",
+              "name": "email",
+              "value": "={{ String($json.body.email).replace(/^\\s+|\\s+$/g, '') }}",
+              "type": "string"
+            },
+            {
+              "id": "1d2a1e0a-86e4-4f49-82ec-1ca54db964ba",
+              "name": "company",
+              "value": "=\t{{ String($json.body.company).replace(/^\\s+|\\s+$/g, '') }}",
+              "type": "string"
+            },
+            {
+              "id": "d5d05d2d-ab8f-434c-aff7-408160b57749",
+              "name": "name",
+              "value": "={{ $json.body.name.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "544da0e0-0e6a-42b4-b3ab-f6dd1a0d0a25",
+              "name": "phone",
+              "value": "={{ String($json.body.phone).replace(/^\\s+|\\s+$/g, '') }}",
+              "type": "string"
+            },
+            {
+              "id": "289c87a5-abcd-4363-a36e-094c47213f59",
+              "name": "id",
+              "value": "={{ $json.body.id }}",
+              "type": "number"
+            },
+            {
+              "id": "b494704f-1ef4-47aa-97bf-82fb874bb970",
+              "name": "interest",
+              "value": "={{ $json.body.interest }}",
+              "type": "string"
+            },
+            {
+              "id": "e06ee13f-dc56-4b62-8e3f-cf0a864da7ef",
+              "name": "value",
+              "value": "={{ $json.body.value }}",
+              "type": "number"
+            },
+            {
+              "id": "9518db81-57f0-4e32-9e27-af976bc8db8c",
+              "name": "message",
+              "value": "={{ String($json.body.message ?? '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "0b62e1e4-5c7b-4eff-840a-ff0c60166f0f",
+              "name": "source",
+              "value": "={{ String($json.body.source ?? 'website').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "f2e08c70-1780-494a-81a7-0c3fc6f8fc91",
+              "name": "status",
+              "value": "={{ String($json.body.status ?? 'new').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "095114fe-236a-44e5-a942-f46575904f66",
+              "name": "created_at",
+              "value": "={{ String($json.body.created_at ?? '') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        480,
+        384
+      ],
+      "id": "7741b97b-4e5c-4fde-9fc4-94f32c6d4cff",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "77dd02db-357f-47e0-a914-09757e35f862",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f0c45978-9d1d-4677-8ff4-b4ed8140a58a",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c8b88f22-c448-4488-bf8f-07a226679f41",
+              "leftValue": "={{ $json.phone }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "61c5943b-f848-4e5d-95f1-6a8493f7d8b0",
+              "leftValue": "={{ $json.company }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        704,
+        384
+      ],
+      "id": "574bc54e-4f81-4c60-a340-542fdad12154",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://hawaii-wrapping-dice-loud.trycloudflare.com/api/notifications",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "ngrok-skip-browser-warning",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": \"New Lead: {{ $json.message }}\"\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        160,
+        496
+      ],
+      "id": "aae9729f-0d47-4835-83e9-9dffd5ee07bd",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0b66baa8-f7f7-40ab-9524-e99b6c3ac75e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b2f88b12f745b649c744d0488b841fd884b6cee45e94169659ce08de0c8541dc"
+  },
+  "nodeGroups": [],
+  "id": "H0ATkDGUqD6WEyts",
+  "tags": []
+}
