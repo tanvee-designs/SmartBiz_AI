@@ -31,7 +31,7 @@
       "typeVersion": 2.2,
       "position": [
         816,
-        0
+        -16
       ],
       "id": "3b865e44-2654-4c91-a557-e47bb57b3d12",
       "name": "Send a message",
@@ -64,7 +64,14 @@
             }
           ]
         },
-        "options": {}
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
@@ -98,7 +105,7 @@
           "parameters": [
             {
               "name": "lead_id",
-              "value": "={{ $('Split Out').item.json.lead_id }}"
+              "value": "={{ $('If').item.json.lead_id }}"
             },
             {
               "name": "channel",
@@ -110,7 +117,7 @@
             },
             {
               "name": "message",
-              "value": "Intro follow-up email"
+              "value": "\tFollow-up email sent via Gmail"
             }
           ]
         },
@@ -120,14 +127,14 @@
       "typeVersion": 4.5,
       "position": [
         1008,
-        0
+        -16
       ],
       "id": "e0278526-44b9-41b7-8647-37faf04e5b3e",
       "name": "HTTP Request1"
     },
     {
       "parameters": {
-        "fieldToSplitOut": "leads",
+        "fieldToSplitOut": "body.leads",
         "options": {}
       },
       "type": "n8n-nodes-base.splitOut",
@@ -151,12 +158,22 @@
           "conditions": [
             {
               "id": "5ee4fc4a-8362-4d78-a634-c7451251b72c",
-              "leftValue": "={{ $json.lead_id }}",
-              "rightValue": "7",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
               "operator": {
                 "type": "string",
-                "operation": "equals",
-                "name": "filter.operator.equals"
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7c0a4d5e-347a-41e9-a929-c3ea9119a1ed",
+              "leftValue": "={{ $json.lead_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
               }
             }
           ],
@@ -242,7 +259,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "10a4ef17-89e2-4d7a-98b3-f85d15ceeb2f",
+  "versionId": "3b0857d3-fc83-4d49-9719-5ec227d3e9b1",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b2f88b12f745b649c744d0488b841fd884b6cee45e94169659ce08de0c8541dc"
