@@ -18,14 +18,22 @@ import models
 import schemas
 
 from database import Base, engine, get_db
-from generate_email import generate_welcome_email
-from n8n_client import send_lead_to_n8n
 
-# Member 3's AI report module is optional: the server still starts without it
+# Optional imports — না থাকলে server চলবে, endpoint 500 দেবে
+try:
+    from generate_email import generate_welcome_email
+except Exception:
+    generate_welcome_email = None
+
 try:
     from generate_report import generate_business_report
 except Exception:
     generate_business_report = None
+
+try:
+    from n8n_client import send_lead_to_n8n
+except Exception:
+    send_lead_to_n8n = None
 
 
 # ---------------- DATABASE SETUP ----------------
@@ -55,18 +63,12 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {
-        "message": "SmartBiz_AI Backend is running",
-        "status": "success",
-    }
+    return {"message": "SmartBiz_AI Backend is running", "status": "success"}
 
 
 @app.get("/health")
 def health_check():
-    return {
-        "status": "ok",
-        "message": "Backend is healthy",
-    }
+    return {"status": "ok", "message": "Backend is healthy"}
 
 
 # ==================================================
@@ -106,17 +108,18 @@ def create_lead(
         source=lead.source,
         interest=lead.interest,
         value=lead.value,
+        status="new",
     )
     db.add(new_lead)
     db.commit()
     db.refresh(new_lead)
 
-    lead_data = (
-        schemas.LeadResponse
-        .model_validate(new_lead)
-        .model_dump(mode="json")
-    )
-    background_tasks.add_task(send_lead_to_n8n, lead_data)
+    # Optional n8n push
+    if send_lead_to_n8n:
+        try:
+            background_tasks.add_task(send_lead_to_n8n, new_lead)
+        except Exception:
+            pass
 
     return new_lead
 
@@ -126,62 +129,51 @@ def export_leads(db: Session = Depends(get_db)):
     leads = db.query(models.Lead).order_by(models.Lead.created_at.desc()).all()
     return [
         {
-            "id": item.id,
-            "name": item.name,
-            "email": item.email,
-            "phone": item.phone or "",
-            "company": item.company or "",
-            "source": item.source,
-            "interest": item.interest or "",
-            "value": item.value or 0,
-            "status": item.status,
-            "last_contacted_at": (
-                item.last_contacted_at.isoformat()
-                if item.last_contacted_at
-                else ""
-            ),
-            "created_at": item.created_at.isoformat(),
+            "id": l.id,
+            "name": l.name,
+            "email": l.email,
+            "phone": l.phone or "",
+            "company": l.company or "",
+            "source": l.source,
+            "status": l.status,
+            "interest": l.interest or "",
+            "value": l.value or 0,
+            "last_contacted_at": l.last_contacted_at.isoformat() if l.last_contacted_at else "",
+            "created_at": l.created_at.isoformat(),
         }
-        for item in leads
+        for l in leads
     ]
 
 
 @app.get("/api/leads", response_model=List[schemas.LeadResponse])
-def list_leads(
-    lead_status: Optional[str] = Query(default=None, alias="status"),
-    db: Session = Depends(get_db),
-):
-    query = db.query(models.Lead)
-    if lead_status:
-        query = query.filter(models.Lead.status == lead_status)
-    return query.order_by(models.Lead.created_at.desc()).all()
+def list_leads(db: Session = Depends(get_db)):
+    return db.query(models.Lead).order_by(models.Lead.created_at.desc()).all()
 
 
-@app.get(
-    "/api/leads/{lead_id}",
-    response_model=schemas.LeadResponse,
-    responses={404: {"description": "Lead not found"}},
-)
+@app.get("/api/leads/{lead_id}", response_model=schemas.LeadResponse)
 def get_lead(lead_id: int, db: Session = Depends(get_db)):
     lead = db.query(models.Lead).filter(models.Lead.id == lead_id).first()
     if not lead:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Lead not found",
-        )
+        raise HTTPException(404, "Lead not found")
     return lead
 
 
-@app.patch(
-    "/api/leads/{lead_id}",
-    response_model=schemas.LeadResponse,
-    responses={404: {"description": "Lead not found"}},
-)
-@app.patch(
-    "/api/leads/{lead_id}/status",
-    response_model=schemas.LeadResponse,
-    include_in_schema=False,
-)
+@app.patch("/api/leads/{lead_id}", response_model=schemas.LeadResponse)
+def update_lead(
+    lead_id: int,
+    payload: schemas.LeadStatusUpdate,
+    db: Session = Depends(get_db),
+):
+    lead = db.query(models.Lead).filter(models.Lead.id == lead_id).first()
+    if not lead:
+        raise HTTPException(404, "Lead not found")
+    lead.status = payload.status
+    db.commit()
+    db.refresh(lead)
+    return lead
+
+
+@app.patch("/api/leads/{lead_id}/status", response_model=schemas.LeadResponse)
 def update_lead_status(
     lead_id: int,
     payload: schemas.LeadStatusUpdate,
@@ -189,15 +181,10 @@ def update_lead_status(
 ):
     lead = db.query(models.Lead).filter(models.Lead.id == lead_id).first()
     if not lead:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Lead not found",
-        )
-
+        raise HTTPException(404, "Lead not found")
     lead.status = payload.status
     db.commit()
     db.refresh(lead)
-
     return lead
 
 
@@ -209,23 +196,20 @@ def update_lead_status(
     "/api/customers",
     response_model=schemas.CustomerResponse,
     status_code=status.HTTP_201_CREATED,
+    responses={409: {"description": "Customer with this email already exists"}},
 )
 def create_customer(
     customer: schemas.CustomerCreate,
     db: Session = Depends(get_db),
 ):
     email = str(customer.email).lower()
-
     existing = (
         db.query(models.Customer)
         .filter(func.lower(models.Customer.email) == email)
         .first()
     )
     if existing:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Customer with this email already exists",
-        )
+        raise HTTPException(409, "Customer with this email already exists")
 
     new_customer = models.Customer(
         name=customer.name.strip(),
@@ -237,17 +221,12 @@ def create_customer(
     db.add(new_customer)
     db.commit()
     db.refresh(new_customer)
-
     return new_customer
 
 
 @app.get("/api/customers", response_model=List[schemas.CustomerResponse])
 def list_customers(db: Session = Depends(get_db)):
-    return (
-        db.query(models.Customer)
-        .order_by(models.Customer.created_at.desc())
-        .all()
-    )
+    return db.query(models.Customer).order_by(models.Customer.created_at.desc()).all()
 
 
 # ==================================================
@@ -273,7 +252,6 @@ def create_report(
     db.add(new_report)
     db.commit()
     db.refresh(new_report)
-
     return new_report
 
 
@@ -288,37 +266,29 @@ def list_reports(db: Session = Depends(get_db)):
     status_code=status.HTTP_201_CREATED,
 )
 def generate_ai_report(db: Session = Depends(get_db)):
-    """Creates an AI business report (Member 3's module) and saves it."""
+    """AI দিয়ে Business Report বানিয়ে reports টেবিলে save করে।"""
     if generate_business_report is None:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="generate_report module not found",
-        )
+        raise HTTPException(500, "generate_report module not found")
 
     leads = db.query(models.Lead).all()
     logs = db.query(models.EmailLog).all()
 
     try:
         result = generate_business_report(leads, logs)
-    except Exception as error:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Report generation failed: {error}",
-        )
+    except Exception as e:
+        raise HTTPException(500, f"Report generation failed: {e}")
 
     new_report = models.Report(
         report_type="ai_report",
-        title=result.get("title") or "AI Business Report",
-        summary=result.get("summary") or "",
+        title=result.get("title"),
+        summary=result.get("summary"),
         insights=json.dumps(result.get("insights", []), ensure_ascii=False),
-        recommendations=json.dumps(
-            result.get("recommendations", []), ensure_ascii=False
-        ),
+        recommendations=json.dumps(result.get("recommendations", []), ensure_ascii=False),
+        content=json.dumps(result, ensure_ascii=False, default=str),
     )
     db.add(new_report)
     db.commit()
     db.refresh(new_report)
-
     return new_report
 
 
@@ -342,26 +312,17 @@ def create_notification(
     db.add(new_notification)
     db.commit()
     db.refresh(new_notification)
-
     return new_notification
 
 
-@app.get(
-    "/api/notifications",
-    response_model=List[schemas.NotificationResponse],
-)
+@app.get("/api/notifications", response_model=List[schemas.NotificationResponse])
 def list_notifications(db: Session = Depends(get_db)):
-    return (
-        db.query(models.Notification)
-        .order_by(models.Notification.created_at.desc())
-        .all()
-    )
+    return db.query(models.Notification).order_by(models.Notification.created_at.desc()).all()
 
 
 @app.patch(
     "/api/notifications/{notification_id}/read",
     response_model=schemas.NotificationResponse,
-    responses={404: {"description": "Notification not found"}},
 )
 def mark_notification_as_read(
     notification_id: int,
@@ -373,49 +334,66 @@ def mark_notification_as_read(
         .first()
     )
     if not notification:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Notification not found",
-        )
-
+        raise HTTPException(404, "Notification not found")
     notification.is_read = "true"
     db.commit()
     db.refresh(notification)
-
     return notification
+
+
+# ==================================================
+# EMAIL LOG APIs
+# ==================================================
+
+@app.patch("/email-logs/{log_id}/status", response_model=schemas.EmailLogResponse)
+def update_email_status(
+    log_id: int,
+    new_status: Literal["pending", "sent", "failed"] = Query(alias="status"),
+    db: Session = Depends(get_db),
+):
+    log = db.query(models.EmailLog).filter(models.EmailLog.id == log_id).first()
+    if not log:
+        raise HTTPException(404, "Log not found")
+    log.status = new_status
+    db.commit()
+    db.refresh(log)
+    return log
+
+
+@app.get("/email-logs", response_model=List[schemas.EmailLogResponse])
+def list_email_logs(db: Session = Depends(get_db)):
+    return db.query(models.EmailLog).order_by(models.EmailLog.created_at.desc()).all()
 
 
 # ==================================================
 # WELCOME EMAIL AUTOMATION
 # ==================================================
 
-@app.post(
-    "/automation/welcome-email/{lead_id}",
-    responses={404: {"description": "Lead not found"}},
-)
+@app.post("/automation/welcome-email/{lead_id}")
 def create_welcome_email(lead_id: int, db: Session = Depends(get_db)):
     lead = db.query(models.Lead).filter(models.Lead.id == lead_id).first()
     if not lead:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Lead not found",
-        )
+        raise HTTPException(404, "Lead not found")
 
-    result = generate_welcome_email(
-        {
+    if generate_welcome_email is None:
+        raise HTTPException(500, "generate_email module not found")
+
+    try:
+        result = generate_welcome_email({
             "name": lead.name,
             "email": lead.email,
             "company": lead.company,
             "phone": lead.phone,
-        }
-    )
+        })
+    except Exception as e:
+        raise HTTPException(500, f"Email generation failed: {e}")
 
     log = models.EmailLog(
         lead_id=lead.id,
         to_email=lead.email,
         subject=result["subject"],
         body=result["body"],
-        generated_by=result["source"],
+        generated_by=result.get("source", "template"),
     )
     db.add(log)
     db.commit()
@@ -424,45 +402,11 @@ def create_welcome_email(lead_id: int, db: Session = Depends(get_db)):
     return {
         "log_id": log.id,
         "to": lead.email,
-        **result,
+        "subject": result["subject"],
+        "body": result["body"],
+        "html": result.get("html", result["body"]),
+        "source": result.get("source", "template"),
     }
-
-
-# ==================================================
-# EMAIL LOG APIs
-# ==================================================
-
-@app.patch(
-    "/email-logs/{log_id}/status",
-    response_model=schemas.EmailLogResponse,
-    responses={404: {"description": "Log not found"}},
-)
-def update_email_status(
-    log_id: int,
-    new_status: Literal["pending", "sent", "failed"] = Query(alias="status"),
-    db: Session = Depends(get_db),
-):
-    log = db.query(models.EmailLog).filter(models.EmailLog.id == log_id).first()
-    if not log:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Log not found",
-        )
-
-    log.status = new_status
-    db.commit()
-    db.refresh(log)
-
-    return log
-
-
-@app.get("/email-logs", response_model=List[schemas.EmailLogResponse])
-def list_email_logs(db: Session = Depends(get_db)):
-    return (
-        db.query(models.EmailLog)
-        .order_by(models.EmailLog.created_at.desc())
-        .all()
-    )
 
 
 # ==================================================
@@ -473,11 +417,8 @@ FOLLOW_UP_INTERVAL_DAYS = 3
 
 
 def get_last_contact(db: Session, lead: models.Lead) -> datetime:
-    """Newest sent email, sent follow-up or last_contacted_at, else created_at."""
+    """Newest sent email / follow-up / last_contacted_at / created_at।"""
     times = [lead.created_at]
-
-    if lead.last_contacted_at:
-        times.append(lead.last_contacted_at)
 
     last_email = (
         db.query(func.max(models.EmailLog.created_at))
@@ -487,48 +428,63 @@ def get_last_contact(db: Session, lead: models.Lead) -> datetime:
         )
         .scalar()
     )
+    if last_email:
+        times.append(last_email)
+
     last_follow_up = (
         db.query(func.max(models.FollowUp.created_at))
-        .filter(
-            models.FollowUp.lead_id == lead.id,
-            models.FollowUp.status == "sent",
-        )
+        .filter(models.FollowUp.lead_id == lead.id)
         .scalar()
     )
+    if last_follow_up:
+        times.append(last_follow_up)
 
-    for value in (last_email, last_follow_up):
-        if value:
-            times.append(value)
+    if lead.last_contacted_at:
+        times.append(lead.last_contacted_at)
 
     return max(times)
 
 
-@app.get(
-    "/api/follow-ups/due",
-    response_model=List[schemas.DueFollowUpResponse],
-)
+@app.get("/api/follow-ups/due")
 def list_due_follow_ups(
     days: int = Query(default=FOLLOW_UP_INTERVAL_DAYS, ge=0, le=90),
     db: Session = Depends(get_db),
 ):
+    """যে lead-গুলো follow-up-এর জন্য due (n8n poll করে)।"""
     now = datetime.utcnow()
+    cutoff = now - timedelta(days=days)
+
+    # new + contacted দুটোই include
     leads = (
         db.query(models.Lead)
-        .filter(models.Lead.status == "contacted")
+        .filter(models.Lead.status.in_(["new", "contacted"]))
         .all()
     )
 
     due = []
     for lead in leads:
         last_contact = get_last_contact(db, lead)
-        if now - last_contact >= timedelta(days=days):
-            item = schemas.LeadResponse.model_validate(lead).model_dump()
-            item["last_contact_at"] = last_contact
-            item["days_since_contact"] = (now - last_contact).days
-            due.append(item)
+        if last_contact is None:
+            last_contact = lead.created_at
+
+        if last_contact <= cutoff:
+            due.append({
+                "lead_id": lead.id,
+                "name": lead.name,
+                "email": lead.email,
+                "company": lead.company,
+                "status": lead.status,
+                "created_at": lead.created_at.isoformat(),
+                "last_contacted_at": (
+                    lead.last_contacted_at.isoformat()
+                    if lead.last_contacted_at else None
+                ),
+                "last_contact_at": last_contact.isoformat(),
+                "days_since_contact": (now - last_contact).days,
+            })
 
     due.sort(key=lambda entry: entry["last_contact_at"])
-    return due
+    return {"count": len(due), "days": days, "leads": due}
 
 
 @app.post(
@@ -544,16 +500,9 @@ def create_follow_up(
     payload: schemas.FollowUpCreate,
     db: Session = Depends(get_db),
 ):
-    lead = (
-        db.query(models.Lead)
-        .filter(models.Lead.id == payload.lead_id)
-        .first()
-    )
+    lead = db.query(models.Lead).filter(models.Lead.id == payload.lead_id).first()
     if not lead:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Lead not found",
-        )
+        raise HTTPException(404, "Lead not found")
 
     if payload.status == "sent":
         window_start = datetime.utcnow() - timedelta(days=FOLLOW_UP_INTERVAL_DAYS)
@@ -568,134 +517,39 @@ def create_follow_up(
         )
         if recent:
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="A follow-up was already sent to this lead recently",
+                409,
+                "A follow-up was already sent recently",
             )
 
     follow_up = models.FollowUp(
-        lead_id=lead.id,
+        lead_id=payload.lead_id,
         channel=payload.channel,
-        note=payload.note,
         status=payload.status,
+        message=payload.message or payload.note,
     )
     db.add(follow_up)
 
     if payload.status == "sent":
         lead.last_contacted_at = datetime.utcnow()
-        db.add(
-            models.Notification(
-                message=f"Follow-up ({payload.channel}) sent to {lead.name}",
-                is_read="false",
-            )
-        )
+        if lead.status == "new":
+            lead.status = "contacted"
+
+    db.add(models.Notification(
+        message=f"Follow-up ({payload.channel}) sent to {lead.name} ({lead.email})"
+    ))
 
     db.commit()
     db.refresh(follow_up)
-
     return follow_up
 
 
-@app.get(
-    "/api/follow-ups",
-    response_model=List[schemas.FollowUpResponse],
-)
+@app.get("/api/follow-ups", response_model=List[schemas.FollowUpResponse])
 def list_follow_ups(
     lead_id: Optional[int] = None,
+    limit: int = 100,
     db: Session = Depends(get_db),
 ):
-    query = db.query(models.FollowUp)
+    q = db.query(models.FollowUp)
     if lead_id is not None:
-        query = query.filter(models.FollowUp.lead_id == lead_id)
-    return query.order_by(models.FollowUp.created_at.desc()).all()
-
-
-# ==================================================
-# STATISTICS API (data for AI reports and Dashboard)
-# ==================================================
-
-@app.get("/api/stats/summary")
-def stats_summary(db: Session = Depends(get_db)):
-    now = datetime.utcnow()
-    week_ago = now - timedelta(days=7)
-
-    leads_by_status = {
-        "new": 0,
-        "contacted": 0,
-        "qualified": 0,
-        "converted": 0,
-        "lost": 0,
-    }
-    for lead_status, count in (
-        db.query(models.Lead.status, func.count(models.Lead.id))
-        .group_by(models.Lead.status)
-        .all()
-    ):
-        leads_by_status[lead_status] = count
-
-    leads_by_source = {
-        "website": 0,
-        "facebook": 0,
-        "google_forms": 0,
-        "linkedin": 0,
-        "referral": 0,
-        "email": 0,
-        "other": 0,
-    }
-    for lead_source, count in (
-        db.query(models.Lead.source, func.count(models.Lead.id))
-        .group_by(models.Lead.source)
-        .all()
-    ):
-        leads_by_source[lead_source or "other"] = count
-
-    total_leads = db.query(func.count(models.Lead.id)).scalar() or 0
-
-    total_value = (
-        db.query(func.coalesce(func.sum(models.Lead.value), 0)).scalar() or 0
-    )
-    converted_value = (
-        db.query(func.coalesce(func.sum(models.Lead.value), 0))
-        .filter(models.Lead.status == "converted")
-        .scalar()
-        or 0
-    )
-
-    new_leads_last_7_days = (
-        db.query(func.count(models.Lead.id))
-        .filter(models.Lead.created_at >= week_ago)
-        .scalar()
-        or 0
-    )
-
-    total_customers = db.query(func.count(models.Customer.id)).scalar() or 0
-
-    emails = {"total": 0, "pending": 0, "sent": 0, "failed": 0}
-    for email_status, count in (
-        db.query(models.EmailLog.status, func.count(models.EmailLog.id))
-        .group_by(models.EmailLog.status)
-        .all()
-    ):
-        emails[email_status] = count
-        emails["total"] += count
-
-    follow_ups = {"total": 0, "sent": 0, "failed": 0}
-    for follow_up_status, count in (
-        db.query(models.FollowUp.status, func.count(models.FollowUp.id))
-        .group_by(models.FollowUp.status)
-        .all()
-    ):
-        follow_ups[follow_up_status] = count
-        follow_ups["total"] += count
-
-    return {
-        "total_leads": total_leads,
-        "leads_by_status": leads_by_status,
-        "leads_by_source": leads_by_source,
-        "total_value": float(total_value),
-        "converted_value": float(converted_value),
-        "new_leads_last_7_days": new_leads_last_7_days,
-        "total_customers": total_customers,
-        "emails": emails,
-        "follow_ups": follow_ups,
-        "generated_at": now.isoformat(),
-    }
+        q = q.filter(models.FollowUp.lead_id == lead_id)
+    return q.order_by(models.FollowUp.created_at.desc()).limit(limit).all()
