@@ -144,6 +144,7 @@ class FollowUpCreate(BaseModel):
     lead_id: int
     channel: str = Field(default="email", max_length=30)
     note: Optional[str] = None
+    message: Optional[str] = None
     status: Literal["sent", "failed"] = "sent"
 
 
@@ -159,5 +160,12 @@ class FollowUpResponse(BaseModel):
 
 
 class DueFollowUpResponse(LeadResponse):
+    lead_id: Optional[int] = None
     last_contact_at: datetime
     days_since_contact: int
+
+
+class DueFollowUpList(BaseModel):
+    count: int
+    days: int
+    leads: List[DueFollowUpResponse] = Field(default_factory=list)
