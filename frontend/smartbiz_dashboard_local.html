@@ -213,10 +213,10 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 .rc-ov.done .rc-slot{max-height:0;opacity:0;border-width:0;padding:0;margin:0 auto}
 .rc-clip{position:relative;margin-top:-6px;overflow:hidden;height:min(410px,54vh);padding-bottom:24px}
 .rc-ov.done .rc-clip{overflow-y:auto}
-.rc-feed{width:80%;margin:0 auto;height:0;overflow:hidden;background:var(--card);box-shadow:0 14px 22px -6px rgba(0,0,0,.32),0 0 0 1px var(--bd);position:relative;z-index:1}
+.rc-feed{will-change:height;width:80%;margin:0 auto;height:0;overflow:hidden;background:var(--card);box-shadow:0 14px 22px -6px rgba(0,0,0,.32),0 0 0 1px var(--bd);position:relative;z-index:1}
 .rc-paper{width:100%;color:var(--ink);background:var(--card);font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px;line-height:1.5;padding:12px 14px 16px}
-.rc-ov.tear .rc-feed{animation:rcTear .7s ease both}
-@keyframes rcTear{20%{transform:translateY(0) rotate(-.8deg)}45%{transform:translateY(5px) rotate(.8deg)}70%{transform:translateY(0) rotate(-.4deg)}100%{transform:translateY(0)}}
+.rc-ov.tear .rc-feed{animation:rcTear .6s cubic-bezier(.3,.7,.2,1) both}
+@keyframes rcTear{0%{transform:translateY(0)}40%{transform:translateY(8px)}100%{transform:translateY(0)}}
 .rc-ban{height:62px;border-radius:6px;margin-bottom:10px;background:linear-gradient(135deg,var(--amber),#C9792A 60%,#7A3F12);display:grid;place-items:center;color:#fff;font-weight:700;letter-spacing:.16em;font-size:10px}
 .rc-t{text-align:center;font-weight:700;font-size:15px}
 .rc-s{text-align:center;color:var(--muted);font-size:10px;letter-spacing:.2em;text-transform:uppercase}
@@ -233,6 +233,13 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 .rc-act{display:none;flex-wrap:wrap;gap:8px;margin-top:14px}.rc-ov.done .rc-act{display:flex}
 .rc-act button{flex:1 1 40%;padding:11px 12px;border-radius:99px;border:1px solid var(--bd);font-weight:600;font-size:.82rem;cursor:pointer;background:var(--card);color:var(--ink)}
 .rc-act button.p{background:var(--pill);color:var(--pill-ink);border:0}
+.go:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.msgbox{padding:16px;border-radius:14px;background:var(--soft);border:1px dashed var(--bd);color:var(--muted);display:flex;gap:12px;align-items:center;flex-wrap:wrap}.msgbox[hidden]{display:none}
+.nlist{display:grid;gap:10px}
+.nt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;padding:14px 16px;border-radius:16px;border:1px solid var(--bd);background:var(--soft);cursor:pointer;color:var(--ink);font:inherit;transition:transform .2s var(--ease)}
+.nt:hover{transform:translateY(-2px)}.nt .d{width:9px;height:9px;border-radius:50%;margin-top:7px;background:var(--amber);flex:none}
+.nt.rd{opacity:.65;cursor:default}.nt.rd .d{background:var(--track)}.nt b{display:block;font-weight:600}.nt small{display:block;color:var(--muted)}
+.nt .rtag{margin-left:auto;font-size:.72rem;font-weight:700;color:var(--muted);white-space:nowrap}
 @media (max-width:480px){.fg{grid-template-columns:1fr}.paper-inner{padding:24px 20px 14px}}
 @media (max-width:1000px){.grid2,.rgrid{grid-template-columns:1fr}}
 @keyframes drift{to{transform:translate3d(4%,3%,0) scale(1.12)}}
@@ -258,7 +265,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
       <button class="tab" type="button" aria-current="page" data-i="tab1"></button>
       <button class="tab" type="button" data-i="tab2"></button>
       <button class="tab" type="button" data-i="tab3"></button>
-      <button class="tab" type="button" data-i="tab4"></button>
+      <button class="tab" type="button" data-i="tab4"></button><button class="tab" type="button" data-i="tab5"></button><button class="tab" type="button" data-i="tab6"></button>
     </div>
     <div class="tools">
       <button class="planbtn" id="planBtn" type="button" data-go="plans"></button>
@@ -267,7 +274,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
         <button type="button" id="bBn" aria-pressed="false">বাংলা</button>
       </div>
       <button class="ic" type="button" id="theme" aria-label="Toggle theme"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg></button>
-      <button class="ic" type="button" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0"/></svg><span class="bdg"></span></button>
+      <button class="ic" type="button" aria-label="Notifications" data-go="notifications"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0"/></svg><span class="bdg" id="bellN" hidden></span></button>
       <div class="av" aria-hidden="true">SB</div>
     </div>
   </nav>
@@ -365,21 +372,30 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 <div class="field reveal" style="--i:5"><label for="fC" data-i="f_c"></label><input id="fC" type="text" placeholder="ABC Ltd" autocomplete="organization"></div>
 <div class="field reveal" style="--i:6"><label for="fS"><span data-i="fl_s"></span> <span class="req">*</span></label><select id="fS"></select><span class="error" id="e_fS"></span></div>
 <div class="field reveal" style="--i:7"><label for="fI" data-i="fl_i"></label><select id="fI"></select></div>
+<div class="field full reveal" style="--i:8"><label for="fV" data-i="f_v"></label><input id="fV" type="number" min="0" step="any" inputmode="decimal" placeholder="25000"><span class="error" id="e_fV"></span></div>
 </div>
-<button type="submit" class="go reveal" style="--i:8;width:100%;margin-top:20px" data-i="save"></button>
-<button type="reset" class="clr reveal" style="--i:9" data-i="clr"></button>
-<p class="atx reveal" style="--i:10" data-i="auto"></p>
+<button type="submit" class="go reveal" style="--i:9;width:100%;margin-top:20px" data-i="save"></button>
+<button type="reset" class="clr reveal" style="--i:10" data-i="clr"></button>
+<p class="atx reveal" style="--i:11" data-i="auto"></p>
 </form></div></div><div class="roll" aria-hidden="true"></div></div>
 </div>
 <p class="mut usage" id="usage"></p>
 <details class="apibox"><summary data-i="api_t"></summary><pre class="api" id="api">POST /api/leads</pre></details>
 </section>
 <section id="pn-rec" class="lpanel"><div class="card"><h2 data-i="ll"></h2><div class="filters"><select id="lS" aria-label="Status"></select><select id="lO" aria-label="Source"></select><input id="lQ" type="search" data-p="q" aria-label="Search"></div>
-<div class="scroll"><table><thead><tr><th data-i="lh1"></th><th data-i="lh2"></th><th data-i="f_i"></th><th data-i="f_s"></th><th data-i="lh5"></th><th data-i="lh6"></th></tr></thead><tbody id="lb"></tbody></table></div></div></section>
+<div class="scroll"><table><thead><tr><th data-i="lh1"></th><th data-i="lh2"></th><th data-i="f_i"></th><th data-i="f_s"></th><th data-i="lh_v"></th><th data-i="lh5"></th><th data-i="lh6"></th></tr></thead><tbody id="lb"></tbody></table></div></div></section>
+</div>
+<div class="view" id="v-customers">
+<header class="head"><div><h1 data-i="tab5"></h1><p data-i="cu_s"></p></div><input id="cuQ" type="search" data-p="q" aria-label="Search" style="padding:10px 16px;border-radius:99px;border:1px solid var(--bd);background:var(--card);min-width:220px"></header>
+<div class="card"><div class="msgbox" id="cuMsg" hidden></div><div class="scroll"><table><thead id="cuHead"></thead><tbody id="cuBody"></tbody></table></div></div>
+</div>
+<div class="view" id="v-notifications">
+<header class="head"><div><h1 data-i="tab6"></h1><p id="noCnt"></p></div></header>
+<div class="card"><div class="msgbox" id="noMsg" hidden></div><div class="nlist" id="noList"></div></div>
 </div>
 <div class="view" id="v-plans"><header class="head"><div><h1 data-i="pl_t"></h1><p data-i="pl_s"></p></div></header><div id="pl"></div></div>
 <div class="view" id="v-reports">
-<header class="head"><div><h1 data-i="rp_t"></h1><p data-i="rp_s"></p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="go alt" id="rDl" type="button" data-i="dl"></button><button class="go" id="rGen" type="button" data-i="gen"></button></div></header>
+<header class="head"><div><h1 data-i="rp_t"></h1><p data-i="rp_s"></p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="go alt" id="rDl" type="button" data-i="dl"></button><button class="go" id="rGen" type="button" data-i="gen" disabled title="Report generation is not available yet"></button></div></header>
 <div id="rBody" style="transition:opacity .3s">
 <div class="card rp"><h2><span data-i="rh_sum"></span><span class="mut"><span data-i="gen_at"></span> <span id="rTime"></span></span></h2><p id="rSum" style="margin:10px 0 8px;font-size:1rem"></p><span class="chip" id="rBadge" style="background:var(--soft);color:var(--muted)"></span></div>
 <div id="rPro" class="prowrap"><div class="gate"><b data-i="g_t"></b><span class="mut" data-i="g_s"></span><button class="go" type="button" data-go="plans" data-i="upg"></button></div>
@@ -444,7 +460,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     lim15:"15 leads",wf3:"3 core workflows",wf6:"All 6 workflows",ai_s:"Summary only",ai_f:"Full insights",team1:"1 user",team5:"Up to 5 users",sup_c:"Community support",sup_p:"Priority support",
     t_limit:"Free plan limit reached (15 leads). Upgrade to add more.",t_prem:"This workflow is a Premium feature",t_up:"Premium activated",t_dn:"Switched to Free plan",t_rs:"Demo restarted: new 7-day trial",
     g_t:"Premium report",g_s:"Upgrade to unlock insights, recommendations and charts.",usage_f:"{n} of 15 leads used on the Free plan",usage_p:"Unlimited leads",pl_free:"Free",
-    m_201:"Lead saved successfully",m_409:"This email already exists. Use a different email.",m_422:"Invalid data. Please check the form and try again.",m_net:"Cannot reach the backend. Start it with: cd backend, then uvicorn main:app --reload",m_err:"Unexpected server response",foot_live:"Live data from the backend",foot_demo:"Demo data · backend offline",m_off:"Backend offline. Showing demo data.",t_demo:"Demo Feature",m_pf:"Could not update status",m_404:"Lead not found",rb_live:"AI report from the backend",m_rep_off:"No backend report yet. Showing the demo report.",dl:"Download report",rc_print:"Printing {p}%",rc_done:"Report ready",rc_sub:"Detached from the printer. Download or print it.",rc_dl:"Download",rc_pr:"Print / Save PDF",rc_cl:"Close",rc_off:"Official report",rc_no:"Report no.",rc_dt:"Date",rc_ty:"Type",rc_sr:"Data",rc_m:"Metric",rc_v:"Value",rc_top:"Top source",rc_thx:"Thank you for using SmartBiz AI",rc_saved:"Report downloaded"},
+    m_201:"Lead saved successfully",m_409:"This email already exists. Use a different email.",m_422:"Invalid data. Please check the form and try again.",m_net:"Cannot reach the backend. Start it with: cd backend, then uvicorn main:app --reload",m_err:"Unexpected server response",foot_live:"Live data from the backend",foot_demo:"Demo data · backend offline",m_off:"Backend offline. Showing demo data.",t_demo:"Demo Feature",m_pf:"Could not update status",m_404:"Lead not found",rb_live:"AI report from the backend",m_rep_off:"No backend report yet. Showing the demo report.",dl:"Download report",rc_print:"Printing {p}%",rc_done:"Report ready",rc_sub:"Detached from the printer. Download or print it.",rc_dl:"Download",rc_pr:"Print / Save PDF",rc_cl:"Close",rc_off:"Official report",rc_no:"Report no.",rc_dt:"Date",rc_ty:"Type",rc_sr:"Data",rc_m:"Metric",rc_v:"Value",rc_top:"Top source",rc_thx:"Thank you for using SmartBiz AI",rc_saved:"Report downloaded",tab5:"Customers",tab6:"Notifications",cu_s:"Customers from the backend",no_s:"Latest notifications",cu_empty:"No customers yet",no_empty:"No notifications",load_err:"Could not load data. Is the backend running?",retry:"Retry",no_unread:"{n} unread",read:"Read",t_read:"Marked as read",m_nr:"Could not mark as read",lh_v:"Deal value",f_v:"Deal value (৳)",v_val:"Enter a valid amount",lh_td:"Total deals"},
   bn:{tab1:"ড্যাশবোর্ড",tab2:"ওয়ার্কফ্লো",tab3:"লিড",tab4:"AI রিপোর্ট",
     gm:"শুভ সকাল",ga:"শুভ অপরাহ্ন",ge:"শুভ সন্ধ্যা",
     sub:"আপনার ব্যবসার অটোমেশন আজ কেমন চলছে, দেখুন।",run:"এখনই ওয়ার্কফ্লো চালান",
@@ -487,9 +503,9 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     lim15:"১৫টি লিড",wf3:"৩টি মূল ওয়ার্কফ্লো",wf6:"সব ৬টি ওয়ার্কফ্লো",ai_s:"শুধু সারাংশ",ai_f:"পূর্ণ ইনসাইট",team1:"১ জন",team5:"সর্বোচ্চ ৫ জন",sup_c:"কমিউনিটি সাপোর্ট",sup_p:"অগ্রাধিকার সাপোর্ট",
     t_limit:"ফ্রি প্ল্যানে সীমা শেষ (১৫টি লিড)। আরও যোগ করতে আপগ্রেড করুন।",t_prem:"এই ওয়ার্কফ্লো প্রিমিয়াম সুবিধা",t_up:"প্রিমিয়াম চালু হয়েছে",t_dn:"ফ্রি প্ল্যানে ফিরে এসেছেন",t_rs:"ডেমো রিস্টার্ট: নতুন ৭ দিনের ট্রায়াল",
     g_t:"প্রিমিয়াম রিপোর্ট",g_s:"ইনসাইট, সুপারিশ ও চার্ট খুলতে আপগ্রেড করুন।",usage_f:"ফ্রি প্ল্যানে {n}/১৫টি লিড ব্যবহৃত",usage_p:"সীমাহীন লিড",pl_free:"ফ্রি",
-    m_201:"লিড সফলভাবে সংরক্ষিত হয়েছে",m_409:"এই ইমেইল আগে থেকেই আছে। অন্য ইমেইল দিন।",m_422:"ডেটা সঠিক নয়। ফর্ম দেখে আবার চেষ্টা করুন।",m_net:"ব্যাকএন্ডে পৌঁছানো যাচ্ছে না। cd backend, তারপর uvicorn main:app --reload চালু করুন।",m_err:"সার্ভার অপ্রত্যাশিত উত্তর দিয়েছে",foot_live:"ব্যাকএন্ড থেকে আসল ডেটা",foot_demo:"ডেমো ডেটা · ব্যাকএন্ড বন্ধ",m_off:"ব্যাকএন্ড বন্ধ। ডেমো ডেটা দেখানো হচ্ছে।",t_demo:"ডেমো ফিচার",m_pf:"স্ট্যাটাস আপডেট করা যায়নি",m_404:"লিড পাওয়া যায়নি",rb_live:"ব্যাকএন্ড থেকে AI রিপোর্ট",m_rep_off:"ব্যাকএন্ডে এখনো রিপোর্ট নেই। ডেমো রিপোর্ট দেখানো হচ্ছে।",dl:"রিপোর্ট ডাউনলোড",rc_print:"ছাপা হচ্ছে {p}%",rc_done:"রিপোর্ট প্রস্তুত",rc_sub:"প্রিন্টার থেকে ছিঁড়ে নেওয়া হয়েছে। ডাউনলোড বা প্রিন্ট করুন।",rc_dl:"ডাউনলোড",rc_pr:"প্রিন্ট / PDF সেভ",rc_cl:"বন্ধ করুন",rc_off:"অফিশিয়াল রিপোর্ট",rc_no:"রিপোর্ট নং",rc_dt:"তারিখ",rc_ty:"ধরন",rc_sr:"ডেটা",rc_m:"মেট্রিক",rc_v:"মান",rc_top:"সেরা উৎস",rc_thx:"SmartBiz AI ব্যবহারের জন্য ধন্যবাদ",rc_saved:"রিপোর্ট ডাউনলোড হয়েছে"}};
+    m_201:"লিড সফলভাবে সংরক্ষিত হয়েছে",m_409:"এই ইমেইল আগে থেকেই আছে। অন্য ইমেইল দিন।",m_422:"ডেটা সঠিক নয়। ফর্ম দেখে আবার চেষ্টা করুন।",m_net:"ব্যাকএন্ডে পৌঁছানো যাচ্ছে না। cd backend, তারপর uvicorn main:app --reload চালু করুন।",m_err:"সার্ভার অপ্রত্যাশিত উত্তর দিয়েছে",foot_live:"ব্যাকএন্ড থেকে আসল ডেটা",foot_demo:"ডেমো ডেটা · ব্যাকএন্ড বন্ধ",m_off:"ব্যাকএন্ড বন্ধ। ডেমো ডেটা দেখানো হচ্ছে।",t_demo:"ডেমো ফিচার",m_pf:"স্ট্যাটাস আপডেট করা যায়নি",m_404:"লিড পাওয়া যায়নি",rb_live:"ব্যাকএন্ড থেকে AI রিপোর্ট",m_rep_off:"ব্যাকএন্ডে এখনো রিপোর্ট নেই। ডেমো রিপোর্ট দেখানো হচ্ছে।",dl:"রিপোর্ট ডাউনলোড",rc_print:"ছাপা হচ্ছে {p}%",rc_done:"রিপোর্ট প্রস্তুত",rc_sub:"প্রিন্টার থেকে ছিঁড়ে নেওয়া হয়েছে। ডাউনলোড বা প্রিন্ট করুন।",rc_dl:"ডাউনলোড",rc_pr:"প্রিন্ট / PDF সেভ",rc_cl:"বন্ধ করুন",rc_off:"অফিশিয়াল রিপোর্ট",rc_no:"রিপোর্ট নং",rc_dt:"তারিখ",rc_ty:"ধরন",rc_sr:"ডেটা",rc_m:"মেট্রিক",rc_v:"মান",rc_top:"সেরা উৎস",rc_thx:"SmartBiz AI ব্যবহারের জন্য ধন্যবাদ",rc_saved:"রিপোর্ট ডাউনলোড হয়েছে",tab5:"গ্রাহক",tab6:"নোটিফিকেশন",cu_s:"ব্যাকএন্ড থেকে গ্রাহকের তালিকা",no_s:"সাম্প্রতিক নোটিফিকেশন",cu_empty:"এখনো কোনো গ্রাহক নেই",no_empty:"কোনো নোটিফিকেশন নেই",load_err:"ডেটা আনা যায়নি। ব্যাকএন্ড চালু আছে কি?",retry:"আবার চেষ্টা",no_unread:"{n}টি অপঠিত",read:"পড়া হয়েছে",t_read:"পড়া হিসেবে চিহ্নিত হয়েছে",m_nr:"পড়া হিসেবে চিহ্নিত করা যায়নি",lh_v:"ডিলের মূল্য",f_v:"ডিলের মূল্য (৳)",v_val:"সঠিক অঙ্ক দিন",lh_td:"মোট ডিল"}};
   var lang="en";
-  var USE_BACKEND=true,API_URL="http://127.0.0.1:8000/api/leads",SEND_SOURCE=false,live=false; // SEND_SOURCE=true once backend accepts "source" // set USE_BACKEND=false for offline demo
+  var USE_BACKEND=true,API_URL="http://127.0.0.1:8000/api/leads",SEND_SOURCE=true,live=false; // SEND_SOURCE=true once backend accepts "source" // set USE_BACKEND=false for offline demo
   try{var sv=localStorage.getItem("sb-lang");if(sv==="bn")lang="bn"}catch(e){}
   var $=function(i){return document.getElementById(i)};
   var tx=function(k){return T[lang][k]};
@@ -543,8 +559,8 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
       return "<tr><td><strong>"+tx(l.w)+"</strong></td><td>"+tx(l.t)+"</td><td>"+ago(l.m)+"</td><td class='num'>"+(l.d===null?"—":N(l.d.toFixed(1))+tx("sec"))+"</td><td><span class='pill "+cl+"'>"+tx(l.s)+"</span></td></tr>";
     }).join(""):"<tr><td colspan='5' class='mut'>"+tx("none")+"</td></tr>";
   }
-  var VS=["dash","workflows","leads","reports","plans"];
-  var SO=["so_web","so_fb","so_gf","so_li","so_ref","so_em","so_oth"],IN=["i_aut","i_ai","i_dash","i_cons","i_dm","i_web","i_oth"],ST=["sn","sc","sq","sw","sl"];
+  var VS=["dash","workflows","leads","reports","customers","notifications","plans"];
+  var SO=["so_web","so_fb","so_gf","so_li","so_ref","so_em","so_oth"],IN=["i_aut","i_ai","i_dash","i_cons","i_dm","i_web","i_oth"],ST=["sn","sc","sq","sw","sl"],IN_EN=["Business Automation","AI Services","Dashboard","Consulting","Digital Marketing","Web Development","Other"],SRC_KEYS=["website","facebook","google_forms","linkedin","referral","email","other"];
   var AT=["Website · Facebook · Google Forms","Name · Email · Phone · Interest","FastAPI · Python","SQLite · PostgreSQL","Leads · Conversion · Revenue · Charts"];
   var leads=[["Rafia Ahmed","rafia@boutique.com","01712345601",0,1,0,0,0],["Tanvir Hasan","tanvir@thelec.com","01812345602",1,0,1,0,0],["Nusrat Jahan","nusrat@bakery.com","01912345603",0,2,3,28000,1],["Sakib Rahman","sakib@traders.com","01612345604",2,1,0,0,1],["Mita Das","mita@fashion.com","01512345605",3,0,2,0,2],["Imran Hossain","imran@shop.com","01712345606",0,0,3,45000,2],["Farhana Akter","farhana@mail.com","01812345607",1,1,1,0,3],["Rakib Islam","rakib@store.com","01912345608",2,2,3,18500,4],["Sadia Khan","sadia@mail.com","01612345609",0,0,2,0,4],["Arif Chowdhury","arif@agro.com","01512345610",3,1,0,0,5],["Tasnia Noor","tasnia@mail.com","01712345611",1,2,3,32000,5],["Jamal Uddin","jamal@mail.com","01812345612",0,0,1,0,6]].map(function(a,i){return{id:i+1,n:a[0],e:a[1],p:a[2],i:a[3],s:a[4],t:a[5],v:a[6],d:a[7]}});
   var reduced=matchMedia("(prefers-reduced-motion:reduce)").matches;
@@ -576,7 +592,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var q=$("lQ").value.trim().toLowerCase(),a=$("lS").value,b=$("lO").value;
     var r=leads.filter(function(l){return(a===""||l.t==a)&&(b===""||l.s==b)&&(!q||(l.n+l.e+l.p).toLowerCase().indexOf(q)>-1)}).sort(function(x,y){return y.id-x.id});
     $("lb").innerHTML=r.length?r.map(function(l){
-      return "<tr><td><strong>"+esc(l.n)+"</strong>"+(l.c?"<br><span class='mut'>"+esc(l.c)+"</span>":"")+"</td><td>"+esc(l.e)+"<br><span class='mut'>"+N(l.p)+"</span></td><td>"+(IN[l.i]?tx(IN[l.i]):"—")+"</td><td>"+tx(SO[l.s])+"</td><td><select data-id='"+l.id+"' aria-label='"+tx("lh5")+"'>"+ST.map(function(k,i){return "<option value='"+i+"'"+(i===l.t?" selected":"")+">"+tx(k)+"</option>"}).join("")+"</select></td><td>"+(l.d?N(l.d)+tx("dago"):tx("dnow"))+"</td></tr>"}).join(""):"<tr><td colspan='6' class='mut'>"+tx("none2")+"</td></tr>";
+      return "<tr><td><strong>"+esc(l.n)+"</strong>"+(l.c?"<br><span class='mut'>"+esc(l.c)+"</span>":"")+"</td><td>"+esc(l.e)+"<br><span class='mut'>"+N(l.p)+"</span></td><td>"+(IN[l.i]?tx(IN[l.i]):(l.ir?esc(l.ir):"—"))+"</td><td>"+tx(SO[l.s])+"</td><td class='num'>"+(l.v?BDT(l.v):"—")+"</td><td><select data-id='"+l.id+"' aria-label='"+tx("lh5")+"'>"+ST.map(function(k,i){return "<option value='"+i+"'"+(i===l.t?" selected":"")+">"+tx(k)+"</option>"}).join("")+"</select></td><td>"+(l.d?N(l.d)+tx("dago"):tx("dnow"))+"</td></tr>"}).join(""):"<tr><td colspan='7' class='mut'>"+tx("none2")+"</td></tr>";
   }
   function bars(keys,arr,tot){return keys.map(function(k,i){var p=tot?Math.round(arr[i]/tot*100):0;return "<div><em>"+tx(k)+"</em><span style='width:"+Math.max(p,14)+"%'>"+N(arr[i])+"</span></div>"}).join("")}
   function li(ks,o){return ks.map(function(k){return "<li>"+F(tx(k),o)+"</li>"}).join("")}
@@ -588,19 +604,42 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     if(typeof v==="object")return Object.keys(v).map(function(k){return k+": "+(typeof v[k]==="string"?v[k]:JSON.stringify(v[k]))});
     return String(v).split(/\n+/).map(function(x){return x.replace(/^\s*[-*\u2022\d.)]+\s*/,"").trim()}).filter(Boolean);
   }
+  function asList(v){
+    if(v==null)return [];
+    if(Array.isArray(v))return v.map(function(x){return typeof x==="string"?x:JSON.stringify(x)});
+    if(typeof v==="string"){var t=v.trim();if(t[0]==="["||t[0]==="{"){try{return asList(JSON.parse(t))}catch(e){}}return toList(v)}
+    return toList(v);
+  }
+  function repStruct(d){
+    var o=d;
+    if(typeof d.content==="string"&&d.summary==null&&d.insights==null){try{var j=JSON.parse(d.content);if(j&&typeof j==="object")o=j}catch(e){}}
+    return{title:pick(o,["title"]),summary:pick(o,["summary"]),insights:asList(o.insights),recs:asList(o.recommendations),content:typeof d.content==="string"?d.content:null,when:d.created_at,type:d.report_type,id:d.id};
+  }
+  function repHasList(d){var st=repStruct(d);return st.insights.length>0||st.recs.length>0}
+  function repText(d){
+    var st=repStruct(d),L=[];
+    if(st.title)L.push(String(st.title));if(st.summary)L.push(String(st.summary));
+    if(st.insights.length){L.push("",tx("rh_ins")+":");st.insights.forEach(function(x){L.push("- "+x)})}
+    if(st.recs.length){L.push("",tx("rh_rec")+":");st.recs.forEach(function(x){L.push("- "+x)})}
+    if(!L.length&&st.content)L.push(st.content);
+    return L.join("\n");
+  }
   function renderRep(d){
-    var c=pick(d,["content","summary","report","text"]),when=pick(d,["created_at","generated_at","date"]),r=$("rSum");
-    r.style.whiteSpace="pre-wrap";
-    r.textContent=c==null?JSON.stringify(d,null,2):(typeof c==="string"?c:JSON.stringify(c,null,2));
-    var dt=when?new Date(/Z|[+-]\d\d:?\d\d$/.test(String(when))?when:when+"Z"):null;
-    if(dt&&!isNaN(dt))$("rTime").textContent=dt.toLocaleString(lang==="bn"?"bn-BD":"en-US",{dateStyle:"medium",timeStyle:"short"});
+    var st=repStruct(d),r=$("rSum"),has=st.title||st.summary||st.insights.length||st.recs.length;
+    if(has){
+      r.style.whiteSpace="";
+      r.innerHTML=(st.title?"<b style='display:block;margin-bottom:6px'>"+esc(st.title)+"</b>":"")+(st.summary?esc(st.summary):"");
+    }else{r.style.whiteSpace="pre-wrap";r.textContent=st.content!=null?st.content:JSON.stringify(d,null,2)}
+    $("rIns").innerHTML=st.insights.map(function(x){return "<li>"+esc(x)+"</li>"}).join("");
+    $("rRec").innerHTML=st.recs.map(function(x){return "<li>"+esc(x)+"</li>"}).join("");
+    var dt=dOf(st.when);if(dt)$("rTime").textContent=dt.toLocaleString(lang==="bn"?"bn-BD":"en-US",{dateStyle:"medium",timeStyle:"short"});
   }
   function repTs(x){var c=String(x.created_at||""),t=new Date(/Z|[+-]\d\d:?\d\d$/.test(c)?c:c+"Z").getTime();return isNaN(t)?(+x.id||0):t}
   async function loadReport(){
     try{
       var r=await fetch(REP_URL);if(!r.ok)throw new Error(r.status);
       var d=await r.json();
-      if(Array.isArray(d))d=d.length?d.reduce(function(a,b){return repTs(b)>=repTs(a)?b:a}):null;
+      if(Array.isArray(d)){var ai=d.filter(function(x){return x&&x.report_type==="ai_report"}),pool=ai.length?ai:d;d=pool.length?pool.reduce(function(a,b){return repTs(b)>=repTs(a)?b:a}):null}
       if(!d||typeof d!=="object")throw new Error("empty");
       repData=d;return true;
     }catch(err){repData=null;return false}
@@ -611,7 +650,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var ts=cs.indexOf(Math.max.apply(null,cs)),ti=ci.indexOf(Math.max.apply(null,ci));
     var o={n:N(s.n),c:N(s.c),r:N(s.rate),rev:BDT(s.rev),src:tx(SO[ts]),sh:N(s.n?Math.round(cs[ts]/s.n*100):0),int:Math.max.apply(null,ci)?tx(IN[ti]):"—",p:N(ct[0]+ct[1]),avg:BDT(s.c?Math.round(s.rev/s.c):0)};
     $("rBadge").textContent=repData?tx("rb_live")+(repData.report_type?" \u00b7 "+repData.report_type:""):tx("rb");
-    $("rIns").parentNode.parentNode.style.display=repData?"none":"";
+    $("rIns").parentNode.parentNode.style.display=(repData&&!repHasList(repData))?"none":"";
     if(repData)renderRep(repData);else{
       $("rSum").style.whiteSpace="";$("rSum").textContent=F(tx("r_sum"),o);
       $("rIns").innerHTML=li(["r_i1","r_i2","r_i3"],o);$("rRec").innerHTML=li(["r_c1","r_c2","r_c3"],o);
@@ -631,15 +670,18 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   function api(c,m,x){var o={status:c,message:m};for(var k in x)o[k]=x[k];$("api").textContent="POST /api/leads\n"+JSON.stringify(o,null,2)}
   $("lf").onsubmit=async function(ev){ev.preventDefault();
     var n=$("fN").value.trim(),e=$("fE").value.trim().toLowerCase(),p=$("fP").value.replace(/[\s-]/g,"");
-    var ok=setErr("fN",n?"":"v_name");ok=setErr("fE",/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)?"":"v_email")&&ok;ok=setErr("fP",/^(\+?88)?01\d{9}$/.test(p)?"":"v_phone")&&ok;ok=setErr("fS",$("fS").value!==""?"":"v_src")&&ok;
+    var ok=setErr("fN",n?"":"v_name");ok=setErr("fE",/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)?"":"v_email")&&ok;ok=setErr("fP",/^(\+?88)?01\d{9}$/.test(p)?"":"v_phone")&&ok;ok=setErr("fS",$("fS").value!==""?"":"v_src")&&ok;ok=setErr("fV",($("fV").value.trim()===""||(+$("fV").value>=0))?"":"v_val")&&ok;
     if(!ok){api(422,"Validation error");var f=$("lf").querySelector(".field.invalid input,.field.invalid select");if(f)f.focus();return}
     var p11=p.slice(-11);
     if(leads.some(function(l){return l.e===e||l.p===p11})){setErr("fE","v_dup");api(409,"Duplicate lead");say(tx("t_dup"));return}
     var btn=$("lf").querySelector("[type=submit]");btn.disabled=true;
     var id=leads.reduce(function(m,l){return Math.max(m,l.id)},0)+1,co=$("fC").value.trim();
+    var bodyObj={name:n,email:e,phone:p11,company:co,source:SRC_KEYS[+$("fS").value]};
+    if($("fI").value!=="")bodyObj.interest=IN_EN[+$("fI").value];
+    if($("fV").value.trim()!=="")bodyObj.value=+$("fV").value;
     if(USE_BACKEND){
       try{
-        var res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(SEND_SOURCE?{name:n,email:e,phone:p11,company:co,source:["website","facebook","google_forms","linkedin","referral","email","other"][+$("fS").value]}:{name:n,email:e,phone:p11,company:co})});
+        var res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(bodyObj)});
         var body=null;try{body=await res.json()}catch(x){}
         if(res.status===409){setErr("fE","m_409");api(409,"Duplicate email",body||{});say(tx("m_409"));btn.disabled=false;return}
         if(res.status===422){var d=body&&body.detail,det=Array.isArray(d)&&d[0]?(d[0].loc?d[0].loc.slice(-1)[0]+": ":"")+d[0].msg:"";api(422,"Invalid data",{detail:d});say(tx("m_422")+(det?" ("+det+")":""));btn.disabled=false;return}
@@ -647,7 +689,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
         api(201,"Lead created",body||{});
       }catch(err){api(0,"Network error",{hint:"cd backend && uvicorn main:app --reload"});say(tx("m_net"));btn.disabled=false;return}
     }else api(201,"Lead created (local demo)",{id:id});
-    if(!(USE_BACKEND&&await loadLeads()))leads.push({id:id,n:n,e:e,p:p11,c:co,i:$("fI").value===""?6:+$("fI").value,s:+$("fS").value,t:0,v:0,d:0});
+    if(!(USE_BACKEND&&await loadLeads()))leads.push({id:id,n:n,e:e,p:p11,c:co,i:$("fI").value===""?6:+$("fI").value,s:+$("fS").value,t:0,v:+$("fV").value||0,d:0});
     $("lf").reset();all();say(tx("m_201"));btn.disabled=false;
   };
   $("lb").onchange=async function(e){
@@ -668,7 +710,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   function route(){var h=(location.hash||"").slice(1);if(VS.indexOf(h)<0)h="dash";
     VS.forEach(function(v){$("v-"+v).classList.toggle("on",v===h)});
     document.querySelectorAll(".tab").forEach(function(t,i){if(VS[i]===h)t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
-    window.scrollTo(0,0);if(h==="leads")showPanel("form")}
+    window.scrollTo(0,0);if(h==="leads")showPanel("form");if(USE_BACKEND){if(h==="customers")loadCustomers();if(h==="notifications")loadNotifs();if(h==="reports")loadReport().then(function(){drawReport()})}}
   window.addEventListener("hashchange",route);
   function esc(s){return String(s).replace(/[&<>"']/g,function(c){return "&#"+c.charCodeAt(0)+";"})}
   var plan="trial",trialStart=Date.now(),PREM=["w3","w5","w6"],LIM=15;
@@ -714,7 +756,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var s=stats(),cs=SO.map(function(){return 0}),ct=ST.map(function(){return 0});
     leads.forEach(function(l){cs[l.s]++;ct[l.t]++});
     var ts=cs.indexOf(Math.max.apply(null,cs)),txt;
-    if(repData){var c=pick(repData,["content","summary","report","text"]);txt=c==null?JSON.stringify(repData):typeof c==="string"?c:JSON.stringify(c)}else txt=$("rSum").textContent;
+    if(repData)txt=repText(repData);else txt=$("rSum").textContent;
     var ca=repData&&repData.created_at?String(repData.created_at):"",when=ca?new Date(/Z|[+-]\d\d:?\d\d$/.test(ca)?ca:ca+"Z"):new Date();
     return{s:s,ct:ct,top:cs[ts]?tx(SO[ts]):"\u2014",txt:txt,no:repData?"SB-"+String(repData.id).padStart(4,"0"):"SB-DEMO",type:repData&&repData.report_type?repData.report_type:"summary",when:isNaN(when)?new Date():when,src:(live||repData)?"foot_live":"foot_demo"};
   }
@@ -756,13 +798,13 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     ov.classList.remove("done","tear");ov.hidden=false;void ov.offsetWidth;ov.classList.add("on");
     document.body.style.overflow="hidden";$("rcX").focus();
     pill.textContent=F(tx("rc_print"),{p:N(0)});
-    var H=pp.offsetHeight;
+    var H=pp.offsetHeight,cl=fd.parentNode,T=Math.max(120,Math.min(H,cl.clientHeight-24));
     function fin(){fd.style.height="auto";fd.style.transform="";fd.style.animation="";ov.classList.add("tear");
-      setTimeout(function(){ov.classList.add("done");fd.style.animation="none"},reduced?0:750)}
+      setTimeout(function(){ov.classList.add("done");fd.style.animation="none"},reduced?0:620)}
     if(reduced){fin();return}
-    var t0=null,D=Math.min(5200,Math.max(3200,H*7));
-    function f(t){if(!t0)t0=t;var p=Math.min((t-t0)/D,1),st=Math.round(p*H/5);
-      fd.style.height=(st*5)+"px";fd.style.transform="translateX("+(st%2?.7:-.7)+"px)";
+    var t0=null,D=Math.min(4400,Math.max(2800,T*8));
+    function f(t){if(!t0)t0=t;var p=Math.min((t-t0)/D,1),e=-(Math.cos(Math.PI*p)-1)/2;
+      fd.style.height=(e*T).toFixed(2)+"px";
       pill.textContent=F(tx("rc_print"),{p:N(Math.round(p*100))});
       if(p<1)rcRaf=requestAnimationFrame(f);else fin()}
     rcRaf=requestAnimationFrame(f);
@@ -772,7 +814,69 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   $("rcOv").addEventListener("click",function(e){if(e.target===this)closeRc()});
   $("rcDl").onclick=function(){rcDownload(rcCur)};$("rcPr").onclick=function(){rcPrint(rcCur)};
   document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("rcOv").hidden)closeRc()});
-  function all(){drawStatic();drawFilters();drawBars();drawWf();drawLog();drawStats();drawLeads();drawReport();drawPlan();drawPlans()}
+  var API_BASE=API_URL.replace(/\/leads$/,""),cuData=[],noData=[],cuErr=null,noErr=null,cuLoaded=false,noLoaded=false;
+  function dOf(c){var t=String(c||"");if(!t)return null;var d=new Date(/Z|[+-]\d\d:?\d\d$/.test(t)?t:t+"Z");return isNaN(d)?null:d}
+  function pretty(k){return k.replace(/_/g," ").replace(/^./,function(c){return c.toUpperCase()})}
+  var CU_PREF=["name","email","phone","company","status","source","value","total_value","total_deals","created_at"],CU_LBL={total_deals:"lh_td",name:"lh1",email:"f_e",phone:"f_p",company:"f_c",status:"lh5",created_at:"lh6",value:"lh_v",total_value:"lh_v",source:"f_s"};
+  function cell2(k,v){
+    if(v==null||v==="")return "\u2014";
+    if(k==="created_at"){var d=dOf(v);return d?esc(fmtDT(d)):esc(v)}
+    if(k==="value"||k==="total_value")return isNaN(+v)?esc(v):BDT(+v);
+    return esc(typeof v==="object"?JSON.stringify(v):v);
+  }
+  async function getList(path){
+    var r=await fetch(API_BASE+path);if(!r.ok)throw new Error(r.status);var d=await r.json();
+    if(Array.isArray(d))return d;
+    if(d&&typeof d==="object"){for(var k in d){if(Array.isArray(d[k]))return d[k]}}
+    throw new Error("bad response");
+  }
+  function msg(id,html){var m=$(id);m.hidden=!html;m.innerHTML=html||""}
+  async function loadCustomers(){try{cuData=await getList("/customers");cuErr=null}catch(e){cuErr=String(e.message||e)}cuLoaded=true;drawCustomers()}
+  function drawCustomers(){
+    var head=$("cuHead"),box=$("cuBody"),q=$("cuQ").value.trim().toLowerCase();
+    head.innerHTML="";box.innerHTML="";
+    if(!cuLoaded){msg("cuMsg","");return}
+    if(cuErr){msg("cuMsg",esc(tx("load_err"))+" ("+esc(cuErr)+") <button class='mini' type='button' data-retry='1'>"+tx("retry")+"</button>");return}
+    if(!cuData.length){msg("cuMsg",esc(tx("cu_empty")));return}
+    msg("cuMsg","");
+    var keys=Object.keys(cuData[0]||{}),cols=CU_PREF.filter(function(k){return keys.indexOf(k)>-1});
+    if(!cols.length)cols=keys.filter(function(k){return k!=="id"}).slice(0,6);
+    head.innerHTML="<tr>"+cols.map(function(k){return "<th>"+(CU_LBL[k]?tx(CU_LBL[k]):esc(pretty(k)))+"</th>"}).join("")+"</tr>";
+    var rows=cuData.filter(function(o){return !q||JSON.stringify(o).toLowerCase().indexOf(q)>-1});
+    box.innerHTML=rows.map(function(o){return "<tr>"+cols.map(function(k,i){var c=cell2(k,o[k]);return "<td>"+(i===0?"<strong>"+c+"</strong>":c)+"</td>"}).join("")+"</tr>"}).join("");
+  }
+  $("cuQ").oninput=drawCustomers;$("cuMsg").onclick=function(e){if(e.target.closest("[data-retry]"))loadCustomers()};
+  function ntRead(o){
+    var v=pick(o,["is_read","read","isRead"]);
+    if(v==null){var st=pick(o,["status"]);return st!=null&&String(st).toLowerCase()==="read"}
+    return v===true||v===1||String(v).toLowerCase()==="true"||v==="1";
+  }
+  async function loadNotifs(){try{noData=await getList("/notifications");noErr=null}catch(e){noErr=String(e.message||e)}noLoaded=true;drawNotifs()}
+  function drawNotifs(){
+    var list=$("noList"),un=noData.filter(function(o){return !(o.__r||ntRead(o))}).length;
+    $("bellN").hidden=!(un>0);
+    $("noCnt").textContent=tx("no_s")+(noLoaded&&!noErr?" \u00b7 "+F(tx("no_unread"),{n:N(un)}):"");
+    list.innerHTML="";
+    if(!noLoaded){msg("noMsg","");return}
+    if(noErr){msg("noMsg",esc(tx("load_err"))+" ("+esc(noErr)+") <button class='mini' type='button' data-retry='1'>"+tx("retry")+"</button>");return}
+    if(!noData.length){msg("noMsg",esc(tx("no_empty")));return}
+    msg("noMsg","");
+    var arr=noData.slice().sort(function(a,b){var x=dOf(b.created_at),y=dOf(a.created_at);return (x?x.getTime():+b.id||0)-(y?y.getTime():+a.id||0)});
+    list.innerHTML=arr.map(function(o){
+      var rd=o.__r||ntRead(o),title=pick(o,["title","subject"]),m=pick(o,["message","text","content","body","description"]),d=dOf(o.created_at);
+      if(title==null&&m==null){title=JSON.stringify(o)}
+      return "<button class='nt"+(rd?" rd":"")+"' type='button' data-id='"+esc(o.id)+"'><span class='d'></span><div><b>"+esc(title!=null?title:m)+"</b>"+(title!=null&&m!=null?esc(m):"")+"<small>"+(d?esc(fmtDT(d)):"")+"</small></div><span class='rtag'>"+(rd?tx("read"):"")+"</span></button>";
+    }).join("");
+  }
+  $("noMsg").onclick=function(e){if(e.target.closest("[data-retry]"))loadNotifs()};
+  $("noList").onclick=async function(e){
+    var b=e.target.closest(".nt");if(!b)return;
+    var id=b.dataset.id,o=noData.filter(function(x){return String(x.id)===id})[0];
+    if(!o||o.__r||ntRead(o))return;
+    try{var r=await fetch(API_BASE+"/notifications/"+encodeURIComponent(id)+"/read",{method:"PATCH"});if(!r.ok)throw new Error(r.status);o.__r=true;drawNotifs();say(tx("t_read"))}
+    catch(err){say(tx("m_nr")+" ("+(err.message||"")+")")}
+  };
+  function all(){drawStatic();drawFilters();drawBars();drawWf();drawLog();drawStats();drawLeads();drawReport();drawPlan();drawPlans();drawCustomers();drawNotifs()}
   applyPlan();
   stamp();route();
   all();
@@ -782,7 +886,8 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var t=/lost/.test(st)?4:/convert|won|closed/.test(st)?3:/qualif/.test(st)?2:/contact/.test(st)?1:0;
     var s=sr.indexOf("face")>-1?1:sr.indexOf("google")>-1?2:sr.indexOf("linked")>-1?3:sr.indexOf("refer")>-1?4:sr==="email"?5:(sr==="website"||sr==="web")?0:6;
     var ca=String(o.created_at||""),dt=new Date(/Z|[+-]\d\d:?\d\d$/.test(ca)?ca:ca+"Z"),d=isNaN(dt)?0:Math.max(0,Math.floor((Date.now()-dt)/864e5));
-    return{id:o.id,n:o.name||"",e:String(o.email||"").toLowerCase(),p:String(o.phone||""),c:o.company||"",i:-1,s:s,t:t,v:+(o.value||o.amount||0)||0,d:d};
+    var nm=function(x){return String(x||"").toLowerCase().replace(/[^a-z0-9]/g,"")},ii=-1;IN_EN.forEach(function(x,k){if(nm(x)===nm(o.interest))ii=k});
+    return{id:o.id,n:o.name||"",e:String(o.email||"").toLowerCase(),p:String(o.phone||""),c:o.company||"",i:ii,ir:o.interest||"",s:s,t:t,v:+(o.value||o.amount||0)||0,d:d};
   }
   async function loadLeads(){
     try{
@@ -793,6 +898,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   }
   if(USE_BACKEND)loadLeads().then(function(ok){if(!ok)say(tx("m_off"))});
   if(USE_BACKEND)loadReport().then(function(ok){if(ok)drawReport()});
+  if(USE_BACKEND)loadNotifs();
 
   function setLang(l){lang=l;try{localStorage.setItem("sb-lang",l)}catch(e){}all()}
   $("bEn").onclick=function(){setLang("en")};$("bBn").onclick=function(){setLang("bn")};
@@ -816,7 +922,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var th=VS[[].indexOf.call(document.querySelectorAll(".tab"),t)];if(location.hash==="#"+th)route();else location.hash=th;
   }});
   document.querySelectorAll(".card").forEach(function(c,i){
-    c.style.setProperty("--i",i);
+    var vw=c.closest(".view");c.style.setProperty("--i",Math.min(vw?[].indexOf.call(vw.querySelectorAll(".card"),c):i,8));
     c.addEventListener("pointermove",function(e){var r=c.getBoundingClientRect();c.style.setProperty("--mx",(e.clientX-r.left)+"px");c.style.setProperty("--my",(e.clientY-r.top)+"px")});
   });
   if(!matchMedia("(prefers-reduced-motion:reduce)").matches)document.querySelectorAll("[data-to]").forEach(function(el){
