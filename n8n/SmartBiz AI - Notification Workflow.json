@@ -22,28 +22,10 @@
         "assignments": {
           "assignments": [
             {
-              "id": "38f25cbd-3905-42d5-a36f-522ae191102b",
-              "name": "event",
-              "value": "={{ $json.body.event }}",
-              "type": "string"
-            },
-            {
-              "id": "933844ec-10b1-401e-8a28-a810eef53a90",
-              "name": "title",
-              "value": "={{ $json.body.title }}",
-              "type": "string"
-            },
-            {
               "id": "24391b4d-2bf6-4372-a161-fc233c56d1be",
               "name": "message",
-              "value": "={{ $json.body.message }}",
+              "value": "={{ \"New lead from website: \" + $json.body.name }}",
               "type": "string"
-            },
-            {
-              "id": "2b6f62d0-3c1b-4d38-8633-c5c5a45ca799",
-              "name": "lead_id",
-              "value": "={{ $json.body.lead_id }}",
-              "type": "number"
             }
           ]
         },
@@ -60,100 +42,8 @@
     },
     {
       "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 4
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ String($json.event ?? '').trim() }}",
-                    "rightValue": "\tnew_lead",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    },
-                    "id": "6371eba8-f847-4daa-b850-fdf65252ce6b"
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "New Lead"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 4
-                },
-                "conditions": [
-                  {
-                    "id": "77acdc78-1b43-40cc-8a27-b96d3a48760c",
-                    "leftValue": "={{ String($json.event ?? '').trim() }}",
-                    "rightValue": "follow_up",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Follow-up"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 4
-                },
-                "conditions": [
-                  {
-                    "id": "070716cf-21b5-41e1-a812-d1983b9a0c34",
-                    "leftValue": "={{ String($json.event ?? '').trim() }}",
-                    "rightValue": "error",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Error"
-            }
-          ]
-        },
-        "looseTypeValidation": true,
-        "options": {}
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.5,
-      "position": [
-        528,
-        -320
-      ],
-      "id": "b3a0105b-89dd-48d2-8cf8-7558d4ed6105",
-      "name": "Switch"
-    },
-    {
-      "parameters": {
         "method": "POST",
-        "url": "https://hawaii-wrapping-dice-loud.trycloudflare.com/api/notifications",
+        "url": "https://defuse-magical-unpicked.ngrok-free.dev/api/notifications",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -165,7 +55,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"message\": \"{{ $json.event }}: {{ $json.message }}\"\n}",
+        "jsonBody": "={\n  \"message\": \"{{ $json.message }}\"\n}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -201,13 +91,6 @@
           }
         ]
       ]
-    },
-    "Switch": {
-      "main": [
-        [],
-        [],
-        []
-      ]
     }
   },
   "active": true,
@@ -215,7 +98,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "bddced4c-10e2-4715-8d01-bfef9bacad46",
+  "versionId": "1c0c5833-4302-44bf-91f5-3e53c9357c88",
   "meta": {
     "instanceId": "b2f88b12f745b649c744d0488b841fd884b6cee45e94169659ce08de0c8541dc"
   },
