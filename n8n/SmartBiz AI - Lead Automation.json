@@ -10,7 +10,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.2,
       "position": [
-        48,
+        -64,
         0
       ],
       "id": "c4283f11-e824-4181-9667-5490dc2fed01",
@@ -19,16 +19,16 @@
     },
     {
       "parameters": {
-        "sendTo": "={{ $('Edit Fields1').item.json.email }}",
-        "subject": "=New Lead Received - SmartBiz AI",
-        "message": "=<p>Hello,</p>\n<p>A new lead has been received.</p>\n<p>Lead Name: {{ $('Edit Fields1').item.json.name }}</p>\n<p>Email: {{ $('Edit Fields1').item.json.email }}</p>\n<p>Company: {{ $('Edit Fields1').item.json.company }}</p>",
+        "sendTo": "={{ $('Generate Welcome Email node').item.json.to }}",
+        "subject": "={{ $('Generate Welcome Email node').item.json.subject }}",
+        "message": "={{ $('Generate Welcome Email node').item.json.html }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        144,
-        144
+        -160,
+        240
       ],
       "id": "692aad23-3c1e-4f90-82fc-9d75cd4bc3dd",
       "name": "Send a message",
@@ -53,7 +53,7 @@
             {
               "id": "1d2a1e0a-86e4-4f49-82ec-1ca54db964ba",
               "name": "company",
-              "value": "=\t{{ String($json.body.company).replace(/^\\s+|\\s+$/g, '') }}",
+              "value": "={{ String($json.body.company ?? '').replace(/^\\s+|\\s+$/g, '') }}",
               "type": "string"
             },
             {
@@ -117,8 +117,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        480,
-        384
+        320,
+        272
       ],
       "id": "7741b97b-4e5c-4fde-9fc4-94f32c6d4cff",
       "name": "Edit Fields1"
@@ -181,8 +181,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.4,
       "position": [
-        704,
-        384
+        544,
+        272
       ],
       "id": "574bc54e-4f81-4c60-a340-542fdad12154",
       "name": "If"
@@ -190,7 +190,73 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://hawaii-wrapping-dice-loud.trycloudflare.com/api/notifications",
+        "url": "https://defuse-magical-unpicked.ngrok-free.dev/api/leads",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "ngrok-skip-browser-warning",
+              "value": "true"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $json.name }}\",\n  \"email\": \"{{ $json.email }}\",\n  \"phone\": \"{{ $json.phone }}\",\n  \"company\": \"{{ $json.company }}\",\n  \"source\": \"{{ $json.source }}\",\n  \"interest\": \"{{ $json.interest }}\",\n  \"value\": {{ $json.value || 0 }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        256
+      ],
+      "id": "1bc3cdb8-e1d9-4763-8a77-5a58e6e542c3",
+      "name": "Save Lead to Backend",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://defuse-magical-unpicked.ngrok-free.dev/api/notifications",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "ngrok-skip-browser-warning",
+              "value": "true"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": \"New Lead: {{ $('Edit Fields1').item.json.name }} | Email: {{ $('Edit Fields1').item.json.email }}\"\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1008,
+        256
+      ],
+      "id": "aae9729f-0d47-4835-83e9-9dffd5ee07bd",
+      "name": "Create Notification",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://defuse-magical-unpicked.ngrok-free.dev/automation/welcome-email/{{ $('Save Lead to Backend').item.json.id }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -200,21 +266,41 @@
             }
           ]
         },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"message\": \"New Lead: {{ $json.message }}\"\n}",
-        "options": {
-          "timeout": 30000
-        }
+        "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        160,
-        496
+        1216,
+        256
       ],
-      "id": "aae9729f-0d47-4835-83e9-9dffd5ee07bd",
-      "name": "HTTP Request"
+      "id": "ce3bb6dd-ed66-4c27-9798-dc51412407c5",
+      "name": "Generate Welcome Email node"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://defuse-magical-unpicked.ngrok-free.dev/email-logs/{{ $('Generate Welcome Email node').item.json.log_id }}/status?status=sent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "ngrok-skip-browser-warning",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        64,
+        240
+      ],
+      "id": "7338547b-e24b-47d4-8795-d03e2c47b709",
+      "name": "Update Email Log Status",
+      "alwaysOutputData": true
     }
   ],
   "pinData": {},
@@ -245,18 +331,51 @@
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "Save Lead to Backend",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "HTTP Request": {
+    "Create Notification": {
+      "main": [
+        [
+          {
+            "node": "Generate Welcome Email node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Lead to Backend": {
+      "main": [
+        [
+          {
+            "node": "Create Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Welcome Email node": {
       "main": [
         [
           {
             "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update Email Log Status",
             "type": "main",
             "index": 0
           }
@@ -269,7 +388,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "0b66baa8-f7f7-40ab-9524-e99b6c3ac75e",
+  "versionId": "e13f62b7-60ef-4b9a-9098-4ac89f8cc5ed",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b2f88b12f745b649c744d0488b841fd884b6cee45e94169659ce08de0c8541dc"
