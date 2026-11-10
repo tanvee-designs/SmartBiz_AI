@@ -640,7 +640,8 @@ SmartBiz AI একটি End-to-End Automation System যা:
 - Created Final Project Report and coordinated deployment.
 
 ### 7.2 n8n Automation Module (Member 2 — Jannatun Naher)
-*(বিস্তারিত ডকুমেন্টেশন: `n8n/SmartBiz_AIdocs_n8n_Automation_User_Manual.pdf`)*
+📄 **[Full n8n Automation User Manual (PDF)](https://github.com/tanvee-designs/SmartBiz_AI/blob/main/n8n/SmartBiz_AIdocsn8n_Automation_User_Manual.pdf)**
+
 
 SmartBiz AI-এর অটোমেশন মডিউলে তিনটি প্রধান ওয়ার্কফ্লো রয়েছে:
 
