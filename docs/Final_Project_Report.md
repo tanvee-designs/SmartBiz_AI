@@ -764,7 +764,9 @@ https://github.com/tanvee-designs/SmartBiz_AI
 ---
 
 ## 11. Live Demo Link
-*(ডেমোর সময় Ngrok URL বা Render URL এখানে বসাও)*
+- **Backend API Docs:** https://smartbiz-ai-backend-8b8k.onrender.com/docs
+- **n8n Automation:** https://n8n-service-1sfw.onrender.com
+- **Frontend Dashboard:** https://smartbizofficial.netlify.app
 
 ---
 
