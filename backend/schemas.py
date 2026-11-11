@@ -155,6 +155,7 @@ class FollowUpResponse(BaseModel):
     lead_id: int
     channel: str
     note: Optional[str] = None
+    message: Optional[str] = None   # <--- এই লাইনটি নতুন যোগ করা হয়েছে
     status: str
     created_at: datetime
 
