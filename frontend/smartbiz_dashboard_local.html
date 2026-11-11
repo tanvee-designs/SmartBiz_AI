@@ -240,6 +240,27 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 .nt:hover{transform:translateY(-2px)}.nt .d{width:9px;height:9px;border-radius:50%;margin-top:7px;background:var(--amber);flex:none}
 .nt.rd{opacity:.65;cursor:default}.nt.rd .d{background:var(--track)}.nt b{display:block;font-weight:600}.nt small{display:block;color:var(--muted)}
 .nt .rtag{margin-left:auto;font-size:.72rem;font-weight:700;color:var(--muted);white-space:nowrap}
+.stats3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}
+.row-b{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);gap:16px}
+.recT{min-width:420px}
+.sd{display:block;max-width:150px;font-size:.72rem;line-height:1.35;color:var(--muted);font-weight:400}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--track);border-top-color:var(--ink);animation:spn .8s linear infinite;display:inline-block;flex:none}
+@keyframes spn{to{transform:rotate(360deg)}}
+.ldr{display:flex;align-items:center;gap:10px;color:var(--muted);padding:6px 0}
+.topbar{position:fixed;top:0;left:0;right:0;height:3px;z-index:60;opacity:0;pointer-events:none;transition:opacity .3s;background:linear-gradient(90deg,transparent,var(--amber),transparent) no-repeat;background-size:40% 100%;animation:tbar 1.1s ease-in-out infinite}
+.is-loading .topbar{opacity:1}
+@keyframes tbar{0%{background-position:-40% 0}100%{background-position:140% 0}}
+.is-loading .big b{color:transparent;width:55%;border-radius:10px;background:linear-gradient(90deg,var(--track) 25%,var(--soft) 50%,var(--track) 75%);background-size:200% 100%;animation:shim 1.3s linear infinite}
+.is-loading .big .chip{visibility:hidden}
+@keyframes shim{to{background-position:-200% 0}}
+:root{--link:#1a63d8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--link:#8ab4f8}}
+:root[data-theme="dark"]{--link:#8ab4f8}
+.planbtn{background:var(--soft);border:0;box-shadow:none;color:var(--muted);font-weight:500;padding:8px 16px;gap:8px}
+.planbtn .sep{opacity:.5}
+.planbtn .up{color:var(--link);text-decoration:underline;text-underline-offset:3px}
+.planbtn.p{background:linear-gradient(135deg,#F7D27A,#E8A44A);color:#2b1c00}
+@media (max-width:1000px){.stats3,.row-b{grid-template-columns:1fr}}
 @media (max-width:480px){.fg{grid-template-columns:1fr}.paper-inner{padding:24px 20px 14px}}
 @media (max-width:1000px){.grid2,.rgrid{grid-template-columns:1fr}}
 @keyframes drift{to{transform:translate3d(4%,3%,0) scale(1.12)}}
@@ -255,20 +276,46 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 @media (max-width:1000px){.hero,.row2,.row3{grid-template-columns:1fr}.wfs{grid-template-columns:1fr 1fr}.tabs{order:3;width:100%}}
 @media (max-width:520px){.wfs{grid-template-columns:1fr}.tools{margin-left:0}}
+
+.planbtn{background:none;border:0;box-shadow:none;color:var(--link);font-weight:700;padding:8px 8px;gap:7px}
+.planbtn:hover{transform:none;opacity:.8}
+.planbtn svg{width:18px;height:18px;fill:currentColor}
+.wkcards{display:grid;gap:16px}
+.dg{display:flex;align-items:stretch;overflow-x:auto;padding:18px 2px 8px}
+.nd{flex:0 0 196px;background:var(--soft);border:1px solid var(--bd);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.nd .nh{display:flex;align-items:center;gap:8px}
+.nd .ni{width:28px;height:28px;border-radius:50%;background:var(--pill);color:var(--pill-ink);display:grid;place-items:center;font-weight:700;font-size:.8rem}
+.nd.trigger .ni{background:var(--amber);color:#111}
+.nd .ty{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.nd b{font-weight:600;font-size:.88rem;line-height:1.3}
+.nd small{color:var(--muted);font-size:.78rem;line-height:1.4}
+.ar{flex:0 0 34px;align-self:center;height:2px;background:var(--muted);opacity:.7;position:relative}
+.ar::after{content:"";position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left:7px solid var(--muted);border-right:0}
+.fan{flex:0 0 230px;align-self:center;color:var(--muted)}.fan text{fill:var(--ink);font-size:11px;font-weight:600}
+.wkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+#v-workflows [hidden]{display:none!important}
+.wtag{display:inline-block;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--soft);border:1px solid var(--bd);margin:0 6px 6px 0}
+.wkc{display:flex;flex-direction:column;gap:4px}.wkc .go{margin-top:14px;align-self:flex-start}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.84rem}.kv span{color:var(--muted)}.kv b{font-weight:500;text-align:right;word-break:break-word}
+.errbox{padding:12px 14px;border-radius:14px;background:var(--bad-bg);color:var(--bad-ink);font-size:.86rem;margin-bottom:10px;word-break:break-word}
+#wkDet tbody tr[data-ix]{cursor:pointer}#wkDet tr.sel{background:rgba(127,127,140,.14)}
+.wkbk{margin-bottom:14px}
+#v-workflows .card{animation:none}
 </style>
 </head>
 <body>
+<div class="topbar" id="topbar"></div>
 <div class="wrap">
   <nav class="top" aria-label="Main">
     <div class="logo"><i></i>SmartBiz AI</div>
     <div class="tabs">
       <button class="tab" type="button" aria-current="page" data-i="tab1"></button>
-      <button class="tab" type="button" data-i="tab2"></button>
+      
       <button class="tab" type="button" data-i="tab3"></button>
-      <button class="tab" type="button" data-i="tab4"></button><button class="tab" type="button" data-i="tab5"></button><button class="tab" type="button" data-i="tab6"></button>
+      <button class="tab" type="button" data-i="tab4"></button><button class="tab" type="button" data-i="tab5"></button><button class="tab" type="button" data-i="tab6"></button><button class="tab" type="button" data-i="tab2"></button>
     </div>
     <div class="tools">
-      <button class="planbtn" id="planBtn" type="button" data-go="plans"></button>
+      <button class="planbtn" id="planBtn" type="button"></button>
       <div class="seg" role="group" aria-label="Language">
         <button type="button" id="bEn" aria-pressed="true">EN</button>
         <button type="button" id="bBn" aria-pressed="false">বাংলা</button>
@@ -279,70 +326,29 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     </div>
   </nav>
 
-  <div class="view on" id="v-dash"><header class="head">
-    <div>
-      <span class="dt" id="date"></span>
-      <h1 id="greet"></h1>
-      <p data-i="sub"></p>
-    </div>
-    <button class="go" id="runBtn" type="button" data-i="run"></button>
-  </header>
-
-  <div class="card pbn" id="planBanner"></div>
-  <section class="hero">
-    <div class="card big"><span class="mut" data-i="m1"></span><b class="num" id="sLeads">0</b><div class="bar"><i id="bLeads" style="width:0"></i></div><span class="chip" id="chW"></span></div>
-    <div class="card big"><span class="mut" data-i="m2"></span><b class="num" id="sConv">0</b><div class="bar a"><i id="bConv" style="width:0"></i></div><span class="chip" id="chC"></span></div>
-    <div class="card">
-      <h2><span data-i="pipe"></span><span class="mut live" data-i="conn"></span></h2>
-      <div class="flow">
-        <div class="step"><span>1</span><em style="font-style:normal" data-i="p1"></em></div><div class="ln"></div>
-        <div class="step"><span>2</span><em style="font-style:normal" data-i="p2"></em></div><div class="ln"></div>
-        <div class="step"><span>3</span><em style="font-style:normal" data-i="p3"></em></div><div class="ln"></div>
-        <div class="step"><span>4</span><em style="font-style:normal" data-i="p4"></em></div><div class="ln"></div><div class="step"><span>5</span><em style="font-style:normal" data-i="p5"></em></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="row2">
-    <div class="col">
-      <div class="card kpi"><h2><span data-i="k1"></span><span class="arrow">↗</span></h2><div class="v"><div><b class="num" id="kRuns" data-to="212">212</b><span class="mut" data-i="k1s"></span></div><div class="spark" id="sp1"></div></div></div>
-      <div class="card kpi"><h2><span data-i="k2"></span><span class="arrow">↗</span></h2><div class="v"><div><b class="num" id="kRev">0</b><span class="mut" data-i="k2s"></span></div><div class="spark" id="sp2"></div></div></div>
-    </div>
-    <div class="card">
-      <h2><span data-i="sr"></span><span class="mut" data-i="today"></span></h2>
-      <div class="hb" id="hb"></div>
-    </div>
-    <div class="card">
-      <h2><span data-i="wc"></span><span class="mut" data-i="wch"></span></h2>
-      <div class="wfs" id="wfs"></div>
-    </div>
-  </section>
-
-  <section class="row3">
-    <div class="card">
-      <h2 data-i="log"></h2>
-      <div class="filters">
-        <select id="fWf" aria-label="Workflow"></select>
-        <select id="fSt" aria-label="Status"></select>
-        <input id="fQ" type="search" data-p="q" aria-label="Search">
-      </div>
-      <div class="scroll"><table>
-        <thead><tr><th data-i="h1"></th><th data-i="h2"></th><th data-i="h3"></th><th data-i="h4"></th><th data-i="h5"></th></tr></thead>
-        <tbody id="log"></tbody>
-      </table></div>
-    </div>
-    <div class="card">
-      <h2 data-i="al"></h2>
-      <div class="al"><span class="d r"></span><div><b data-i="a1"></b><span class="mut" data-i="a1s"></span></div></div>
-      <div class="al"><span class="d"></span><div><b data-i="a2"></b><span class="mut" data-i="a2s"></span></div></div>
-      <div class="al"><span class="d"></span><div><b data-i="a3"></b><span class="mut" data-i="a3s"></span></div></div>
-    </div>
-  </section>
+  <div class="view on" id="v-dash">
+<header class="head"><div><span class="dt" id="date"></span><h1 id="greet"></h1><p data-i="sub"></p></div></header>
+<div class="msgbox" id="offMsg" hidden style="margin-bottom:16px"></div>
+<section class="stats3">
+  <div class="card big"><span class="mut" data-i="m1"></span><b class="num" id="sLeads">0</b><div class="bar"><i id="bLeads" style="width:0"></i></div><span class="chip" id="chW"></span></div>
+  <div class="card big"><span class="mut" data-i="m2"></span><b class="num" id="sConv">0</b><div class="bar a"><i id="bConv" style="width:0"></i></div><span class="chip" id="chC"></span></div>
+  <div class="card big"><span class="mut" data-i="k2"></span><b class="num" id="kRev">0</b><div class="bar"><i style="width:0;visibility:hidden"></i></div><span class="chip" data-i="k2s"></span></div>
+</section>
+<div class="card" style="margin-bottom:16px">
+  <h2><span data-i="pipe"></span></h2>
+  <div class="flow">
+    <div class="step"><span>1</span><em style="font-style:normal" data-i="p1"></em><small class="sd" data-i="ar1d"></small></div><div class="ln"></div>
+    <div class="step"><span>2</span><em style="font-style:normal" data-i="p2"></em><small class="sd" data-i="ar2d"></small></div><div class="ln"></div>
+    <div class="step"><span>3</span><em style="font-style:normal" data-i="p3"></em><small class="sd" data-i="ar3d"></small></div><div class="ln"></div>
+    <div class="step"><span>4</span><em style="font-style:normal" data-i="p4"></em><small class="sd" data-i="ar4d"></small></div><div class="ln"></div>
+    <div class="step"><span>5</span><em style="font-style:normal" data-i="p5"></em><small class="sd" data-i="ar5d"></small></div>
   </div>
-<div class="view" id="v-workflows">
-<header class="head"><div><h1 data-i="wf_t"></h1><p data-i="wf_s"></p></div></header>
-<div class="arch" id="arch"></div>
-<div class="card"><h2 data-i="au_t"></h2><div class="scroll"><table><thead><tr><th data-i="h1"></th><th data-i="th_s"></th><th data-i="th_a"></th><th></th></tr></thead><tbody id="wt"></tbody></table></div></div>
+</div>
+<section class="row-b">
+  <div class="card chart"><h2><span data-i="sr"></span><span class="mut" data-i="today"></span></h2><div class="hb" id="hb"></div></div>
+  <div class="card"><h2><span data-i="rec_t"></span><button class="mini" id="vaBtn" type="button" data-i="va"></button></h2>
+    <div class="scroll"><table class="recT"><thead><tr><th data-i="lh1"></th><th data-i="f_s"></th><th data-i="lh5"></th><th data-i="lh6"></th></tr></thead><tbody id="recBody"></tbody></table></div></div>
+</section>
 </div>
 <div class="view" id="v-leads">
 <header class="head"><div><h1 data-i="tab3"></h1><p data-i="ld_s"></p></div>
@@ -393,13 +399,14 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 <header class="head"><div><h1 data-i="tab6"></h1><p id="noCnt"></p></div></header>
 <div class="card"><div class="msgbox" id="noMsg" hidden></div><div class="nlist" id="noList"></div></div>
 </div>
-<div class="view" id="v-plans"><header class="head"><div><h1 data-i="pl_t"></h1><p data-i="pl_s"></p></div></header><div id="pl"></div></div>
+<div class="view" id="v-workflows"><div id="wkTop"><header class="head"><div><h1 data-i="wk_t"></h1><p data-i="wk_s"></p></div></header>
+<div class="card" style="margin-bottom:16px"><h2><span data-i="wk_stat"></span><span class="pill s-run" id="wkPill"></span></h2><p class="mut" id="wkNote" style="margin:8px 0 0"></p></div></div>
+<div class="wkgrid" id="wkMain"></div><div class="card" id="wkRec" style="margin-top:16px" hidden></div><div id="wkDet" hidden></div></div>
 <div class="view" id="v-reports">
 <header class="head"><div><h1 data-i="rp_t"></h1><p data-i="rp_s"></p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="go alt" id="rDl" type="button" data-i="dl"></button><button class="go" id="rGen" type="button" data-i="gen" disabled title="Report generation is not available yet"></button></div></header>
 <div id="rBody" style="transition:opacity .3s">
 <div class="card rp"><h2><span data-i="rh_sum"></span><span class="mut"><span data-i="gen_at"></span> <span id="rTime"></span></span></h2><p id="rSum" style="margin:10px 0 8px;font-size:1rem"></p><span class="chip" id="rBadge" style="background:var(--soft);color:var(--muted)"></span></div>
-<div id="rPro" class="prowrap"><div class="gate"><b data-i="g_t"></b><span class="mut" data-i="g_s"></span><button class="go" type="button" data-go="plans" data-i="upg"></button></div>
-<div class="rgrid"><div class="card rp"><h2 data-i="rh_ins"></h2><ul id="rIns"></ul></div><div class="card rp"><h2 data-i="rh_rec"></h2><ul id="rRec"></ul></div></div>
+<div id="rPro" class="prowrap"><div class="rgrid"><div class="card rp"><h2 data-i="rh_ins"></h2><ul id="rIns"></ul></div><div class="card rp"><h2 data-i="rh_rec"></h2><ul id="rRec"></ul></div></div>
 <div class="rgrid"><div class="card"><h2 data-i="rh_src"></h2><div class="hb" id="rSrc"></div></div><div class="card"><h2 data-i="rh_st"></h2><div class="hb" id="rSt"></div></div></div></div>
 </div></div>
 <p class="foot" id="srcNote"></p>
@@ -418,7 +425,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 <script>
 (function(){
   var T={
-  en:{tab1:"Dashboard",tab2:"Workflows",tab3:"Leads",tab4:"AI Reports",
+  en:{wk_t:"Workflows",wk_vd:"View Details",wk_rec:"Recent executions",wk_unl:"No executions are linked to this workflow yet. All executions are listed under Recent executions on the Workflows page.",wk_lst:"Last execution status",wk_lt:"Last execution time",wk_back:"← Back to Workflows",wk_trig:"Trigger type",wk_act:"Active status",wk_last:"Last execution",wk_struct:"Node structure and connections",wk_det:"Execution details",wk_err:"Error message",wk_na:"Not available",wk_active:"Active",wk_inactive:"Inactive",wk_sel:"Select an execution to see its details.",wk_noerr:"No error recorded",wk_hd:"Status",wk_hs:"Started",wk_hu:"Duration",wk_he:"Error",wk_trl:"Trigger",wk_s:"The n8n automation workflows behind SmartBiz AI.",wk_nodes:"nodes",wk_node:"node",wk_tr:"Trigger",wk_ac:"Action",wk_lg:"Condition",wk_stat:"Execution status",wk_off:"Not connected",wk_off_s:"Execution status and history will appear here once the backend provides the workflows API.",wk_on:"Connected",wk_hist:"Execution history",wk_h1:"Workflow",wk_h2:"Status",wk_h3:"Started",wk_h4:"Duration",wk_none:"No execution data available",t_upg:"Premium plans are coming soon",tab1:"Dashboard",tab2:"Workflows",tab3:"Leads",tab4:"AI Reports",
     gm:"Good morning",ga:"Good afternoon",ge:"Good evening",
     sub:"Here’s how your business automation is performing today.",run:"Run workflow now",
     m1:"New leads captured",m2:"Automated emails sent",d1:"+14% vs yesterday",d2:"+9% vs yesterday",
@@ -460,8 +467,8 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     lim15:"15 leads",wf3:"3 core workflows",wf6:"All 6 workflows",ai_s:"Summary only",ai_f:"Full insights",team1:"1 user",team5:"Up to 5 users",sup_c:"Community support",sup_p:"Priority support",
     t_limit:"Free plan limit reached (15 leads). Upgrade to add more.",t_prem:"This workflow is a Premium feature",t_up:"Premium activated",t_dn:"Switched to Free plan",t_rs:"Demo restarted: new 7-day trial",
     g_t:"Premium report",g_s:"Upgrade to unlock insights, recommendations and charts.",usage_f:"{n} of 15 leads used on the Free plan",usage_p:"Unlimited leads",pl_free:"Free",
-    m_201:"Lead saved successfully",m_409:"This email already exists. Use a different email.",m_422:"Invalid data. Please check the form and try again.",m_net:"Cannot reach the backend. Start it with: cd backend, then uvicorn main:app --reload",m_err:"Unexpected server response",foot_live:"Live data from the backend",foot_demo:"Demo data · backend offline",m_off:"Backend offline. Showing demo data.",t_demo:"Demo Feature",m_pf:"Could not update status",m_404:"Lead not found",rb_live:"AI report from the backend",m_rep_off:"No backend report yet. Showing the demo report.",dl:"Download report",rc_print:"Printing {p}%",rc_done:"Report ready",rc_sub:"Detached from the printer. Download or print it.",rc_dl:"Download",rc_pr:"Print / Save PDF",rc_cl:"Close",rc_off:"Official report",rc_no:"Report no.",rc_dt:"Date",rc_ty:"Type",rc_sr:"Data",rc_m:"Metric",rc_v:"Value",rc_top:"Top source",rc_thx:"Thank you for using SmartBiz AI",rc_saved:"Report downloaded",tab5:"Customers",tab6:"Notifications",cu_s:"Customers from the backend",no_s:"Latest notifications",cu_empty:"No customers yet",no_empty:"No notifications",load_err:"Could not load data. Is the backend running?",retry:"Retry",no_unread:"{n} unread",read:"Read",t_read:"Marked as read",m_nr:"Could not mark as read",lh_v:"Deal value",f_v:"Deal value (৳)",v_val:"Enter a valid amount",lh_td:"Total deals"},
-  bn:{tab1:"ড্যাশবোর্ড",tab2:"ওয়ার্কফ্লো",tab3:"লিড",tab4:"AI রিপোর্ট",
+    m_201:"Lead saved successfully",m_409:"This email already exists. Use a different email.",m_422:"Invalid data. Please check the form and try again.",m_net:"Cannot reach the backend. Start it with: cd backend, then uvicorn main:app --reload",m_err:"Unexpected server response",foot_live:"Live data from the backend",foot_demo:"Demo data · backend offline",m_off:"Backend offline. Showing demo data.",t_demo:"Demo Feature",m_pf:"Could not update status",m_404:"Lead not found",rb_live:"AI report from the backend",m_rep_off:"No backend report yet. Showing the demo report.",dl:"Download report",rc_print:"Printing {p}%",rc_done:"Report ready",rc_sub:"Detached from the printer. Download or print it.",rc_dl:"Download",rc_pr:"Print / Save PDF",rc_cl:"Close",rc_off:"Official report",rc_no:"Report no.",rc_dt:"Date",rc_ty:"Type",rc_sr:"Data",rc_m:"Metric",rc_v:"Value",rc_top:"Top source",rc_thx:"Thank you for using SmartBiz AI",rc_saved:"Report downloaded",tab5:"Customers",tab6:"Notifications",cu_s:"Customers from the backend",no_s:"Latest notifications",cu_empty:"No customers yet",no_empty:"No notifications",load_err:"Could not load data. Is the backend running?",retry:"Retry",no_unread:"{n} unread",read:"Read",t_read:"Marked as read",m_nr:"Could not mark as read",lh_v:"Deal value",f_v:"Deal value (৳)",v_val:"Enter a valid amount",lh_td:"Total deals",no_data:"No data available",loading:"Loading\u2026",no_report:"No AI report available yet",rec_t:"Recent leads",va:"View all",pl_lbl:"Free plan",cu_empty:"No data available",no_empty:"No data available",foot_demo:"Backend offline \u00b7 data unavailable",m_off:"Could not reach the backend."},
+  bn:{wk_t:"ওয়ার্কফ্লো",wk_vd:"বিস্তারিত দেখুন",wk_rec:"সাম্প্রতিক এক্সিকিউশন",wk_unl:"এই ওয়ার্কফ্লোর সাথে এখনো কোনো এক্সিকিউশন যুক্ত নেই। সব এক্সিকিউশন Workflows পেজের সাম্প্রতিক এক্সিকিউশনে আছে।",wk_lst:"সর্বশেষ এক্সিকিউশনের অবস্থা",wk_lt:"সর্বশেষ এক্সিকিউশনের সময়",wk_back:"← ওয়ার্কফ্লো তালিকায় ফিরুন",wk_trig:"ট্রিগারের ধরন",wk_act:"সক্রিয় অবস্থা",wk_last:"সর্বশেষ এক্সিকিউশন",wk_struct:"নোড কাঠামো ও সংযোগ",wk_det:"এক্সিকিউশনের বিবরণ",wk_err:"এরর মেসেজ",wk_na:"পাওয়া যায়নি",wk_active:"সক্রিয়",wk_inactive:"নিষ্ক্রিয়",wk_sel:"বিবরণ দেখতে একটি এক্সিকিউশন বেছে নিন।",wk_noerr:"কোনো এরর নেই",wk_hd:"অবস্থা",wk_hs:"শুরু",wk_hu:"সময়কাল",wk_he:"এরর",wk_trl:"ট্রিগার",wk_s:"SmartBiz AI-এর n8n অটোমেশন ওয়ার্কফ্লো।",wk_nodes:"টি নোড",wk_node:"টি নোড",wk_tr:"ট্রিগার",wk_ac:"অ্যাকশন",wk_lg:"শর্ত",wk_stat:"এক্সিকিউশন স্ট্যাটাস",wk_off:"সংযুক্ত নয়",wk_off_s:"ব্যাকএন্ডে workflows API এলে এখানে এক্সিকিউশন স্ট্যাটাস ও হিস্ট্রি দেখা যাবে।",wk_on:"সংযুক্ত",wk_hist:"এক্সিকিউশন হিস্ট্রি",wk_h1:"ওয়ার্কফ্লো",wk_h2:"অবস্থা",wk_h3:"শুরু",wk_h4:"সময়কাল",wk_none:"কোনো এক্সিকিউশন ডেটা নেই",t_upg:"প্রিমিয়াম প্ল্যান শীঘ্রই আসছে",tab1:"ড্যাশবোর্ড",tab2:"ওয়ার্কফ্লো",tab3:"লিড",tab4:"AI রিপোর্ট",
     gm:"শুভ সকাল",ga:"শুভ অপরাহ্ন",ge:"শুভ সন্ধ্যা",
     sub:"আপনার ব্যবসার অটোমেশন আজ কেমন চলছে, দেখুন।",run:"এখনই ওয়ার্কফ্লো চালান",
     m1:"নতুন লিড সংগ্রহ",m2:"স্বয়ংক্রিয় ইমেইল পাঠানো",d1:"গতকালের চেয়ে +১৪%",d2:"গতকালের চেয়ে +৯%",
@@ -503,11 +510,11 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     lim15:"১৫টি লিড",wf3:"৩টি মূল ওয়ার্কফ্লো",wf6:"সব ৬টি ওয়ার্কফ্লো",ai_s:"শুধু সারাংশ",ai_f:"পূর্ণ ইনসাইট",team1:"১ জন",team5:"সর্বোচ্চ ৫ জন",sup_c:"কমিউনিটি সাপোর্ট",sup_p:"অগ্রাধিকার সাপোর্ট",
     t_limit:"ফ্রি প্ল্যানে সীমা শেষ (১৫টি লিড)। আরও যোগ করতে আপগ্রেড করুন।",t_prem:"এই ওয়ার্কফ্লো প্রিমিয়াম সুবিধা",t_up:"প্রিমিয়াম চালু হয়েছে",t_dn:"ফ্রি প্ল্যানে ফিরে এসেছেন",t_rs:"ডেমো রিস্টার্ট: নতুন ৭ দিনের ট্রায়াল",
     g_t:"প্রিমিয়াম রিপোর্ট",g_s:"ইনসাইট, সুপারিশ ও চার্ট খুলতে আপগ্রেড করুন।",usage_f:"ফ্রি প্ল্যানে {n}/১৫টি লিড ব্যবহৃত",usage_p:"সীমাহীন লিড",pl_free:"ফ্রি",
-    m_201:"লিড সফলভাবে সংরক্ষিত হয়েছে",m_409:"এই ইমেইল আগে থেকেই আছে। অন্য ইমেইল দিন।",m_422:"ডেটা সঠিক নয়। ফর্ম দেখে আবার চেষ্টা করুন।",m_net:"ব্যাকএন্ডে পৌঁছানো যাচ্ছে না। cd backend, তারপর uvicorn main:app --reload চালু করুন।",m_err:"সার্ভার অপ্রত্যাশিত উত্তর দিয়েছে",foot_live:"ব্যাকএন্ড থেকে আসল ডেটা",foot_demo:"ডেমো ডেটা · ব্যাকএন্ড বন্ধ",m_off:"ব্যাকএন্ড বন্ধ। ডেমো ডেটা দেখানো হচ্ছে।",t_demo:"ডেমো ফিচার",m_pf:"স্ট্যাটাস আপডেট করা যায়নি",m_404:"লিড পাওয়া যায়নি",rb_live:"ব্যাকএন্ড থেকে AI রিপোর্ট",m_rep_off:"ব্যাকএন্ডে এখনো রিপোর্ট নেই। ডেমো রিপোর্ট দেখানো হচ্ছে।",dl:"রিপোর্ট ডাউনলোড",rc_print:"ছাপা হচ্ছে {p}%",rc_done:"রিপোর্ট প্রস্তুত",rc_sub:"প্রিন্টার থেকে ছিঁড়ে নেওয়া হয়েছে। ডাউনলোড বা প্রিন্ট করুন।",rc_dl:"ডাউনলোড",rc_pr:"প্রিন্ট / PDF সেভ",rc_cl:"বন্ধ করুন",rc_off:"অফিশিয়াল রিপোর্ট",rc_no:"রিপোর্ট নং",rc_dt:"তারিখ",rc_ty:"ধরন",rc_sr:"ডেটা",rc_m:"মেট্রিক",rc_v:"মান",rc_top:"সেরা উৎস",rc_thx:"SmartBiz AI ব্যবহারের জন্য ধন্যবাদ",rc_saved:"রিপোর্ট ডাউনলোড হয়েছে",tab5:"গ্রাহক",tab6:"নোটিফিকেশন",cu_s:"ব্যাকএন্ড থেকে গ্রাহকের তালিকা",no_s:"সাম্প্রতিক নোটিফিকেশন",cu_empty:"এখনো কোনো গ্রাহক নেই",no_empty:"কোনো নোটিফিকেশন নেই",load_err:"ডেটা আনা যায়নি। ব্যাকএন্ড চালু আছে কি?",retry:"আবার চেষ্টা",no_unread:"{n}টি অপঠিত",read:"পড়া হয়েছে",t_read:"পড়া হিসেবে চিহ্নিত হয়েছে",m_nr:"পড়া হিসেবে চিহ্নিত করা যায়নি",lh_v:"ডিলের মূল্য",f_v:"ডিলের মূল্য (৳)",v_val:"সঠিক অঙ্ক দিন",lh_td:"মোট ডিল"}};
+    m_201:"লিড সফলভাবে সংরক্ষিত হয়েছে",m_409:"এই ইমেইল আগে থেকেই আছে। অন্য ইমেইল দিন।",m_422:"ডেটা সঠিক নয়। ফর্ম দেখে আবার চেষ্টা করুন।",m_net:"ব্যাকএন্ডে পৌঁছানো যাচ্ছে না। cd backend, তারপর uvicorn main:app --reload চালু করুন।",m_err:"সার্ভার অপ্রত্যাশিত উত্তর দিয়েছে",foot_live:"ব্যাকএন্ড থেকে আসল ডেটা",foot_demo:"ডেমো ডেটা · ব্যাকএন্ড বন্ধ",m_off:"ব্যাকএন্ড বন্ধ। ডেমো ডেটা দেখানো হচ্ছে।",t_demo:"ডেমো ফিচার",m_pf:"স্ট্যাটাস আপডেট করা যায়নি",m_404:"লিড পাওয়া যায়নি",rb_live:"ব্যাকএন্ড থেকে AI রিপোর্ট",m_rep_off:"ব্যাকএন্ডে এখনো রিপোর্ট নেই। ডেমো রিপোর্ট দেখানো হচ্ছে।",dl:"রিপোর্ট ডাউনলোড",rc_print:"ছাপা হচ্ছে {p}%",rc_done:"রিপোর্ট প্রস্তুত",rc_sub:"প্রিন্টার থেকে ছিঁড়ে নেওয়া হয়েছে। ডাউনলোড বা প্রিন্ট করুন।",rc_dl:"ডাউনলোড",rc_pr:"প্রিন্ট / PDF সেভ",rc_cl:"বন্ধ করুন",rc_off:"অফিশিয়াল রিপোর্ট",rc_no:"রিপোর্ট নং",rc_dt:"তারিখ",rc_ty:"ধরন",rc_sr:"ডেটা",rc_m:"মেট্রিক",rc_v:"মান",rc_top:"সেরা উৎস",rc_thx:"SmartBiz AI ব্যবহারের জন্য ধন্যবাদ",rc_saved:"রিপোর্ট ডাউনলোড হয়েছে",tab5:"গ্রাহক",tab6:"নোটিফিকেশন",cu_s:"ব্যাকএন্ড থেকে গ্রাহকের তালিকা",no_s:"সাম্প্রতিক নোটিফিকেশন",cu_empty:"এখনো কোনো গ্রাহক নেই",no_empty:"কোনো নোটিফিকেশন নেই",load_err:"ডেটা আনা যায়নি। ব্যাকএন্ড চালু আছে কি?",retry:"আবার চেষ্টা",no_unread:"{n}টি অপঠিত",read:"পড়া হয়েছে",t_read:"পড়া হিসেবে চিহ্নিত হয়েছে",m_nr:"পড়া হিসেবে চিহ্নিত করা যায়নি",lh_v:"ডিলের মূল্য",f_v:"ডিলের মূল্য (৳)",v_val:"সঠিক অঙ্ক দিন",lh_td:"মোট ডিল",no_data:"কোনো ডেটা পাওয়া যায়নি",loading:"লোড হচ্ছে…",no_report:"এখনো কোনো AI রিপোর্ট নেই",rec_t:"সাম্প্রতিক লিড",va:"সবগুলো দেখুন",pl_lbl:"ফ্রি প্ল্যান",cu_empty:"কোনো ডেটা পাওয়া যায়নি",no_empty:"কোনো ডেটা পাওয়া যায়নি",foot_demo:"ব্যাকএন্ড বন্ধ · ডেটা পাওয়া যায়নি",m_off:"ব্যাকএন্ডে পৌঁছানো যায়নি।"}};
   var lang="en";
   var API_HOST=(location.search.indexOf("api=local")>-1)?"http://127.0.0.1:8000":"https://smartbiz-ai-backend-8b8k.onrender.com",USE_BACKEND=true,API_URL=API_HOST+"/api/leads",SEND_SOURCE=true,live=false; // SEND_SOURCE=true once backend accepts "source" // set USE_BACKEND=false for offline demo
   try{var sv=localStorage.getItem("sb-lang");if(sv==="bn")lang="bn"}catch(e){}
-  var $=function(i){return document.getElementById(i)};
+  var _d=document.createElement("input");var $=function(i){return document.getElementById(i)||_d};
   var tx=function(k){return T[lang][k]};
   var BN="০১২৩৪৫৬৭৮৯";
   function N(n){var s=String(n);return lang==="bn"?s.replace(/\d/g,function(d){return BN[d]}):s}
@@ -559,18 +566,21 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
       return "<tr><td><strong>"+tx(l.w)+"</strong></td><td>"+tx(l.t)+"</td><td>"+ago(l.m)+"</td><td class='num'>"+(l.d===null?"—":N(l.d.toFixed(1))+tx("sec"))+"</td><td><span class='pill "+cl+"'>"+tx(l.s)+"</span></td></tr>";
     }).join(""):"<tr><td colspan='5' class='mut'>"+tx("none")+"</td></tr>";
   }
-  var VS=["dash","workflows","leads","reports","customers","notifications","plans"];
+  var VS=["dash","leads","reports","customers","notifications","workflows"];
   var SO=["so_web","so_fb","so_gf","so_li","so_ref","so_em","so_oth"],IN=["i_aut","i_ai","i_dash","i_cons","i_dm","i_web","i_oth"],ST=["sn","sc","sq","sw","sl"],IN_EN=["Business Automation","AI Services","Dashboard","Consulting","Digital Marketing","Web Development","Other"],SRC_KEYS=["website","facebook","google_forms","linkedin","referral","email","other"];
   var AT=["Website · Facebook · Google Forms","Name · Email · Phone · Interest","FastAPI · Python","SQLite · PostgreSQL","Leads · Conversion · Revenue · Charts"];
   var leads=[["Rafia Ahmed","rafia@boutique.com","01712345601",0,1,0,0,0],["Tanvir Hasan","tanvir@thelec.com","01812345602",1,0,1,0,0],["Nusrat Jahan","nusrat@bakery.com","01912345603",0,2,3,28000,1],["Sakib Rahman","sakib@traders.com","01612345604",2,1,0,0,1],["Mita Das","mita@fashion.com","01512345605",3,0,2,0,2],["Imran Hossain","imran@shop.com","01712345606",0,0,3,45000,2],["Farhana Akter","farhana@mail.com","01812345607",1,1,1,0,3],["Rakib Islam","rakib@store.com","01912345608",2,2,3,18500,4],["Sadia Khan","sadia@mail.com","01612345609",0,0,2,0,4],["Arif Chowdhury","arif@agro.com","01512345610",3,1,0,0,5],["Tasnia Noor","tasnia@mail.com","01712345611",1,2,3,32000,5],["Jamal Uddin","jamal@mail.com","01812345612",0,0,1,0,6]].map(function(a,i){return{id:i+1,n:a[0],e:a[1],p:a[2],i:a[3],s:a[4],t:a[5],v:a[6],d:a[7]}});
+  if(USE_BACKEND)leads=[];
+  var leadsLoading=USE_BACKEND,repLoaded=!USE_BACKEND;
   var reduced=matchMedia("(prefers-reduced-motion:reduce)").matches;
   function F(s,o){return s.replace(/\{(\w+)\}/g,function(_,k){return o[k]})}
   function BDT(n){return "৳"+N(n.toLocaleString("en-US"))}
   function stats(){var c=leads.filter(function(l){return l.t===3}),rev=c.reduce(function(a,l){return a+l.v},0);return{n:leads.length,c:c.length,rate:leads.length?Math.round(c.length/leads.length*100):0,rev:rev,wk:leads.filter(function(l){return l.d<=6}).length}}
   function setNum(el,to,f){
+    el._t=to;el._f=f;
     if(el._a||reduced){el.textContent=f(to);return}
     el._a=1;var t0=null;el.textContent=f(0);
-    function s(t){if(!t0)t0=t;var p=Math.min((t-t0)/1500,1);el.textContent=f(Math.round(to*(1-Math.pow(1-p,4))));if(p<1)requestAnimationFrame(s);else el.textContent=f(to)}
+    function s(t){if(!t0)t0=t;var p=Math.min((t-t0)/1500,1);el._f&&(el.textContent=el._f(Math.round(el._t*(1-Math.pow(1-p,4)))));if(p<1)requestAnimationFrame(s);else el.textContent=el._f(el._t)}
     setTimeout(function(){requestAnimationFrame(s)},500);
   }
   function drawStats(){var s=stats();
@@ -584,7 +594,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var mx=Math.max.apply(null,cnt.concat(3));
     for(var i=0;i<7;i++){var dt=new Date(Date.now()-(6-i)*864e5),bh=cnt[i]/mx*115,x=14+i*58;
       h+="<rect x='"+x+"' y='"+(150-bh)+"' width='34' height='"+bh+"' rx='7' fill='"+(cnt[i]===Math.max.apply(null,cnt)?"var(--amber)":"var(--pill)")+"'/><text x='"+(x+17)+"' y='"+(144-bh)+"' text-anchor='middle' font-weight='600'>"+N(cnt[i])+"</text><text x='"+(x+17)+"' y='170' text-anchor='middle'>"+dt.toLocaleDateString(loc,{weekday:"short"})+"</text>";}
-    $("hb").innerHTML="<svg viewBox='0 0 420 180' class='chart' role='img' aria-label='"+tx("sr")+"'>"+h+"<line x1='6' x2='414' y1='150' y2='150' stroke='var(--line)'/></svg>";
+    $("hb").innerHTML=(leadsLoading?LDR():!leads.length?"<div class='ldr'>"+esc(tx("no_data"))+"</div>":"<svg viewBox='0 0 420 180' class='chart' role='img' aria-label='"+tx("sr")+"'>"+h+"<line x1='6' x2='414' y1='150' y2='150' stroke='var(--line)'/></svg>");
   }
   function fillSel(id,keys,first){var s=$(id),v=s.value;s.innerHTML=(first?"<option value=''>"+tx(first)+"</option>":"")+keys.map(function(k,i){return "<option value='"+i+"'>"+tx(k)+"</option>"}).join("");if(v!=="")s.value=v}
   function drawLeads(){
@@ -592,7 +602,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var q=$("lQ").value.trim().toLowerCase(),a=$("lS").value,b=$("lO").value;
     var r=leads.filter(function(l){return(a===""||l.t==a)&&(b===""||l.s==b)&&(!q||(l.n+l.e+l.p).toLowerCase().indexOf(q)>-1)}).sort(function(x,y){return y.id-x.id});
     $("lb").innerHTML=r.length?r.map(function(l){
-      return "<tr><td><strong>"+esc(l.n)+"</strong>"+(l.c?"<br><span class='mut'>"+esc(l.c)+"</span>":"")+"</td><td>"+esc(l.e)+"<br><span class='mut'>"+N(l.p)+"</span></td><td>"+(IN[l.i]?tx(IN[l.i]):(l.ir?esc(l.ir):"—"))+"</td><td>"+tx(SO[l.s])+"</td><td class='num'>"+(l.v?BDT(l.v):"—")+"</td><td><select data-id='"+l.id+"' aria-label='"+tx("lh5")+"'>"+ST.map(function(k,i){return "<option value='"+i+"'"+(i===l.t?" selected":"")+">"+tx(k)+"</option>"}).join("")+"</select></td><td>"+(l.d?N(l.d)+tx("dago"):tx("dnow"))+"</td></tr>"}).join(""):"<tr><td colspan='7' class='mut'>"+tx("none2")+"</td></tr>";
+      return "<tr><td><strong>"+esc(l.n)+"</strong>"+(l.c?"<br><span class='mut'>"+esc(l.c)+"</span>":"")+"</td><td>"+esc(l.e)+"<br><span class='mut'>"+N(l.p)+"</span></td><td>"+(IN[l.i]?tx(IN[l.i]):(l.ir?esc(l.ir):"—"))+"</td><td>"+tx(SO[l.s])+"</td><td class='num'>"+(l.v?BDT(l.v):"—")+"</td><td><select data-id='"+l.id+"' aria-label='"+tx("lh5")+"'>"+ST.map(function(k,i){return "<option value='"+i+"'"+(i===l.t?" selected":"")+">"+tx(k)+"</option>"}).join("")+"</select></td><td>"+(l.d?N(l.d)+tx("dago"):tx("dnow"))+"</td></tr>"}).join(""):"<tr><td colspan='7' class='mut'>"+(leadsLoading?LDR():leads.length?tx("none2"):tx("no_data"))+"</td></tr>";
   }
   function bars(keys,arr,tot){return keys.map(function(k,i){var p=tot?Math.round(arr[i]/tot*100):0;return "<div><em>"+tx(k)+"</em><span style='width:"+Math.max(p,14)+"%'>"+N(arr[i])+"</span></div>"}).join("")}
   function li(ks,o){return ks.map(function(k){return "<li>"+F(tx(k),o)+"</li>"}).join("")}
@@ -641,18 +651,18 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
       var d=await r.json();
       if(Array.isArray(d)){var ai=d.filter(function(x){return x&&x.report_type==="ai_report"}),pool=ai.length?ai:d;d=pool.length?pool.reduce(function(a,b){return repTs(b)>=repTs(a)?b:a}):null}
       if(!d||typeof d!=="object")throw new Error("empty");
-      repData=d;return true;
-    }catch(err){repData=null;return false}
+      repData=d;repLoaded=true;return true;
+    }catch(err){repData=null;repLoaded=true;return false}
   }
   function drawReport(){
     var s=stats(),cs=SO.map(function(){return 0}),ci=IN.map(function(){return 0}),ct=ST.map(function(){return 0});
     leads.forEach(function(l){cs[l.s]++;if(l.i>=0)ci[l.i]++;ct[l.t]++});
     var ts=cs.indexOf(Math.max.apply(null,cs)),ti=ci.indexOf(Math.max.apply(null,ci));
     var o={n:N(s.n),c:N(s.c),r:N(s.rate),rev:BDT(s.rev),src:tx(SO[ts]),sh:N(s.n?Math.round(cs[ts]/s.n*100):0),int:Math.max.apply(null,ci)?tx(IN[ti]):"—",p:N(ct[0]+ct[1]),avg:BDT(s.c?Math.round(s.rev/s.c):0)};
-    $("rBadge").textContent=repData?tx("rb_live")+(repData.report_type?" \u00b7 "+repData.report_type:""):tx("rb");
-    $("rIns").parentNode.parentNode.style.display=(repData&&!repHasList(repData))?"none":"";
+    $("rBadge").hidden=!repData;$("rBadge").textContent=repData?tx("rb_live")+(repData.report_type?" \u00b7 "+repData.report_type:""):"";
+    $("rIns").parentNode.parentNode.style.display=(!USE_BACKEND||(repData&&repHasList(repData)))?"":"none";
     if(repData)renderRep(repData);else{
-      $("rSum").style.whiteSpace="";$("rSum").textContent=F(tx("r_sum"),o);
+      $("rSum").style.whiteSpace="";$("rSum").textContent=USE_BACKEND?(repLoaded?tx("no_report"):tx("loading")):F(tx("r_sum"),o);
       $("rIns").innerHTML=li(["r_i1","r_i2","r_i3"],o);$("rRec").innerHTML=li(["r_c1","r_c2","r_c3"],o);
     }
     $("rSrc").innerHTML=bars(SO,cs,s.n);$("rSt").innerHTML=bars(ST,ct,s.n);
@@ -707,49 +717,101 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   };
   $("lS").onchange=$("lO").onchange=drawLeads;$("lQ").oninput=drawLeads;
   $("rGen").onclick=async function(){var b=this;b.disabled=true;b.textContent=tx("gen_ing");$("rBody").style.opacity=.35;var ok=USE_BACKEND?await loadReport():false;if(!ok)await new Promise(function(r){setTimeout(r,900)});drawReport();if(!repData)stamp();$("rBody").style.opacity=1;b.disabled=false;b.textContent=tx("gen");say(tx(ok?"t_rep":"m_rep_off"))};
-  function route(){var h=(location.hash||"").slice(1);if(VS.indexOf(h)<0)h="dash";
+  function route(){var h=(location.hash||"").slice(1),mw=/^workflows-(lead|follow|notif)$/.exec(h);var wasV=curV;curV=mw?"workflows":h;wkSel=mw?mw[1]:null;wkExec=null;if(mw)h="workflows";if(VS.indexOf(h)<0)h="dash";
     VS.forEach(function(v){$("v-"+v).classList.toggle("on",v===h)});
     document.querySelectorAll(".tab").forEach(function(t,i){if(VS[i]===h)t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
-    window.scrollTo(0,0);if(h==="leads")showPanel("form");if(USE_BACKEND){if(h==="customers")loadCustomers();if(h==="notifications")loadNotifs();if(h==="reports")loadReport().then(function(){drawReport()})}}
+    window.scrollTo(0,0);if(h==="leads")showPanel("form");if(USE_BACKEND){if(h==="customers")loadCustomers();if(h==="notifications")loadNotifs();if(h==="workflows"){if(!wkLoaded||(wasV!=="workflows"&&Date.now()-wkAt>30000))loadWk();else drawWk()}if(h==="reports")loadReport().then(function(){drawReport()})}}
   window.addEventListener("hashchange",route);
   function esc(s){return String(s).replace(/[&<>"']/g,function(c){return "&#"+c.charCodeAt(0)+";"})}
-  var plan="trial",trialStart=Date.now(),PREM=["w3","w5","w6"],LIM=15;
-  try{var ts=localStorage.getItem("sb-ts");if(ts)trialStart=+ts;else localStorage.setItem("sb-ts",String(trialStart));var pp=localStorage.getItem("sb-plan");if(pp==="premium"||pp==="free")plan=pp}catch(x){}
-  function daysLeft(){return Math.max(0,7-Math.floor((Date.now()-trialStart)/864e5))}
-  function eff(){return plan==="premium"?"premium":plan==="free"?"free":daysLeft()>0?"trial":"free"}
-  function isPro(){return eff()!=="free"}
-  function lockedWf(w){return !isPro()&&PREM.indexOf(w.k)>-1}
-  function applyPlan(){if(!isPro())wfs.forEach(function(w){if(PREM.indexOf(w.k)>-1)w.on=false})}
-  function setPlan(p){plan=p;try{localStorage.setItem("sb-plan",p)}catch(x){}applyPlan();all()}
+  function isPro(){return true}
+  function lockedWf(){return false}
+  function applyPlan(){}
   function playStage(){var s=$("stage");s.classList.remove("play");void s.offsetWidth;s.classList.add("play")}
   function showPanel(p){$("pn-form").classList.toggle("on",p==="form");$("pn-rec").classList.toggle("on",p!=="form");$("sgForm").setAttribute("aria-pressed",p==="form");$("sgRec").setAttribute("aria-pressed",p!=="form");if(p==="form")playStage()}
   $("sgForm").onclick=function(){showPanel("form")};$("sgRec").onclick=function(){showPanel("rec")};
   $("lf").addEventListener("reset",function(){document.querySelectorAll("#lf .field").forEach(function(f){f.classList.remove("invalid")})});
   document.addEventListener("click",function(e){var b=e.target.closest("[data-go]");if(b)location.hash=b.dataset.go});
   function drawPlan(){
-    var e=eff(),d=daysLeft(),b=$("planBtn"),t=e==="trial"?"pb_trial":e==="premium"?"pb_prem":"pb_free";
-    b.className="planbtn"+(e==="premium"?" p":"");
-    b.innerHTML="<i></i>"+(e==="trial"?F(tx("b_trial"),{d:N(d)}):e==="premium"?"★ "+tx("b_prem"):tx("b_free"));
-    $("planBanner").innerHTML="<div><strong>"+tx(t)+"</strong><br><span class='mut'>"+F(tx(t+"_s"),{d:N(d)})+"</span></div>"+(e==="trial"?"<div class='meter'><div class='bar a'><i style='width:"+((8-d)/7*100)+"%'></i></div><span class='mut'>"+F(tx("tr_d"),{a:N(8-d)})+"</span></div>":"")+(e==="premium"?"":"<button class='go' type='button' data-go='plans'>"+tx(e==="trial"?"viewp":"upg")+"</button>");
-    $("rPro").classList.toggle("locked",!isPro());
-    $("usage").textContent="";
+    $("planBtn").innerHTML="<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 1.5c.5 5.2 2.6 8.8 6.2 10.5-3.6 1.7-5.7 5.3-6.2 10.5-.5-5.2-2.6-8.8-6.2-10.5C9.4 10.3 11.5 6.7 12 1.5z\"/></svg><span>"+tx("upg")+"</span>";
     $("srcNote").textContent=tx(live?"foot_live":"foot_demo");
   }
-  function cell(v){return v==="y"?"<span class='yes' aria-label='yes'>✓</span>":v==="n"?"<span class='no2' aria-label='no'>✕</span>":tx(v)}
-  function drawPlans(){
-    var e=eff(),d=daysLeft(),h="",li=function(a){return a.map(function(k){return "<li>"+tx(k)+"</li>"}).join("")};
-    if(plan==="trial"&&d>0)h+="<div class='card hi'><h2>"+tx("tr_t")+"<span class='mut'>"+F(tx("tr_d"),{a:N(8-d)})+"</span></h2><div class='bar a' style='margin:12px 0'><i style='width:"+((8-d)/7*100)+"%'></i></div><ul class='feat'>"+li(["tb1","tb2","tb3","tb4","tb5"])+"</ul><p class='mut' style='margin:0'>"+tx("tr_note")+"</p></div>";
-    else if(plan==="trial")h+="<div class='card hi'><h2>"+tx("tr_end")+"</h2><p class='mut' style='margin:8px 0 0'>"+tx("tr_end_s")+"</p></div>";
-    h+="<div class='plans'><div class='card'><h2>"+tx("pl_free")+"</h2><div class='price num'>"+BDT(0)+" <span class='mut'>"+tx("forever")+"</span></div><ul class='feat'>"+li(["lim15","wf3","ai_s","team1","sup_c"])+"</ul><button class='mini' type='button' data-act='dn'"+(e==="free"?" disabled":"")+" style='width:100%;padding:10px'>"+tx(e==="free"?"cur":"sw_free")+"</button></div>";
-    h+="<div class='card hi'><h2>"+tx("prem")+"<span class='recb'>"+tx("rec")+"</span></h2><div class='price num'>"+BDT(1499)+"<span class='mut'>"+tx("permo")+"</span></div><ul class='feat'>"+li(["tb1","wf6","ai_f","team5","sup_p","pf_e"])+"</ul><button class='go' type='button' data-act='up'"+(e==="premium"?" disabled":"")+" style='width:100%'>"+tx(e==="premium"?"cur":"up_prem")+"</button></div></div>";
-    var rows=[["tab3","lim15","tb1"],["pf_w","wf3","wf6"],["pf_f","n","y"],["pf_a","ai_s","ai_f"],["pf_ch","n","y"],["pf_t","team1","team5"],["pf_s","sup_c","sup_p"],["pf_e","n","y"]];
-    h+="<div class='card'><h2>"+tx("cmp")+"</h2><div class='scroll'><table><thead><tr><th></th><th>"+tx("pl_free")+"</th><th>"+tx("prem")+"</th></tr></thead><tbody>"+rows.map(function(r){return "<tr><td><strong>"+tx(r[0])+"</strong></td><td>"+cell(r[1])+"</td><td>"+cell(r[2])+"</td></tr>"}).join("")+"</tbody></table></div></div>";
-    h+="<p class='usage'><button class='clr' type='button' data-act='reset'>"+tx("reset")+"</button></p>";
-    $("pl").innerHTML=h;
+  $("planBtn").onclick=function(){say(tx("t_upg"))};
+  var WK=[
+   {k:"lead",trig:"Webhook",t:["Lead Automation","লিড অটোমেশন"],n:[
+    ["trigger","Webhook","Webhook","Receives the new lead.","নতুন লিড গ্রহণ করে।"],
+    ["action","Edit Fields1","Edit Fields1","Prepares and maps the lead data.","লিডের ডেটা প্রস্তুত ও ম্যাপ করে।"],
+    ["logic","IF","IF","Validates the lead data.","লিডের ডেটা যাচাই করে।"],
+    ["action","Save Lead to Backend","Save Lead to Backend","Saves the lead through the backend API.","ব্যাকএন্ড API-তে লিড সেভ করে।"],
+    ["action","Create Notification","Create Notification","Creates a dashboard notification.","ড্যাশবোর্ড নোটিফিকেশন তৈরি করে।"],
+    ["action","Generate Welcome Email","Generate Welcome Email","Generates the welcome email.","স্বাগত ইমেইল তৈরি করে।"],
+    ["action","Send a message (Gmail)","Send a message (Gmail)","Sends the welcome email to the lead.","লিডকে স্বাগত ইমেইল পাঠায়।"],
+    ["action","Update Email Log Status","Update Email Log Status","Updates the email status.","ইমেইলের স্ট্যাটাস আপডেট করে।"]]},
+   {k:"follow",trig:"Schedule Trigger",t:["Customer Follow-up","কাস্টমার ফলো-আপ"],n:[
+    ["trigger","Schedule Trigger","Schedule Trigger","Starts the workflow at a set time.","নির্দিষ্ট সময়ে ওয়ার্কফ্লো শুরু করে।"],
+    ["action","HTTP Request","HTTP Request","Gets due follow-up leads from GET /api/follow-ups/due?days=3.","GET /api/follow-ups/due?days=3 থেকে ফলো-আপ লিড আনে।"],
+    ["action","Split Out","Split Out","Separates each lead.","প্রতিটি লিড আলাদা করে।"],
+    ["logic","IF","IF","Checks the lead for follow-up.","ফলো-আপের জন্য লিড যাচাই করে।"],
+    ["action","Gmail Send","Gmail Send","Sends the follow-up email to the customer.","কাস্টমারকে ফলো-আপ ইমেইল পাঠায়।"],
+    ["action","HTTP Request1","HTTP Request1","Records the follow-up with POST /api/follow-ups.","POST /api/follow-ups দিয়ে ফলো-আপ রেকর্ড করে।"]]},
+   {k:"notif",trig:"Webhook",fan:["Follow-up","Error","New Lead"],t:["Notification Workflow","নোটিফিকেশন ওয়ার্কফ্লো"],n:[
+    ["trigger","Webhook","Webhook","Receives the notification event.","নোটিফিকেশন ইভেন্ট গ্রহণ করে।"],
+    ["logic","Switch","Switch","Routes the event into one of three branches: Follow-up, Error or New Lead.","ইভেন্টকে তিন ব্রাঞ্চের একটিতে পাঠায়: Follow-up, Error বা New Lead।"],
+    ["action","HTTP Request","HTTP Request","All three branches end here. Creates the notification with POST /api/notifications.","তিনটি ব্রাঞ্চই এখানে মেলে। POST /api/notifications দিয়ে নোটিফিকেশন তৈরি করে।"]]}];
+  function FAN(l){var ys=[22,75,128],h="<div class='fan' aria-hidden='true'><svg viewBox='0 0 230 150' width='230' height='150'><defs><marker id='fa' viewBox='0 0 8 8' refX='7' refY='4' markerWidth='7' markerHeight='7' orient='auto'><path d='M0 0L8 4L0 8z' fill='currentColor'/></marker></defs>";
+    ys.forEach(function(y,k){h+="<path d='M0 75C40 75 40 "+y+" 75 "+y+"L155 "+y+"C190 "+y+" 190 75 228 75' fill='none' stroke='currentColor' stroke-width='2'"+(k===1?" marker-end='url(#fa)'":"")+"/><text x='115' y='"+(y-6)+"' text-anchor='middle'>"+l[k]+"</text>"});
+    return h+"</svg></div>"}
+  var TY={trigger:"wk_tr",action:"wk_ac",logic:"wk_lg"},wkRows=[],wkLoaded=false;
+  var wkInfo=[],wkSel=null,wkExec=null,wkAt=0,curV=null;
+  async function loadWk(){var a,b;try{a=await getList("/workflows/executions")}catch(e){a=[]}try{b=await getList("/workflows")}catch(e){b=[]}var ch=!wkLoaded||JSON.stringify(a)!==JSON.stringify(wkRows)||JSON.stringify(b)!==JSON.stringify(wkInfo);wkRows=a;wkInfo=b;wkLoaded=true;wkAt=Date.now();if(ch)drawWk()}
+  function wkKey(o){var wid=pick(o,["workflow_id","workflowId"]);if(wid!=null){var hit=null;wkInfo.forEach(function(i){if(String(i.id)===String(wid))hit=i});if(hit)return wkKey(hit)}
+    var n=String(pick(o,["workflow","workflow_name","workflowName","name"])||(o.workflowData&&o.workflowData.name)||"").toLowerCase();return /follow/.test(n)?"follow":/notif/.test(n)?"notif":/lead/.test(n)?"lead":null}
+  function wkT(o){var d=dOf(pick(o,["started_at","startedAt","created_at"]));return d}
+  function wkRow(o){
+    var st=pick(o,["status"]);if(st==null&&typeof o.finished==="boolean")st=o.finished?"success":"running";st=String(st||"—");
+    var d=wkT(o),e=dOf(pick(o,["finished_at","stopped_at","stoppedAt","ended_at"])),ms=null,er=pick(o,["error_message","errorMessage","error","message"]);
+    if(o.duration_ms!=null&&!isNaN(+o.duration_ms))ms=+o.duration_ms;else if(o.duration!=null&&!isNaN(+o.duration))ms=+o.duration*1000;else if(d&&e)ms=e-d;
+    if(er&&typeof er==="object")er=er.message||JSON.stringify(er);
+    var bad=/fail|err/i.test(st);
+    return{st:st,cl:/succ|ok|done/i.test(st)?"s-ok":bad?"s-bad":"s-run",d:d,er:er?String(er):"",bad:bad,
+      du:ms==null||ms<0?tx("wk_na"):ms<1000?N(Math.round(ms))+" ms":ms<60000?N((ms/1000).toFixed(1))+tx("sec"):N(Math.floor(ms/60000))+" min "+N(Math.round(ms%60000/1000))+tx("sec")};
   }
-  $("pl").onclick=function(e){var b=e.target.closest("[data-act]");if(!b)return;var a=b.dataset.act;
-    if(a==="up")say(tx("t_demo"));else if(a==="dn"){setPlan("free");say(tx("t_dn"))}
-    else{plan="trial";trialStart=Date.now();try{localStorage.setItem("sb-ts",String(trialStart));localStorage.removeItem("sb-plan")}catch(x){}applyPlan();all();say(tx("t_rs"))}};
+  function dgHTML(w,L){return "<div class='dg'>"+w.n.map(function(n,i){
+    return (i?(w.fan&&i===2?FAN(w.fan):"<div class='ar' aria-hidden='true'></div>"):"")+"<div class='nd "+n[0]+"'><div class='nh'><span class='ni'>"+N(i+1)+"</span><span class='ty'>"+tx(TY[n[0]])+"</span></div><b>"+n[1+L]+"</b><small>"+n[3+L]+"</small></div>"}).join("")+"</div>"}
+  function wkRowsFor(k){return wkRows.filter(function(o){return wkKey(o)===k}).sort(function(a,b){var x=wkT(a),y=wkT(b);return (y?y.getTime():0)-(x?x.getTime():0)})}
+  function nodeCnt(w){return N(w.n.length)+(lang==="bn"?"":" ")+tx(w.n.length==1?"wk_node":"wk_nodes")}
+  function wkAct(k){var inf=null;wkInfo.forEach(function(o){if(wkKey(o)===k)inf=o});var ac=inf?pick(inf,["active","is_active","isActive"]):null;
+    return ac==null?"<span class='mut'>"+tx("wk_na")+"</span>":(ac===true||ac==="true"||ac===1)?"<span class='pill s-ok'>"+tx("wk_active")+"</span>":"<span class='pill s-run'>"+tx("wk_inactive")+"</span>"}
+  function drawWk(){
+    var L=lang==="bn"?1:0,sel=null;WK.forEach(function(w){if(w.k===wkSel)sel=w});
+    var has=wkRows.length>0||wkInfo.length>0,pl=$("wkPill");
+    pl.className="pill "+(has?"s-ok":"s-run");pl.textContent=tx(has?"wk_on":"wk_off");
+    $("wkNote").textContent=has?"":tx("wk_off_s");
+    $("wkTop").hidden=!!sel;$("wkMain").hidden=!!sel;$("wkDet").hidden=!sel;
+    $("wkMain").innerHTML=WK.map(function(w){
+      var r=wkRowsFor(w.k)[0],li=r?wkRow(r):null,na="<span class='mut'>"+tx("wk_na")+"</span>";
+      return "<div class='card wkc'><h2><span>"+w.t[L]+"</span><span class='mut'>"+nodeCnt(w)+"</span></h2>"+
+        "<div class='kv'><span>"+tx("wk_trig")+"</span><b>"+w.trig+"</b></div>"+
+        "<div class='kv'><span>"+tx("wk_act")+"</span><b>"+wkAct(w.k)+"</b></div>"+
+        "<div class='kv'><span>"+tx("wk_lst")+"</span><b>"+(li?"<span class='pill "+li.cl+"'>"+esc(li.st)+"</span>":na)+"</b></div>"+
+        "<div class='kv'><span>"+tx("wk_lt")+"</span><b>"+(li&&li.d?esc(fmtDT(li.d)):na)+"</b></div>"+
+        "<button class='go' type='button' data-go='workflows-"+w.k+"'>"+tx("wk_vd")+"</button></div>"}).join("");
+    var rc=$("wkRec");rc.hidden=!!sel||!wkRows.length;
+    if(!rc.hidden)rc.innerHTML="<h2>"+tx("wk_rec")+"</h2><div class='scroll'><table><thead><tr><th>"+tx("wk_h1")+"</th><th>"+tx("wk_hd")+"</th><th>"+tx("wk_hs")+"</th><th>"+tx("wk_hu")+"</th></tr></thead><tbody>"+wkRows.slice().sort(function(a,b){var x=wkT(a),y=wkT(b);return (y?y.getTime():0)-(x?x.getTime():0)}).slice(0,10).map(function(o){var q=wkRow(o);return "<tr><td><strong>"+esc(pick(o,["workflow","workflow_name","workflowName","name"])||(o.workflowData&&o.workflowData.name)||"—")+"</strong></td><td><span class='pill "+q.cl+"'>"+esc(q.st)+"</span></td><td>"+(q.d?esc(fmtDT(q.d)):"—")+"</td><td class='num'>"+q.du+"</td></tr>"}).join("")+"</tbody></table></div>";
+    if(!sel)return;
+    var rs=wkRowsFor(sel.k),li=rs.length?wkRow(rs[0]):null,inf=null;
+    wkInfo.forEach(function(o){if(wkKey(o)===sel.k)inf=o});
+    var acH=wkAct(sel.k);
+    var h="<button class='mini wkbk' type='button' data-go='workflows'>"+tx("wk_back")+"</button><header class='head'><div><h1>"+sel.t[L]+"</h1><p>"+nodeCnt(sel)+"</p></div></header>";
+    h+="<section class='stats3'><div class='card'><span class='mut'>"+tx("wk_trig")+"</span><b style='display:block;font-size:1.25rem;margin-top:8px'>"+sel.trig+"</b></div><div class='card'><span class='mut'>"+tx("wk_act")+"</span><div style='margin-top:8px'>"+acH+"</div></div><div class='card'><span class='mut'>"+tx("wk_last")+"</span><div style='margin-top:8px'>"+(li?"<span class='pill "+li.cl+"'>"+esc(li.st)+"</span> <span class='mut'>"+(li.d?esc(fmtDT(li.d)):"")+" · "+li.du+"</span>":"<span class='mut'>"+tx("wk_none")+"</span>")+"</div></div></section>";
+    h+="<div class='card' style='margin-bottom:16px'><h2>"+tx("wk_struct")+"</h2>"+dgHTML(sel,L)+"</div>";
+    h+="<div class='card' style='margin-bottom:16px'><h2>"+tx("wk_hist")+"</h2><div class='scroll'><table><thead><tr><th>"+tx("wk_hd")+"</th><th>"+tx("wk_hs")+"</th><th>"+tx("wk_hu")+"</th><th>"+tx("wk_he")+"</th></tr></thead><tbody>"+(!wkLoaded?"<tr><td colspan='4'>"+LDR()+"</td></tr>":rs.length?rs.slice(0,20).map(function(o,i){var q=wkRow(o);return "<tr data-ix='"+i+"'"+(i===wkExec?" class='sel'":"")+"><td><span class='pill "+q.cl+"'>"+esc(q.st)+"</span></td><td>"+(q.d?esc(fmtDT(q.d)):"—")+"</td><td class='num'>"+q.du+"</td><td>"+(q.er?esc(q.er.slice(0,70)):"—")+"</td></tr>"}).join(""):"<tr><td colspan='4' class='mut'>"+tx(wkRows.length?"wk_unl":"wk_none")+"</td></tr>")+"</tbody></table></div></div>";
+    var cur=wkExec!=null?rs[wkExec]:null;
+    h+="<div class='card'><h2>"+tx("wk_det")+"</h2>";
+    if(cur){var q=wkRow(cur);h+="<div style='margin-top:12px'>"+(q.er?"<div class='errbox'><b>"+tx("wk_err")+":</b> "+esc(q.er)+"</div>":"<div class='mut' style='margin-bottom:8px'>"+(q.bad?tx("wk_err")+": —":tx("wk_noerr"))+"</div>")+Object.keys(cur).slice(0,30).map(function(k){var v=cur[k];return "<div class='kv'><span>"+esc(pretty(k))+"</span><b>"+esc(v!==null&&typeof v==="object"?JSON.stringify(v):v)+"</b></div>"}).join("")+"</div>"}
+    else h+="<p class='mut' style='margin:10px 0 0'>"+tx("wk_sel")+"</p>";
+    $("wkDet").innerHTML=h+"</div>";
+  }
+  $("wkDet").onclick=function(e){var r=e.target.closest("tr[data-ix]");if(r){wkExec=+r.dataset.ix;drawWk()}};
   var rcCur=null,rcRaf=0;
   function fmtDT(d){var lc=lang==="bn"?"bn-BD":"en-US";return d.toLocaleDateString(lc,{year:"numeric",month:"short",day:"numeric"})+", "+d.toLocaleTimeString(lc,{hour:"2-digit",minute:"2-digit"})}
   function rcModel(){
@@ -835,7 +897,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   function drawCustomers(){
     var head=$("cuHead"),box=$("cuBody"),q=$("cuQ").value.trim().toLowerCase();
     head.innerHTML="";box.innerHTML="";
-    if(!cuLoaded){msg("cuMsg","");return}
+    if(!cuLoaded){msg("cuMsg",USE_BACKEND?LDR():"");return}
     if(cuErr){msg("cuMsg",esc(tx("load_err"))+" ("+esc(cuErr)+") <button class='mini' type='button' data-retry='1'>"+tx("retry")+"</button>");return}
     if(!cuData.length){msg("cuMsg",esc(tx("cu_empty")));return}
     msg("cuMsg","");
@@ -857,7 +919,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     $("bellN").hidden=!(un>0);
     $("noCnt").textContent=tx("no_s")+(noLoaded&&!noErr?" \u00b7 "+F(tx("no_unread"),{n:N(un)}):"");
     list.innerHTML="";
-    if(!noLoaded){msg("noMsg","");return}
+    if(!noLoaded){msg("noMsg",USE_BACKEND?LDR():"");return}
     if(noErr){msg("noMsg",esc(tx("load_err"))+" ("+esc(noErr)+") <button class='mini' type='button' data-retry='1'>"+tx("retry")+"</button>");return}
     if(!noData.length){msg("noMsg",esc(tx("no_empty")));return}
     msg("noMsg","");
@@ -876,7 +938,21 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     try{var r=await fetch(API_BASE+"/notifications/"+encodeURIComponent(id)+"/read",{method:"PATCH"});if(!r.ok)throw new Error(r.status);o.__r=true;drawNotifs();say(tx("t_read"))}
     catch(err){say(tx("m_nr")+" ("+(err.message||"")+")")}
   };
-  function all(){drawStatic();drawFilters();drawBars();drawWf();drawLog();drawStats();drawLeads();drawReport();drawPlan();drawPlans();drawCustomers();drawNotifs()}
+  function LDR(){return "<div class='ldr'><span class='spin'></span><span>"+esc(tx("loading"))+"</span></div>"}
+  function drawRecent(){
+    var b=$("recBody");
+    if(leadsLoading){b.innerHTML="<tr><td colspan='4'>"+LDR()+"</td></tr>";return}
+    var r=leads.slice().sort(function(a,c){return c.id-a.id}).slice(0,5);
+    b.innerHTML=r.length?r.map(function(l){var cl=l.t===3?"s-ok":l.t===4?"s-bad":"s-run";return "<tr><td><strong>"+esc(l.n)+"</strong></td><td>"+tx(SO[l.s])+"</td><td><span class='pill "+cl+"'>"+tx(ST[l.t])+"</span></td><td>"+(l.d?N(l.d)+tx("dago"):tx("dnow"))+"</td></tr>"}).join(""):"<tr><td colspan='4' class='mut'>"+tx("no_data")+"</td></tr>";
+  }
+  function drawState(){
+    document.body.classList.toggle("is-loading",leadsLoading);
+    var off=USE_BACKEND&&!live&&!leadsLoading,m=$("offMsg");m.hidden=!off;
+    if(off)m.innerHTML=esc(tx("load_err"))+" <button class='mini' type='button' data-retry='1'>"+tx("retry")+"</button>";
+  }
+  $("offMsg").onclick=function(e){if(e.target.closest("[data-retry]")){leadsLoading=true;repLoaded=false;all();loadLeads();loadReport().then(function(){drawReport()})}};
+  $("vaBtn").onclick=function(){location.hash="leads";setTimeout(function(){showPanel("rec")},120)};
+  function all(){drawStatic();drawBars();drawStats();drawLeads();drawReport();drawPlan();drawCustomers();drawNotifs();drawRecent();drawState();drawWk()}
   applyPlan();
   stamp();route();
   all();
@@ -893,11 +969,11 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     try{
       var r=await fetch(API_URL);if(!r.ok)throw new Error(r.status);
       var data=await r.json();if(!Array.isArray(data))throw new Error("bad");
-      leads=data.map(mapLead);live=true;all();return true;
-    }catch(err){live=false;all();return false}
+      leads=data.map(mapLead);live=true;leadsLoading=false;all();return true;
+    }catch(err){live=false;leadsLoading=false;all();return false}
   }
   if(USE_BACKEND)loadLeads().then(function(ok){if(!ok)say(tx("m_off"))});
-  if(USE_BACKEND)loadReport().then(function(ok){if(ok)drawReport()});
+  if(USE_BACKEND)loadReport().then(function(){drawReport()});
   if(USE_BACKEND)loadNotifs();
 
   function setLang(l){lang=l;try{localStorage.setItem("sb-lang",l)}catch(e){}all()}
