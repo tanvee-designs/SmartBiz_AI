@@ -14,10 +14,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.4,
       "position": [
-        -128,
-        0
+        0,
+        16
       ],
-      "id": "6f11c3c8-793a-48f0-8808-aa789d580d88",
+      "id": "89d0ef19-9d9b-4d7b-8d18-007c49f0a9b7",
       "name": "Schedule Trigger"
     },
     {
@@ -30,39 +30,34 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        816,
-        -16
+        944,
+        0
       ],
-      "id": "3b865e44-2654-4c91-a557-e47bb57b3d12",
+      "id": "c150b2f1-5ea3-4be0-883b-be5b4e53ca79",
       "name": "Send a message",
       "webhookId": "c3ebe9fb-f0bc-458a-8c5f-5b2687cd2fe0",
       "credentials": {
         "gmailOAuth2": {
-          "id": "sD2NdLBIj6CEVpTN",
-          "name": "Gmail account 2"
+          "id": "3JCNlQFkdli85ZCG",
+          "name": "Gmail account"
         }
       }
     },
     {
       "parameters": {
-        "url": "https://defuse-magical-unpicked.ngrok-free.dev/api/follow-ups/due",
+        "url": "https://smartbiz-ai-backend-8b8k.onrender.com/api/follow-ups/due?days=0",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
               "name": "days",
-              "value": "3"
+              "value": "0"
             }
           ]
         },
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [
-            {
-              "name": "ngrok-skip-browser-warning",
-              "value": "true"
-            }
-          ]
+          "parameters": []
         },
         "options": {
           "response": {
@@ -76,27 +71,23 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        112,
-        0
+        240,
+        16
       ],
-      "id": "8b50569e-200f-4031-8a01-786bd990030c",
+      "id": "6b02da8d-5b2a-4c26-9153-82bab521a297",
       "name": "HTTP Request",
       "alwaysOutputData": true
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://defuse-magical-unpicked.ngrok-free.dev/api/follow-ups",
+        "url": "https://smartbiz-ai-backend-8b8k.onrender.com/api/follow-ups",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Content-Type",
               "value": "application/json"
-            },
-            {
-              "name": "ngrok-skip-browser-warning",
-              "value": "true"
             }
           ]
         },
@@ -126,10 +117,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        1008,
-        -16
+        1136,
+        0
       ],
-      "id": "e0278526-44b9-41b7-8647-37faf04e5b3e",
+      "id": "67b1f2a6-397e-42be-9fcd-e3e634768dd8",
       "name": "HTTP Request1"
     },
     {
@@ -140,10 +131,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1.1,
       "position": [
-        336,
-        0
+        464,
+        16
       ],
-      "id": "bd91f730-e4c3-4913-b6d7-a4d6eeba1f29",
+      "id": "cd5df65f-0b86-4c04-881b-b922d4af29ce",
       "name": "Split Out"
     },
     {
@@ -185,10 +176,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.4,
       "position": [
-        560,
-        0
+        688,
+        16
       ],
-      "id": "22a037af-e899-4ae5-8e2f-1249037c8cef",
+      "id": "bf2bcb36-2749-4a92-8a96-8a433bb6d6e7",
       "name": "If"
     }
   ],
@@ -253,18 +244,14 @@
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate",
-    "timeSavedMode": "fixed",
-    "timezone": "Asia/Dhaka",
-    "callerPolicy": "workflowsFromSameOwner",
-    "availableInMCP": false
+    "binaryMode": "separate"
   },
-  "versionId": "3b0857d3-fc83-4d49-9719-5ec227d3e9b1",
+  "versionId": "117e9a07-94f4-4e72-98f0-e538c6fc1c14",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "b2f88b12f745b649c744d0488b841fd884b6cee45e94169659ce08de0c8541dc"
+    "instanceId": "a3d3d4117698a9dfcd13345861353999075b017980099f8296b78df7ce7fde7d"
   },
   "nodeGroups": [],
-  "id": "kr0JLuUHglb8FTAK",
+  "id": "6xwt3tUUnmgNFo2g",
   "tags": []
 }

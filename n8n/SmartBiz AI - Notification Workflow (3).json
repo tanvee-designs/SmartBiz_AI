@@ -13,7 +13,7 @@
         0,
         0
       ],
-      "id": "c611adcd-4fcc-42e2-8d92-08266f2a1b28",
+      "id": "81a812ff-d539-460d-b7e2-1a6522693634",
       "name": "Webhook",
       "webhookId": "19ff09f9-c209-4f0b-a718-84980c084eea"
     },
@@ -37,21 +37,16 @@
         224,
         0
       ],
-      "id": "4f0a9ece-f9d4-4c3c-9697-ddfbc78c1b72",
+      "id": "e18c2fe3-a782-417c-94e4-dd1cdee17210",
       "name": "Edit Fields"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://defuse-magical-unpicked.ngrok-free.dev/api/notifications",
+        "url": "https://httpbin.org/post",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [
-            {
-              "name": "ngrok-skip-browser-warning",
-              "value": "true"
-            }
-          ]
+          "parameters": []
         },
         "sendBody": true,
         "specifyBody": "json",
@@ -64,7 +59,7 @@
         464,
         0
       ],
-      "id": "1c49d9a8-2926-4c1e-8eb8-929518383d05",
+      "id": "214e00c4-32e1-4974-9d9f-f90e2a207ebb",
       "name": "HTTP Request"
     }
   ],
@@ -98,11 +93,11 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "1c0c5833-4302-44bf-91f5-3e53c9357c88",
+  "versionId": "be75cc9e-c295-4998-8159-5ed3fe373776",
   "meta": {
-    "instanceId": "b2f88b12f745b649c744d0488b841fd884b6cee45e94169659ce08de0c8541dc"
+    "instanceId": "a3d3d4117698a9dfcd13345861353999075b017980099f8296b78df7ce7fde7d"
   },
   "nodeGroups": [],
-  "id": "DQyoLJUIyTvfDrVu",
+  "id": "1NfMuyW8UG3vtFLt",
   "tags": []
 }
