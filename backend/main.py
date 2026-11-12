@@ -1,6 +1,7 @@
 import json
 import os
 import httpx
+import requests
 from datetime import datetime, timedelta
 from typing import List, Literal, Optional
 
@@ -57,6 +58,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ---------------- ENV VARIABLES ----------------
+
+N8N_BASE_URL = os.getenv("N8N_BASE_URL", "http://localhost:5678")
+N8N_API_KEY = os.getenv("N8N_API_KEY", "")
+N8N_NOTIFICATION_WEBHOOK_URL = os.getenv("N8N_NOTIFICATION_WEBHOOK_URL", "")
 
 
 # ==================================================
@@ -314,6 +322,23 @@ def create_notification(
     db.add(new_notification)
     db.commit()
     db.refresh(new_notification)
+
+    # n8n Cloud Notification Webhook Trigger (Professional Try-Catch)
+    if N8N_NOTIFICATION_WEBHOOK_URL:
+        try:
+            requests.post(
+                N8N_NOTIFICATION_WEBHOOK_URL,
+                json={
+                    "id": new_notification.id,
+                    "message": new_notification.message,
+                    "created_at": new_notification.created_at.isoformat(),
+                },
+                headers={"ngrok-skip-browser-warning": "true"}, # Ngrok সাপোর্টের জন্য (যদিও Cloud, তবুও সেফটি)
+                timeout=10,
+            )
+        except Exception as e:
+            print(f"Could not send notification to n8n: {e}")
+
     return new_notification
 
 
@@ -559,11 +584,6 @@ def list_follow_ups(
 # ==================================================
 # N8N WORKFLOW APIs (LIVE INTEGRATION)
 # ==================================================
-
-# n8n-এর Environment Variable (Render-এ সেট করা থাকলে)
-N8N_BASE_URL = os.getenv("N8N_BASE_URL", "http://localhost:5678")
-N8N_API_KEY = os.getenv("N8N_API_KEY", "")
-
 
 @app.get("/api/workflows")
 async def get_workflows():
