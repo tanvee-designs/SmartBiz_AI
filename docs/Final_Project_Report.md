@@ -754,7 +754,7 @@ SmartBiz AI-এর অটোমেশন মডিউলে তিনটি প�
 ---
 
 ## 9. Demo Video Link
-*(Member 6-এর দেওয়া লিংক এখানে বসাও)*
+🎥 **[SmartBiz AI — Final Demo Video](https://canva.link/dqhabwxtxdyxlaa)**
 
 ---
 
@@ -764,9 +764,11 @@ https://github.com/tanvee-designs/SmartBiz_AI
 ---
 
 ## 11. Live Demo Link
-- **Backend API Docs:** https://smartbiz-ai-backend-8b8k.onrender.com/docs
-- **n8n Automation:** https://n8n-service-1sfw.onrender.com
+- **Backend:** https://smartbiz-ai-backend-8b8k.onrender.com
+- **Swagger UI:** https://smartbiz-ai-backend-8b8k.onrender.com/docs
+- **n8n Cloud:** https://smartbiz-ai-jannatun.app.n8n.cloud
 - **Frontend Dashboard:** https://smartbizofficial.netlify.app
+- **Presentation Slide:** https://pilandok-3j22jr.my.canva.site
 
 ---
 
