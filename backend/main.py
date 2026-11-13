@@ -103,12 +103,22 @@ def create_lead(
         .filter(func.lower(models.Lead.email) == email)
         .first()
     )
+    
+    # ১. ডুপ্লিকেট লিড হ্যান্ডলিং (Upsert): 409 Conflict এর বদলে আপডেট করা হবে
     if existing:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Lead with this email already exists",
-        )
+        existing.name = lead.name.strip() if lead.name else existing.name
+        existing.phone = lead.phone if lead.phone else existing.phone
+        existing.company = lead.company if lead.company else existing.company
+        existing.interest = lead.interest if lead.interest else existing.interest
+        existing.value = lead.value if lead.value else existing.value
+        existing.message = lead.message if lead.message else existing.message
+        existing.source = lead.source if lead.source else existing.source
+        
+        db.commit()
+        db.refresh(existing)
+        return existing
 
+    # ২. নতুন লিড তৈরি
     new_lead = models.Lead(
         name=lead.name.strip(),
         email=email,
@@ -124,7 +134,7 @@ def create_lead(
     db.commit()
     db.refresh(new_lead)
 
-    # Optional n8n push
+    # Optional n8n push (শুধু নতুন লিডের জন্য)
     if send_lead_to_n8n:
         try:
             background_tasks.add_task(send_lead_to_n8n, new_lead)
@@ -323,7 +333,7 @@ def create_notification(
     db.commit()
     db.refresh(new_notification)
 
-    # n8n Cloud Notification Webhook Trigger (Professional Try-Catch)
+    # n8n Cloud Notification Webhook Trigger
     if N8N_NOTIFICATION_WEBHOOK_URL:
         try:
             requests.post(
@@ -333,8 +343,7 @@ def create_notification(
                     "message": new_notification.message,
                     "created_at": new_notification.created_at.isoformat(),
                 },
-                headers={"ngrok-skip-browser-warning": "true"}, # Ngrok সাপোর্টের জন্য (যদিও Cloud, তবুও সেফটি)
-                timeout=10,
+                timeout=5,
             )
         except Exception as e:
             print(f"Could not send notification to n8n: {e}")
@@ -633,7 +642,7 @@ async def get_workflow_executions():
             wf_map = {wf.get("id"): wf.get("name") for wf in workflows_data}
 
             # ২. এরপর এক্সিকিউশন হিস্ট্রি আনি
-            response = await client.get(f"{N8N_BASE_URL}/api/v1/executions?limit=5", headers=headers, timeout=10.0)
+            response = await client.get(f"{N8N_BASE_URL}/api/v1/executions?limit=20", headers=headers, timeout=10.0)
             response.raise_for_status()
             data = response.json()
             
@@ -650,8 +659,13 @@ async def get_workflow_executions():
                     "started_at": ex.get("startedAt"),
                     "time_saved": "N/A"
                 })
-            return executions
-    except Exception:
+            
+            # ৩. তারিখ অনুযায়ী সাজানো (সর্বশেষটি প্রথমে)
+            executions.sort(key=lambda x: x["started_at"] if x["started_at"] else "", reverse=True)
+            
+            return executions[:10] # শুধু লেটেস্ট ১০টি রিটার্ন করবে
+    except Exception as e:
+        print(f"n8n Execution Error: {e}")
         # n8n কানেক্ট না হলে ফলব্যাক ডেটা
         return [
             {"id": 101, "workflow_name": "SmartBiz AI - Lead Automation", "status": "success", "started_at": "2026-11-11T10:00:00Z"},
