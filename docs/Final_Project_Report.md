@@ -754,7 +754,7 @@ SmartBiz AI-এর অটোমেশন মডিউলে তিনটি প�
 ---
 
 ## 9. Demo Video Link
-🎥 **[SmartBiz AI — Final Demo Video](https://canva.link/dqhabwxtxdyxlaa)**
+🎥 **[SmartBiz AI — Final Demo Video](https://pilandok-3j22jr.my.canva.site/dahaldxpzhg)**
 
 ---
 
