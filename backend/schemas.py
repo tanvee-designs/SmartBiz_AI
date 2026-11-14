@@ -170,3 +170,18 @@ class DueFollowUpList(BaseModel):
     count: int
     days: int
     leads: List[DueFollowUpResponse] = Field(default_factory=list)
+
+
+    # ---------------- EXECUTION LOG SCHEMAS ----------------
+
+class ExecutionLogCreate(BaseModel):
+    execution_id: str
+    workflow_name: str
+    status: str
+    started_at: Optional[datetime] = None
+    finished_at: Optional[datetime] = None
+
+class ExecutionLogResponse(ExecutionLogCreate):
+    id: int
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)

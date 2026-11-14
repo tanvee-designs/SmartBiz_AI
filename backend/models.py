@@ -96,3 +96,18 @@ class EmailLog(Base):
     generated_by = Column(String(50), default="template")
     status = Column(String(20), default="pending")
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+    # ============================================================
+# EXECUTION LOG (n8n Cloud Webhook Callback)
+# ============================================================
+class ExecutionLog(Base):
+    __tablename__ = "execution_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    execution_id = Column(String(100), unique=True, index=True)
+    workflow_name = Column(String(150), nullable=False)
+    status = Column(String(50), nullable=False)
+    started_at = Column(DateTime, nullable=True)
+    finished_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
