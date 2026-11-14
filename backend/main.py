@@ -66,6 +66,32 @@ N8N_WEBHOOK_HEALTH_URL = os.getenv("N8N_WEBHOOK_HEALTH_URL", "https://smartbiz-a
 
 
 # ==================================================
+# HELPER FUNCTIONS
+# ==================================================
+
+def send_notification_to_n8n(payload: dict):
+    """
+    n8n Notification Workflow-এ POST request পাঠায়।
+    Background Task হিসেবে চলবে, তাই API response ব্লক করবে না।
+    """
+    if not N8N_NOTIFICATION_WEBHOOK_URL:
+        print("⚠️ N8N_NOTIFICATION_WEBHOOK_URL is not set. Skipping.")
+        return
+
+    try:
+        response = requests.post(
+            N8N_NOTIFICATION_WEBHOOK_URL,
+            json=payload,
+            headers={"Content-Type": "application/json"},
+            timeout=5,
+        )
+        response.raise_for_status()
+        print(f"✅ Notification sent to n8n for lead_id: {payload.get('lead_id')}")
+    except Exception as e:
+        print(f"❌ Failed to send notification to n8n: {e}")
+
+
+# ==================================================
 # HOME AND HEALTH
 # ==================================================
 
@@ -80,7 +106,7 @@ def health_check():
 
 
 # ==================================================
-# LEAD APIs (Upsert Logic)
+# LEAD APIs (Upsert Logic + Auto Notification)
 # ==================================================
 
 @app.post(
@@ -101,7 +127,8 @@ def create_lead(
         .filter(func.lower(models.Lead.email) == email)
         .first()
     )
-    
+
+    # Upsert: ডুপ্লিকেট হলে আপডেট হবে
     if existing:
         existing.name = lead.name.strip() if lead.name else existing.name
         existing.phone = lead.phone if lead.phone else existing.phone
@@ -110,7 +137,7 @@ def create_lead(
         existing.value = lead.value if lead.value else existing.value
         existing.message = lead.message if lead.message else existing.message
         existing.source = lead.source if lead.source else existing.source
-        
+
         db.commit()
         db.refresh(existing)
         return existing
@@ -130,6 +157,31 @@ def create_lead(
     db.commit()
     db.refresh(new_lead)
 
+    # ১. Backend Notification তৈরি (Dashboard-এর জন্য)
+    notification = models.Notification(
+        message=f"New lead from {new_lead.source}: {new_lead.name} ({new_lead.email})",
+        is_read="false",
+    )
+    db.add(notification)
+    db.commit()
+    db.refresh(notification)
+
+    # ২. n8n Notification Workflow Trigger (Non-blocking Background Task)
+    if N8N_NOTIFICATION_WEBHOOK_URL:
+        background_tasks.add_task(
+            send_notification_to_n8n,
+            {
+                "notification_id": notification.id,
+                "lead_id": new_lead.id,
+                "name": new_lead.name,
+                "email": new_lead.email,
+                "company": new_lead.company,
+                "source": new_lead.source,
+                "message": notification.message,
+            },
+        )
+
+    # ৩. Optional n8n Lead Automation Push (যদি কনফিগার করা থাকে)
     if send_lead_to_n8n:
         try:
             background_tasks.add_task(send_lead_to_n8n, new_lead)
@@ -261,6 +313,7 @@ def create_notification(notification: schemas.NotificationCreate, db: Session = 
     db.commit()
     db.refresh(new_notification)
 
+    # n8n Notification Webhook Trigger
     if N8N_NOTIFICATION_WEBHOOK_URL:
         try:
             requests.post(
@@ -340,6 +393,7 @@ def create_welcome_email(lead_id: int, db: Session = Depends(get_db)):
 # ==================================================
 
 FOLLOW_UP_INTERVAL_DAYS = 3
+
 
 def get_last_contact(db: Session, lead: models.Lead) -> datetime:
     times = [lead.created_at]
