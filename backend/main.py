@@ -102,7 +102,6 @@ def create_lead(
         .first()
     )
     
-    # Upsert: ডুপ্লিকেট হলে আপডেট হবে
     if existing:
         existing.name = lead.name.strip() if lead.name else existing.name
         existing.phone = lead.phone if lead.phone else existing.phone
@@ -262,7 +261,6 @@ def create_notification(notification: schemas.NotificationCreate, db: Session = 
     db.commit()
     db.refresh(new_notification)
 
-    # n8n Webhook Trigger (Only if URL is set)
     if N8N_NOTIFICATION_WEBHOOK_URL:
         try:
             requests.post(
@@ -288,6 +286,21 @@ def list_notifications(db: Session = Depends(get_db)):
 @app.get("/email-logs", response_model=List[schemas.EmailLogResponse])
 def list_email_logs(db: Session = Depends(get_db)):
     return db.query(models.EmailLog).order_by(models.EmailLog.created_at.desc()).all()
+
+
+@app.patch("/email-logs/{log_id}/status", response_model=schemas.EmailLogResponse)
+def update_email_status(
+    log_id: int,
+    new_status: Literal["pending", "sent", "failed"] = Query(alias="status"),
+    db: Session = Depends(get_db),
+):
+    log = db.query(models.EmailLog).filter(models.EmailLog.id == log_id).first()
+    if not log:
+        raise HTTPException(404, "Log not found")
+    log.status = new_status
+    db.commit()
+    db.refresh(log)
+    return log
 
 
 # ==================================================
@@ -401,7 +414,6 @@ def list_follow_ups(lead_id: Optional[int] = None, limit: int = 100, db: Session
 
 @app.get("/api/integrations/n8n/health")
 async def n8n_health_check():
-    """n8n Cloud-এর সঠিক স্ট্যাটাস দেখায়।"""
     try:
         async with httpx.AsyncClient() as client:
             response = await client.head(N8N_WEBHOOK_HEALTH_URL, headers={"ngrok-skip-browser-warning": "true"}, timeout=5.0)
@@ -421,10 +433,9 @@ async def n8n_health_check():
 
 @app.post("/api/executions/log", response_model=schemas.ExecutionLogResponse, status_code=201)
 def log_execution(payload: schemas.ExecutionLogCreate, db: Session = Depends(get_db)):
-    """n8n থেকে Execution Summary রিসিভ করে ডাটাবেসে সেভ করে।"""
     existing = db.query(models.ExecutionLog).filter(models.ExecutionLog.execution_id == payload.execution_id).first()
     if existing:
-        return existing  # Duplicate হলে আগেরটাই রিটার্ন করবে
+        return existing
 
     new_log = models.ExecutionLog(**payload.model_dump())
     db.add(new_log)
@@ -435,7 +446,6 @@ def log_execution(payload: schemas.ExecutionLogCreate, db: Session = Depends(get
 
 @app.get("/api/workflows/executions")
 def get_workflow_executions(db: Session = Depends(get_db)):
-    """ডাটাবেস থেকে লেটেস্ট Execution Data রিটার্ন করে (Stale Data বাদ)।"""
     logs = db.query(models.ExecutionLog).order_by(models.ExecutionLog.created_at.desc()).limit(10).all()
     return [
         {
@@ -451,7 +461,6 @@ def get_workflow_executions(db: Session = Depends(get_db)):
 
 @app.get("/api/workflows")
 def get_workflows():
-    """n8n Cloud-এর বর্তমান Workflow List।"""
     return [
         {"id": 1, "name": "SmartBiz AI - Lead Automation", "active": True, "nodes": ["Webhook", "HTTP Request", "Gmail", "IF"], "connections": "Live n8n Data"},
         {"id": 2, "name": "SmartBiz AI - Customer Follow-up", "active": True, "nodes": ["Schedule", "HTTP Request", "Split Out", "Gmail"], "connections": "Live n8n Data"},
