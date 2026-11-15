@@ -1,8 +1,8 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, field_serializer
 
 
 LeadStatus = Literal["new", "contacted", "qualified", "converted", "lost"]
@@ -15,6 +15,9 @@ LeadSource = Literal[
     "email",
     "other",
 ]
+
+# BST Timezone (UTC+6)
+BST = timezone(timedelta(hours=6))
 
 
 # ---------------- LEAD SCHEMAS ----------------
@@ -50,6 +53,14 @@ class LeadResponse(BaseModel):
     last_contacted_at: Optional[datetime] = None
     created_at: datetime
 
+    @field_serializer("created_at", "last_contacted_at")
+    def serialize_datetime(self, value: Optional[datetime]):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(BST).isoformat()
+
 
 # ---------------- CUSTOMER SCHEMAS ----------------
 
@@ -71,6 +82,14 @@ class CustomerResponse(BaseModel):
     company: Optional[str] = None
     total_deals: int
     created_at: datetime
+
+    @field_serializer("created_at")
+    def serialize_datetime(self, value: Optional[datetime]):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(BST).isoformat()
 
 
 # ---------------- REPORT SCHEMAS ----------------
@@ -107,6 +126,14 @@ class ReportResponse(BaseModel):
             return parsed if isinstance(parsed, list) else [str(parsed)]
         return value
 
+    @field_serializer("created_at")
+    def serialize_datetime(self, value: Optional[datetime]):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(BST).isoformat()
+
 
 # ---------------- NOTIFICATION SCHEMAS ----------------
 
@@ -122,6 +149,14 @@ class NotificationResponse(BaseModel):
     is_read: str
     created_at: datetime
 
+    @field_serializer("created_at")
+    def serialize_datetime(self, value: Optional[datetime]):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(BST).isoformat()
+
 
 # ---------------- EMAIL LOG SCHEMAS ----------------
 
@@ -136,6 +171,14 @@ class EmailLogResponse(BaseModel):
     generated_by: str
     status: str
     created_at: datetime
+
+    @field_serializer("created_at")
+    def serialize_datetime(self, value: Optional[datetime]):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(BST).isoformat()
 
 
 # ---------------- FOLLOW-UP SCHEMAS ----------------
@@ -155,9 +198,17 @@ class FollowUpResponse(BaseModel):
     lead_id: int
     channel: str
     note: Optional[str] = None
-    message: Optional[str] = None   # <--- এই লাইনটি নতুন যোগ করা হয়েছে
+    message: Optional[str] = None
     status: str
     created_at: datetime
+
+    @field_serializer("created_at")
+    def serialize_datetime(self, value: Optional[datetime]):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(BST).isoformat()
 
 
 class DueFollowUpResponse(LeadResponse):
@@ -172,7 +223,7 @@ class DueFollowUpList(BaseModel):
     leads: List[DueFollowUpResponse] = Field(default_factory=list)
 
 
-    # ---------------- EXECUTION LOG SCHEMAS ----------------
+# ---------------- EXECUTION LOG SCHEMAS ----------------
 
 class ExecutionLogCreate(BaseModel):
     execution_id: str
@@ -181,7 +232,16 @@ class ExecutionLogCreate(BaseModel):
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
 
+
 class ExecutionLogResponse(ExecutionLogCreate):
     id: int
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+    @field_serializer("created_at", "started_at", "finished_at")
+    def serialize_datetime(self, value: Optional[datetime]):
+        if value is None:
+            return None
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(BST).isoformat()
