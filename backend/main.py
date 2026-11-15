@@ -65,15 +65,20 @@ N8N_NOTIFICATION_WEBHOOK_URL = os.getenv("N8N_NOTIFICATION_WEBHOOK_URL", "")
 N8N_WEBHOOK_HEALTH_URL = os.getenv("N8N_WEBHOOK_HEALTH_URL", "https://smartbiz-ai-jannatun.app.n8n.cloud/webhook/smartbiz-new-lead")
 
 
-# ==================================================
-# HELPER FUNCTIONS
-# ==================================================
-
-def get_current_time():
-    """বর্তমান UTC সময় (timezone-aware)।"""
-    return datetime.now(timezone.utc)
+# ---------------- TIMEZONE (BST = UTC+6) ----------------
+BST = timezone(timedelta(hours=6))
 
 
+def to_bst_iso(dt: Optional[datetime]) -> Optional[str]:
+    """Convert any datetime to BST ISO string."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(BST).isoformat()
+
+
+# ---------------- HELPER FUNCTIONS ----------------
 def send_notification_to_n8n(payload: dict):
     """n8n Notification Workflow-এ POST request পাঠায় (Background Task)।"""
     if not N8N_NOTIFICATION_WEBHOOK_URL:
@@ -168,7 +173,7 @@ def create_lead(
     db.commit()
     db.refresh(notification)
 
-    # ২. n8n Notification Workflow Trigger (Non-blocking)
+    # ২. n8n Notification Workflow Trigger
     if N8N_NOTIFICATION_WEBHOOK_URL:
         background_tasks.add_task(
             send_notification_to_n8n,
@@ -315,7 +320,6 @@ def create_notification(notification: schemas.NotificationCreate, db: Session = 
     db.commit()
     db.refresh(new_notification)
 
-    # n8n Notification Webhook Trigger
     if N8N_NOTIFICATION_WEBHOOK_URL:
         try:
             requests.post(
@@ -372,7 +376,9 @@ def create_welcome_email(lead_id: int, db: Session = Depends(get_db)):
         raise HTTPException(500, "generate_email module not found")
 
     try:
-        result = generate_welcome_email({"name": lead.name, "email": lead.email, "company": lead.company, "phone": lead.phone})
+        result = generate_welcome_email(
+            {"name": lead.name, "email": lead.email, "company": lead.company, "phone": lead.phone}
+        )
     except Exception as e:
         raise HTTPException(500, f"Email generation failed: {e}")
 
@@ -399,26 +405,42 @@ FOLLOW_UP_INTERVAL_DAYS = 3
 
 def get_last_contact(db: Session, lead: models.Lead) -> datetime:
     times = [lead.created_at]
-    last_email = db.query(func.max(models.EmailLog.created_at)).filter(models.EmailLog.lead_id == lead.id, models.EmailLog.status == "sent").scalar()
-    if last_email: times.append(last_email)
-    last_follow_up = db.query(func.max(models.FollowUp.created_at)).filter(models.FollowUp.lead_id == lead.id).scalar()
-    if last_follow_up: times.append(last_follow_up)
-    if lead.last_contacted_at: times.append(lead.last_contacted_at)
+    last_email = db.query(func.max(models.EmailLog.created_at)).filter(
+        models.EmailLog.lead_id == lead.id, models.EmailLog.status == "sent"
+    ).scalar()
+    if last_email:
+        times.append(last_email)
+    last_follow_up = db.query(func.max(models.FollowUp.created_at)).filter(
+        models.FollowUp.lead_id == lead.id
+    ).scalar()
+    if last_follow_up:
+        times.append(last_follow_up)
+    if lead.last_contacted_at:
+        times.append(lead.last_contacted_at)
     return max(times)
 
 
 @app.get("/api/follow-ups/due")
-def list_due_follow_ups(days: int = Query(default=FOLLOW_UP_INTERVAL_DAYS, ge=0, le=90), db: Session = Depends(get_db)):
-    now = get_current_time()
+def list_due_follow_ups(
+    days: int = Query(default=FOLLOW_UP_INTERVAL_DAYS, ge=0, le=90),
+    db: Session = Depends(get_db),
+):
+    now = datetime.now(timezone.utc)
     cutoff = now - timedelta(days=days)
     leads = db.query(models.Lead).filter(models.Lead.status.in_(["new", "contacted"])).all()
 
     due = []
     for lead in leads:
         last_contact = get_last_contact(db, lead) or lead.created_at
+        if last_contact.tzinfo is None:
+            last_contact = last_contact.replace(tzinfo=timezone.utc)
         if last_contact <= cutoff:
             due.append({
-                "lead_id": lead.id, "name": lead.name, "email": lead.email, "company": lead.company, "status": lead.status,
+                "lead_id": lead.id,
+                "name": lead.name,
+                "email": lead.email,
+                "company": lead.company,
+                "status": lead.status,
                 "created_at": lead.created_at.isoformat(),
                 "last_contacted_at": lead.last_contacted_at.isoformat() if lead.last_contacted_at else None,
                 "last_contact_at": last_contact.isoformat(),
@@ -435,18 +457,25 @@ def create_follow_up(payload: schemas.FollowUpCreate, db: Session = Depends(get_
         raise HTTPException(404, "Lead not found")
 
     if payload.status == "sent":
-        window_start = get_current_time() - timedelta(days=FOLLOW_UP_INTERVAL_DAYS)
+        window_start = datetime.now(timezone.utc) - timedelta(days=FOLLOW_UP_INTERVAL_DAYS)
         recent = db.query(models.FollowUp).filter(
-            models.FollowUp.lead_id == lead.id, models.FollowUp.status == "sent", models.FollowUp.created_at >= window_start
+            models.FollowUp.lead_id == lead.id,
+            models.FollowUp.status == "sent",
+            models.FollowUp.created_at >= window_start,
         ).first()
         if recent:
             raise HTTPException(409, "A follow-up was already sent recently")
 
-    follow_up = models.FollowUp(lead_id=payload.lead_id, channel=payload.channel, status=payload.status, message=payload.message or payload.note)
+    follow_up = models.FollowUp(
+        lead_id=payload.lead_id,
+        channel=payload.channel,
+        status=payload.status,
+        message=payload.message or payload.note,
+    )
     db.add(follow_up)
 
     if payload.status == "sent":
-        lead.last_contacted_at = get_current_time()
+        lead.last_contacted_at = datetime.now(timezone.utc)
         if lead.status == "new":
             lead.status = "contacted"
 
@@ -457,7 +486,11 @@ def create_follow_up(payload: schemas.FollowUpCreate, db: Session = Depends(get_
 
 
 @app.get("/api/follow-ups", response_model=List[schemas.FollowUpResponse])
-def list_follow_ups(lead_id: Optional[int] = None, limit: int = 100, db: Session = Depends(get_db)):
+def list_follow_ups(
+    lead_id: Optional[int] = None,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+):
     q = db.query(models.FollowUp)
     if lead_id is not None:
         q = q.filter(models.FollowUp.lead_id == lead_id)
@@ -472,7 +505,11 @@ def list_follow_ups(lead_id: Optional[int] = None, limit: int = 100, db: Session
 async def n8n_health_check():
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.head(N8N_WEBHOOK_HEALTH_URL, headers={"ngrok-skip-browser-warning": "true"}, timeout=5.0)
+            response = await client.head(
+                N8N_WEBHOOK_HEALTH_URL,
+                headers={"ngrok-skip-browser-warning": "true"},
+                timeout=5.0,
+            )
             is_reachable = response.status_code < 500
     except Exception:
         is_reachable = False
@@ -489,7 +526,9 @@ async def n8n_health_check():
 
 @app.post("/api/executions/log", response_model=schemas.ExecutionLogResponse, status_code=201)
 def log_execution(payload: schemas.ExecutionLogCreate, db: Session = Depends(get_db)):
-    existing = db.query(models.ExecutionLog).filter(models.ExecutionLog.execution_id == payload.execution_id).first()
+    existing = db.query(models.ExecutionLog).filter(
+        models.ExecutionLog.execution_id == payload.execution_id
+    ).first()
     if existing:
         return existing
 
@@ -502,14 +541,15 @@ def log_execution(payload: schemas.ExecutionLogCreate, db: Session = Depends(get
 
 @app.get("/api/workflows/executions")
 def get_workflow_executions(db: Session = Depends(get_db)):
+    """লেটেস্ট Execution Log (BST timezone-এ) রিটার্ন করে।"""
     logs = db.query(models.ExecutionLog).order_by(models.ExecutionLog.created_at.desc()).limit(10).all()
     return [
         {
             "id": log.execution_id,
             "workflow_name": log.workflow_name,
             "status": log.status,
-            "started_at": log.started_at.isoformat() if log.started_at else None,
-            "time_saved": "N/A"
+            "started_at": to_bst_iso(log.started_at),
+            "time_saved": "N/A",
         }
         for log in logs
     ]
@@ -520,5 +560,5 @@ def get_workflows():
     return [
         {"id": 1, "name": "SmartBiz AI - Lead Automation", "active": True, "nodes": ["Webhook", "HTTP Request", "Gmail", "IF"], "connections": "Live n8n Data"},
         {"id": 2, "name": "SmartBiz AI - Customer Follow-up", "active": True, "nodes": ["Schedule", "HTTP Request", "Split Out", "Gmail"], "connections": "Live n8n Data"},
-        {"id": 3, "name": "SmartBiz AI - Notification Workflow", "active": True, "nodes": ["Webhook", "HTTP Request"], "connections": "Live n8n Data"}
+        {"id": 3, "name": "SmartBiz AI - Notification Workflow", "active": True, "nodes": ["Webhook", "HTTP Request"], "connections": "Live n8n Data"},
     ]
