@@ -2,7 +2,7 @@ import json
 import os
 import httpx
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Literal, Optional
 
 from fastapi import (
@@ -69,11 +69,13 @@ N8N_WEBHOOK_HEALTH_URL = os.getenv("N8N_WEBHOOK_HEALTH_URL", "https://smartbiz-a
 # HELPER FUNCTIONS
 # ==================================================
 
+def get_current_time():
+    """বর্তমান UTC সময় (timezone-aware)।"""
+    return datetime.now(timezone.utc)
+
+
 def send_notification_to_n8n(payload: dict):
-    """
-    n8n Notification Workflow-এ POST request পাঠায়।
-    Background Task হিসেবে চলবে, তাই API response ব্লক করবে না।
-    """
+    """n8n Notification Workflow-এ POST request পাঠায় (Background Task)।"""
     if not N8N_NOTIFICATION_WEBHOOK_URL:
         print("⚠️ N8N_NOTIFICATION_WEBHOOK_URL is not set. Skipping.")
         return
@@ -157,7 +159,7 @@ def create_lead(
     db.commit()
     db.refresh(new_lead)
 
-    # ১. Backend Notification তৈরি (Dashboard-এর জন্য)
+    # ১. Backend Notification তৈরি
     notification = models.Notification(
         message=f"New lead from {new_lead.source}: {new_lead.name} ({new_lead.email})",
         is_read="false",
@@ -166,7 +168,7 @@ def create_lead(
     db.commit()
     db.refresh(notification)
 
-    # ২. n8n Notification Workflow Trigger (Non-blocking Background Task)
+    # ২. n8n Notification Workflow Trigger (Non-blocking)
     if N8N_NOTIFICATION_WEBHOOK_URL:
         background_tasks.add_task(
             send_notification_to_n8n,
@@ -181,7 +183,7 @@ def create_lead(
             },
         )
 
-    # ৩. Optional n8n Lead Automation Push (যদি কনফিগার করা থাকে)
+    # ৩. Optional n8n Lead Automation Push
     if send_lead_to_n8n:
         try:
             background_tasks.add_task(send_lead_to_n8n, new_lead)
@@ -407,7 +409,7 @@ def get_last_contact(db: Session, lead: models.Lead) -> datetime:
 
 @app.get("/api/follow-ups/due")
 def list_due_follow_ups(days: int = Query(default=FOLLOW_UP_INTERVAL_DAYS, ge=0, le=90), db: Session = Depends(get_db)):
-    now = datetime.utcnow()
+    now = get_current_time()
     cutoff = now - timedelta(days=days)
     leads = db.query(models.Lead).filter(models.Lead.status.in_(["new", "contacted"])).all()
 
@@ -433,7 +435,7 @@ def create_follow_up(payload: schemas.FollowUpCreate, db: Session = Depends(get_
         raise HTTPException(404, "Lead not found")
 
     if payload.status == "sent":
-        window_start = datetime.utcnow() - timedelta(days=FOLLOW_UP_INTERVAL_DAYS)
+        window_start = get_current_time() - timedelta(days=FOLLOW_UP_INTERVAL_DAYS)
         recent = db.query(models.FollowUp).filter(
             models.FollowUp.lead_id == lead.id, models.FollowUp.status == "sent", models.FollowUp.created_at >= window_start
         ).first()
@@ -444,7 +446,7 @@ def create_follow_up(payload: schemas.FollowUpCreate, db: Session = Depends(get_
     db.add(follow_up)
 
     if payload.status == "sent":
-        lead.last_contacted_at = datetime.utcnow()
+        lead.last_contacted_at = get_current_time()
         if lead.status == "new":
             lead.status = "contacted"
 
