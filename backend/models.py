@@ -1,8 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Column, Integer, String, Text, DateTime
 
 from database import Base
+
+
+# Timezone-aware helper
+def utc_now():
+    return datetime.now(timezone.utc)
 
 
 # ============================================================
@@ -22,7 +27,7 @@ class Lead(Base):
     value = Column(Integer, default=0)
     status = Column(String(30), default="new")
     last_contacted_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
 # ============================================================
@@ -37,7 +42,7 @@ class Customer(Base):
     phone = Column(String(30), nullable=True)
     company = Column(String(150), nullable=True)
     total_deals = Column(Integer, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
 # ============================================================
@@ -48,10 +53,10 @@ class FollowUp(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     lead_id = Column(Integer, nullable=False, index=True)
-    channel = Column(String(30), default="email", index=True)   # email / sms / call
-    status = Column(String(30), default="sent")                 # sent / failed / opened
+    channel = Column(String(30), default="email", index=True)
+    status = Column(String(30), default="sent")
     message = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    created_at = Column(DateTime, default=utc_now, index=True)
 
 
 # ============================================================
@@ -67,7 +72,7 @@ class Report(Base):
     insights = Column(Text, nullable=True)
     recommendations = Column(Text, nullable=True)
     content = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
 # ============================================================
@@ -79,7 +84,7 @@ class Notification(Base):
     id = Column(Integer, primary_key=True, index=True)
     message = Column(String(255), nullable=False)
     is_read = Column(String(10), default="false")
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
 # ============================================================
@@ -95,10 +100,10 @@ class EmailLog(Base):
     body = Column(Text, nullable=False)
     generated_by = Column(String(50), default="template")
     status = Column(String(20), default="pending")
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
-    # ============================================================
+# ============================================================
 # EXECUTION LOG (n8n Cloud Webhook Callback)
 # ============================================================
 class ExecutionLog(Base):
@@ -110,4 +115,4 @@ class ExecutionLog(Base):
     status = Column(String(50), nullable=False)
     started_at = Column(DateTime, nullable=True)
     finished_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
