@@ -301,6 +301,50 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 #wkDet tbody tr[data-ix]{cursor:pointer}#wkDet tr.sel{background:rgba(127,127,140,.14)}
 .wkbk{margin-bottom:14px}
 #v-workflows .card{animation:none}
+.lg{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:radial-gradient(60% 50% at 50% 45%,rgba(245,166,35,.12),transparent 70%),var(--bg)}.lg[hidden]{display:none}
+.vt{position:relative;width:min(460px,92vw);aspect-ratio:23/16;perspective:1100px;filter:drop-shadow(0 30px 40px rgba(0,0,0,.4))}
+.vt-in{position:absolute;inset:0;border-radius:26px;overflow:hidden;background:radial-gradient(circle at 75% 25%,#f0b45a,#8a5314 55%,#2a1906)}
+.vt-ok{position:absolute;top:12%;right:8%;padding:7px 14px;border-radius:10px;background:rgba(20,14,6,.78);border:1px solid rgba(245,166,35,.5);color:#ffd88a;font-size:.78rem;font-weight:600;opacity:0;transition:opacity .5s 1s}
+.vt.open .vt-ok{opacity:1}
+.gold{position:absolute;right:9%;bottom:12%;width:42%;display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.gold i{display:block;height:clamp(16px,5.2vw,26px);border-radius:4px;background:linear-gradient(#ffe6a6,#d9992d);box-shadow:0 3px 6px rgba(0,0,0,.35)}
+.gold i:first-child{grid-column:1/3;width:50%;justify-self:center}
+.vt-door{position:absolute;inset:0;margin:0;border-radius:26px;display:flex;gap:4%;padding:6% 5% 6% 7%;color:#ececf2;background:linear-gradient(150deg,#2c2d36,#15151a 72%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -12px 26px rgba(0,0,0,.4);transform-origin:left center;transition:transform 1s cubic-bezier(.6,0,.2,1) .6s;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px),linear-gradient(150deg,#2c2d36,#15151a 72%)}
+.vt.open .vt-door{transform:rotateY(-62deg)}
+.vt-door::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 14px 14px,#6a6c78 0 3px,transparent 4px),radial-gradient(circle at calc(100% - 14px) 14px,#6a6c78 0 3px,transparent 4px),radial-gradient(circle at 14px calc(100% - 14px),#6a6c78 0 3px,transparent 4px),radial-gradient(circle at calc(100% - 14px) calc(100% - 14px),#6a6c78 0 3px,transparent 4px)}
+.vt-f{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:6px}
+.vt-c{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.vt-fl label{display:block;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.vt-fl input{width:100%;box-sizing:border-box;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.22);color:#fff;padding:7px 2px;font:inherit;font-size:.95rem;outline:0;-webkit-text-fill-color:#fff;transition:border-color .2s}
+.vt-fl input:focus{border-bottom-color:var(--amber,#f5a623)}
+.vt-fl input:-webkit-autofill{-webkit-text-fill-color:#fff;transition:background-color 99999s}
+.vt-m{min-height:1.1em;font-size:.76rem;color:#ff9a8a}
+.vt-b{align-self:flex-start;padding:9px 24px;border-radius:12px;font:inherit;font-size:.88rem;font-weight:600;color:#fff;cursor:pointer;background:linear-gradient(#383944,#25262e);border:1px solid rgba(255,255,255,.15);transition:border-color .2s,opacity .2s}
+.vt-b:hover{border-color:var(--amber,#f5a623)}.vt-b:disabled{opacity:.6;cursor:default}
+.vt-r{position:relative;flex:0 0 38%;display:grid;place-items:center}
+.wheel{width:100%;max-width:130px;color:#9b9dac;transition:transform 1.2s cubic-bezier(.6,0,.2,1)}
+.vt.busy .wheel{animation:vtspin 1.1s linear infinite}.vt.open .wheel{animation:none;transform:rotate(200deg)}
+.bolt{position:absolute;right:-9%;width:16%;height:6%;border-radius:4px;background:linear-gradient(#7c7e8c,#4a4b57);box-shadow:0 2px 4px rgba(0,0,0,.4);transition:transform .6s ease .1s}
+.vt.open .bolt{transform:translateX(-130%)}
+.vt.shake{animation:vtshake .4s}
+@keyframes vtspin{to{transform:rotate(360deg)}}
+@keyframes vtshake{20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@media(max-width:420px){.vt-door{padding:5% 4% 5% 6%}.vt-fl input{font-size:.85rem}.vt-b{padding:7px 18px}}
+@media(prefers-reduced-motion:reduce){.vt-door,.bolt,.wheel,.vt-ok{transition:none}.vt.busy .wheel,.vt.shake{animation:none}}
+@media(max-width:480px){.tools{gap:6px;max-width:100%}.planbtn{padding:8px 2px}}
+.aic{display:flex;flex-direction:column;gap:14px;padding:18px}
+.aim{min-height:320px;max-height:56vh;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:4px}
+.aib{max-width:86%;padding:12px 16px;border-radius:18px;font-size:.92rem;line-height:1.55;word-break:break-word}
+.aib.u{align-self:flex-end;background:var(--ink);color:var(--bg);border-bottom-right-radius:6px}
+.aib.a{align-self:flex-start;background:var(--soft);border:1px solid var(--bd);border-bottom-left-radius:6px}
+.aib.e{align-self:flex-start;background:var(--bad-bg);color:var(--bad-ink);border-bottom-left-radius:6px}
+.aib ul{margin:6px 0 0 18px;padding:0}.aib p:last-child{margin-bottom:0!important}
+.dots i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin:0 2px;animation:aid 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes aid{50%{opacity:.25;transform:translateY(-3px)}}
+.ais{display:flex;flex-wrap:wrap;gap:8px}.ais button{border:1px solid var(--bd);background:var(--soft);color:var(--ink);border-radius:99px;padding:8px 14px;font:inherit;font-size:.8rem;cursor:pointer}.ais button:hover:not(:disabled){border-color:var(--amber)}.ais button:disabled{opacity:.5;cursor:default}
+.aif{display:flex;gap:10px;align-items:flex-end}.aif textarea{flex:1;resize:none;max-height:140px;padding:13px 16px;border-radius:18px;border:1px solid var(--bd);background:var(--card);color:var(--ink);font:inherit}.aif textarea:focus{outline:0;border-color:var(--amber)}
+#aiClr[hidden]{display:none}
+@media(prefers-reduced-motion:reduce){.dots i{animation:none}}
 </style>
 </head>
 <body>
@@ -312,7 +356,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
       <button class="tab" type="button" aria-current="page" data-i="tab1"></button>
       
       <button class="tab" type="button" data-i="tab3"></button>
-      <button class="tab" type="button" data-i="tab4"></button><button class="tab" type="button" data-i="tab5"></button><button class="tab" type="button" data-i="tab6"></button><button class="tab" type="button" data-i="tab2"></button>
+      <button class="tab" type="button" data-i="tab4"></button><button class="tab" type="button" data-i="tab5"></button><button class="tab" type="button" data-i="tab6"></button><button class="tab" type="button" data-i="tab2"></button><button class="tab" type="button" data-i="tab7"></button>
     </div>
     <div class="tools">
       <button class="planbtn" id="planBtn" type="button"></button>
@@ -322,6 +366,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
       </div>
       <button class="ic" type="button" id="theme" aria-label="Toggle theme"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg></button>
       <button class="ic" type="button" aria-label="Notifications" data-go="notifications"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0"/></svg><span class="bdg" id="bellN" hidden></span></button>
+      <button class="ic" type="button" id="lgOut" aria-label="Sign out" title="Sign out"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
       <div class="av" aria-hidden="true">SB</div>
     </div>
   </nav>
@@ -399,6 +444,9 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
 <header class="head"><div><h1 data-i="tab6"></h1><p id="noCnt"></p></div></header>
 <div class="card"><div class="msgbox" id="noMsg" hidden></div><div class="nlist" id="noList"></div></div>
 </div>
+<div class="view" id="v-assistant"><header class="head"><div><h1 data-i="as_t"></h1><p data-i="as_s"></p></div><button class="mini" type="button" id="aiClr" data-i="as_clr" hidden></button></header>
+<div class="card aic"><div class="aim" id="aiMsgs" role="log" aria-live="polite"></div><div class="ais" id="aiSug"></div>
+<form class="aif" id="aiF"><textarea id="aiQ" rows="1" maxlength="1000"></textarea><button class="go" id="aiB" type="submit" data-i="as_send"></button></form></div></div>
 <div class="view" id="v-workflows"><div id="wkTop"><header class="head"><div><h1 data-i="wk_t"></h1><p data-i="wk_s"></p></div></header>
 <div class="card" style="margin-bottom:16px"><h2><span data-i="wk_stat"></span><span class="pill s-run" id="wkPill"></span></h2><p class="mut" id="wkNote" style="margin:8px 0 0"></p></div></div>
 <div class="wkgrid" id="wkMain"></div><div class="card" id="wkRec" style="margin-top:16px" hidden></div><div id="wkDet" hidden></div></div>
@@ -421,11 +469,21 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   <div class="rc-act"><button class="p" id="rcDl" type="button" data-i="rc_dl"></button><button id="rcPr" type="button" data-i="rc_pr"></button><button id="rcCl" type="button" data-i="rc_cl"></button></div>
  </div>
 </div>
+<div class="lg" id="lg" hidden role="dialog" aria-modal="true" aria-label="Sign in"><div class="vt" id="vt">
+<div class="vt-in" aria-hidden="true"><span class="vt-ok" data-i="lg_ok"></span><div class="gold"><i></i><i></i><i></i></div></div>
+<form class="vt-door" id="lgF" novalidate>
+<div class="vt-f"><span class="vt-c" data-i="lg_s"></span>
+<div class="vt-fl"><label for="lgE" data-i="lg_e"></label><input id="lgE" type="email" autocomplete="username" spellcheck="false"></div>
+<div class="vt-fl"><label for="lgP" data-i="lg_p"></label><input id="lgP" type="password" autocomplete="current-password"></div>
+<span class="vt-m" id="lgM" role="alert"></span>
+<button class="vt-b" id="lgB" type="submit" data-i="lg_u"></button></div>
+<div class="vt-r" aria-hidden="true"><svg class="wheel" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="50" cy="50" r="7" fill="currentColor"/><path d="M50 50V12M50 50L83 69M50 50L17 69" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"/><g fill="currentColor"><circle cx="50" cy="10" r="5"/><circle cx="85" cy="70" r="5"/><circle cx="15" cy="70" r="5"/></g></svg><i class="bolt" style="top:20%"></i><i class="bolt" style="top:48%"></i><i class="bolt" style="top:76%"></i></div>
+</form></div></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
 (function(){
   var T={
-  en:{wk_t:"Workflows",wk_vd:"View Details",wk_unr:"Unreachable",wk_chk:"Checking…",wk_hf:"Could not reach n8n through the backend.",wk_rec:"Recent executions",wk_unl:"No executions are linked to this workflow yet. All executions are listed under Recent executions on the Workflows page.",wk_lst:"Last execution status",wk_lt:"Last execution time",wk_back:"← Back to Workflows",wk_trig:"Trigger type",wk_act:"Active status",wk_last:"Last execution",wk_struct:"Node structure and connections",wk_det:"Execution details",wk_err:"Error message",wk_na:"Not available",wk_active:"Active",wk_inactive:"Inactive",wk_sel:"Select an execution to see its details.",wk_noerr:"No error recorded",wk_hd:"Status",wk_hs:"Started",wk_hu:"Duration",wk_he:"Error",wk_trl:"Trigger",wk_s:"The n8n automation workflows behind SmartBiz AI.",wk_nodes:"nodes",wk_node:"node",wk_tr:"Trigger",wk_ac:"Action",wk_lg:"Condition",wk_stat:"n8n status",wk_off:"Not connected",wk_off_s:"Execution status and history will appear here once the backend provides the workflows API.",wk_on:"Connected",wk_hist:"Execution history",wk_h1:"Workflow",wk_h2:"Status",wk_h3:"Started",wk_h4:"Duration",wk_none:"No execution data available",t_upg:"Premium plans are coming soon",tab1:"Dashboard",tab2:"Workflows",tab3:"Leads",tab4:"AI Reports",
+  en:{wk_t:"Workflows",tab7:"AI Business Assistant",as_t:"AI Business Assistant",as_s:"Ask questions about your leads, customers and business performance.",as_ph:"Ask a business question…",as_send:"Send",as_clr:"Clear chat",as_think:"Thinking…",as_retry:"Retry",as_wel:"Ask me about your business. Pick a suggestion below or type your own question.",as_e404:"The AI Assistant is not available on the server yet.",as_e422:"The question could not be processed. Please rephrase it.",as_e429:"Too many requests. Please wait a moment and try again.",as_e5:"The server had a problem answering this question.",as_ex:"Something went wrong.",as_eempty:"The assistant returned an empty answer.",as_enet:"Cannot reach the backend. Try again in a moment.",lg_t:"Sign in",lg_u:"Unlock",lg_wait:"Connecting… the server may need up to a minute to wake up.",lg_srv:"Server error",lg_ok:"Access granted",lg_s:"SmartBiz AI Dashboard",lg_e:"Email",lg_p:"Password",lg_bad:"Incorrect email or password.",lg_net:"Cannot reach the backend. Try again in a moment.",lg_req:"Enter your email and password.",wk_vd:"View Details",wk_unr:"Unreachable",wk_chk:"Checking…",wk_hf:"Could not reach n8n through the backend.",wk_rec:"Recent executions",wk_unl:"No executions are linked to this workflow yet. All executions are listed under Recent executions on the Workflows page.",wk_lst:"Last execution status",wk_lt:"Last execution time",wk_back:"← Back to Workflows",wk_trig:"Trigger type",wk_act:"Active status",wk_last:"Last execution",wk_struct:"Node structure and connections",wk_det:"Execution details",wk_err:"Error message",wk_na:"Not available",wk_active:"Active",wk_inactive:"Inactive",wk_sel:"Select an execution to see its details.",wk_noerr:"No error recorded",wk_hd:"Status",wk_hs:"Started",wk_hu:"Duration",wk_he:"Error",wk_trl:"Trigger",wk_s:"The n8n automation workflows behind SmartBiz AI.",wk_nodes:"nodes",wk_node:"node",wk_tr:"Trigger",wk_ac:"Action",wk_lg:"Condition",wk_stat:"n8n status",wk_off:"Not connected",wk_off_s:"Execution status and history will appear here once the backend provides the workflows API.",wk_on:"Connected",wk_hist:"Execution history",wk_h1:"Workflow",wk_h2:"Status",wk_h3:"Started",wk_h4:"Duration",wk_none:"No execution data available",t_upg:"Premium plans are coming soon",tab1:"Dashboard",tab2:"Workflows",tab3:"Leads",tab4:"AI Reports",
     gm:"Good morning",ga:"Good afternoon",ge:"Good evening",
     sub:"Here’s how your business automation is performing today.",run:"Run workflow now",
     m1:"New leads captured",m2:"Automated emails sent",d1:"+14% vs yesterday",d2:"+9% vs yesterday",
@@ -468,7 +526,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     t_limit:"Free plan limit reached (15 leads). Upgrade to add more.",t_prem:"This workflow is a Premium feature",t_up:"Premium activated",t_dn:"Switched to Free plan",t_rs:"Demo restarted: new 7-day trial",
     g_t:"Premium report",g_s:"Upgrade to unlock insights, recommendations and charts.",usage_f:"{n} of 15 leads used on the Free plan",usage_p:"Unlimited leads",pl_free:"Free",
     m_201:"Lead saved successfully",m_409:"This email already exists. Use a different email.",m_422:"Invalid data. Please check the form and try again.",m_net:"Cannot reach the backend. Start it with: cd backend, then uvicorn main:app --reload",m_err:"Unexpected server response",foot_live:"Live data from the backend",foot_demo:"Demo data · backend offline",m_off:"Backend offline. Showing demo data.",t_demo:"Demo Feature",m_pf:"Could not update status",m_404:"Lead not found",rb_live:"AI report from the backend",m_rep_off:"No backend report yet. Showing the demo report.",dl:"Download report",rc_print:"Printing {p}%",rc_done:"Report ready",rc_sub:"Detached from the printer. Download or print it.",rc_dl:"Download",rc_pr:"Print / Save PDF",rc_cl:"Close",rc_off:"Official report",rc_no:"Report no.",rc_dt:"Date",rc_ty:"Type",rc_sr:"Data",rc_m:"Metric",rc_v:"Value",rc_top:"Top source",rc_thx:"Thank you for using SmartBiz AI",rc_saved:"Report downloaded",tab5:"Customers",tab6:"Notifications",cu_s:"Customers from the backend",no_s:"Latest notifications",cu_empty:"No customers yet",no_empty:"No notifications",load_err:"Could not load data. Is the backend running?",retry:"Retry",no_unread:"{n} unread",read:"Read",t_read:"Marked as read",m_nr:"Could not mark as read",lh_v:"Deal value",f_v:"Deal value (৳)",v_val:"Enter a valid amount",lh_td:"Total deals",no_data:"No data available",loading:"Loading\u2026",no_report:"No AI report available yet",rec_t:"Recent leads",va:"View all",pl_lbl:"Free plan",cu_empty:"No data available",no_empty:"No data available",foot_demo:"Backend offline \u00b7 data unavailable",m_off:"Could not reach the backend."},
-  bn:{wk_t:"ওয়ার্কফ্লো",wk_vd:"বিস্তারিত দেখুন",wk_unr:"পৌঁছানো যাচ্ছে না",wk_chk:"যাচাই হচ্ছে…",wk_hf:"ব্যাকএন্ডের মাধ্যমে n8n-এ পৌঁছানো যায়নি।",wk_rec:"সাম্প্রতিক এক্সিকিউশন",wk_unl:"এই ওয়ার্কফ্লোর সাথে এখনো কোনো এক্সিকিউশন যুক্ত নেই। সব এক্সিকিউশন Workflows পেজের সাম্প্রতিক এক্সিকিউশনে আছে।",wk_lst:"সর্বশেষ এক্সিকিউশনের অবস্থা",wk_lt:"সর্বশেষ এক্সিকিউশনের সময়",wk_back:"← ওয়ার্কফ্লো তালিকায় ফিরুন",wk_trig:"ট্রিগারের ধরন",wk_act:"সক্রিয় অবস্থা",wk_last:"সর্বশেষ এক্সিকিউশন",wk_struct:"নোড কাঠামো ও সংযোগ",wk_det:"এক্সিকিউশনের বিবরণ",wk_err:"এরর মেসেজ",wk_na:"পাওয়া যায়নি",wk_active:"সক্রিয়",wk_inactive:"নিষ্ক্রিয়",wk_sel:"বিবরণ দেখতে একটি এক্সিকিউশন বেছে নিন।",wk_noerr:"কোনো এরর নেই",wk_hd:"অবস্থা",wk_hs:"শুরু",wk_hu:"সময়কাল",wk_he:"এরর",wk_trl:"ট্রিগার",wk_s:"SmartBiz AI-এর n8n অটোমেশন ওয়ার্কফ্লো।",wk_nodes:"টি নোড",wk_node:"টি নোড",wk_tr:"ট্রিগার",wk_ac:"অ্যাকশন",wk_lg:"শর্ত",wk_stat:"এক্সিকিউশন স্ট্যাটাস",wk_off:"সংযুক্ত নয়",wk_off_s:"ব্যাকএন্ডে workflows API এলে এখানে এক্সিকিউশন স্ট্যাটাস ও হিস্ট্রি দেখা যাবে।",wk_on:"সংযুক্ত",wk_hist:"এক্সিকিউশন হিস্ট্রি",wk_h1:"ওয়ার্কফ্লো",wk_h2:"অবস্থা",wk_h3:"শুরু",wk_h4:"সময়কাল",wk_none:"কোনো এক্সিকিউশন ডেটা নেই",t_upg:"প্রিমিয়াম প্ল্যান শীঘ্রই আসছে",tab1:"ড্যাশবোর্ড",tab2:"ওয়ার্কফ্লো",tab3:"লিড",tab4:"AI রিপোর্ট",
+  bn:{wk_t:"ওয়ার্কফ্লো",tab7:"এআই বিজনেস অ্যাসিস্ট্যান্ট",as_t:"এআই বিজনেস অ্যাসিস্ট্যান্ট",as_s:"আপনার লিড, কাস্টমার ও ব্যবসার পারফরম্যান্স নিয়ে প্রশ্ন করুন।",as_ph:"ব্যবসা নিয়ে প্রশ্ন লিখুন…",as_send:"পাঠান",as_clr:"চ্যাট মুছুন",as_think:"ভাবছি…",as_retry:"আবার চেষ্টা",as_wel:"আপনার ব্যবসা নিয়ে জিজ্ঞেস করুন। নিচের পরামর্শ বেছে নিন বা নিজের প্রশ্ন লিখুন।",as_e404:"সার্ভারে এআই অ্যাসিস্ট্যান্ট এখনো চালু নেই।",as_e422:"প্রশ্নটি প্রক্রিয়া করা যায়নি। অন্যভাবে লিখে দেখুন।",as_e429:"অনেক বেশি অনুরোধ। একটু অপেক্ষা করে আবার চেষ্টা করুন।",as_e5:"এই প্রশ্নের উত্তর দিতে সার্ভারে সমস্যা হয়েছে।",as_ex:"কিছু একটা ভুল হয়েছে।",as_eempty:"অ্যাসিস্ট্যান্ট খালি উত্তর দিয়েছে।",as_enet:"ব্যাকএন্ডে পৌঁছানো যায়নি। একটু পরে আবার চেষ্টা করুন।",lg_t:"সাইন ইন",lg_u:"আনলক",lg_wait:"সংযোগ হচ্ছে… সার্ভার জাগতে এক মিনিট পর্যন্ত লাগতে পারে।",lg_srv:"সার্ভারে সমস্যা",lg_ok:"অ্যাক্সেস মঞ্জুর",lg_s:"SmartBiz AI ড্যাশবোর্ড",lg_e:"ইমেইল",lg_p:"পাসওয়ার্ড",lg_bad:"ইমেইল বা পাসওয়ার্ড ভুল।",lg_net:"ব্যাকএন্ডে পৌঁছানো যায়নি। একটু পরে আবার চেষ্টা করুন।",lg_req:"ইমেইল ও পাসওয়ার্ড দিন।",wk_vd:"বিস্তারিত দেখুন",wk_unr:"পৌঁছানো যাচ্ছে না",wk_chk:"যাচাই হচ্ছে…",wk_hf:"ব্যাকএন্ডের মাধ্যমে n8n-এ পৌঁছানো যায়নি।",wk_rec:"সাম্প্রতিক এক্সিকিউশন",wk_unl:"এই ওয়ার্কফ্লোর সাথে এখনো কোনো এক্সিকিউশন যুক্ত নেই। সব এক্সিকিউশন Workflows পেজের সাম্প্রতিক এক্সিকিউশনে আছে।",wk_lst:"সর্বশেষ এক্সিকিউশনের অবস্থা",wk_lt:"সর্বশেষ এক্সিকিউশনের সময়",wk_back:"← ওয়ার্কফ্লো তালিকায় ফিরুন",wk_trig:"ট্রিগারের ধরন",wk_act:"সক্রিয় অবস্থা",wk_last:"সর্বশেষ এক্সিকিউশন",wk_struct:"নোড কাঠামো ও সংযোগ",wk_det:"এক্সিকিউশনের বিবরণ",wk_err:"এরর মেসেজ",wk_na:"পাওয়া যায়নি",wk_active:"সক্রিয়",wk_inactive:"নিষ্ক্রিয়",wk_sel:"বিবরণ দেখতে একটি এক্সিকিউশন বেছে নিন।",wk_noerr:"কোনো এরর নেই",wk_hd:"অবস্থা",wk_hs:"শুরু",wk_hu:"সময়কাল",wk_he:"এরর",wk_trl:"ট্রিগার",wk_s:"SmartBiz AI-এর n8n অটোমেশন ওয়ার্কফ্লো।",wk_nodes:"টি নোড",wk_node:"টি নোড",wk_tr:"ট্রিগার",wk_ac:"অ্যাকশন",wk_lg:"শর্ত",wk_stat:"এক্সিকিউশন স্ট্যাটাস",wk_off:"সংযুক্ত নয়",wk_off_s:"ব্যাকএন্ডে workflows API এলে এখানে এক্সিকিউশন স্ট্যাটাস ও হিস্ট্রি দেখা যাবে।",wk_on:"সংযুক্ত",wk_hist:"এক্সিকিউশন হিস্ট্রি",wk_h1:"ওয়ার্কফ্লো",wk_h2:"অবস্থা",wk_h3:"শুরু",wk_h4:"সময়কাল",wk_none:"কোনো এক্সিকিউশন ডেটা নেই",t_upg:"প্রিমিয়াম প্ল্যান শীঘ্রই আসছে",tab1:"ড্যাশবোর্ড",tab2:"ওয়ার্কফ্লো",tab3:"লিড",tab4:"AI রিপোর্ট",
     gm:"শুভ সকাল",ga:"শুভ অপরাহ্ন",ge:"শুভ সন্ধ্যা",
     sub:"আপনার ব্যবসার অটোমেশন আজ কেমন চলছে, দেখুন।",run:"এখনই ওয়ার্কফ্লো চালান",
     m1:"নতুন লিড সংগ্রহ",m2:"স্বয়ংক্রিয় ইমেইল পাঠানো",d1:"গতকালের চেয়ে +১৪%",d2:"গতকালের চেয়ে +৯%",
@@ -511,12 +569,31 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     t_limit:"ফ্রি প্ল্যানে সীমা শেষ (১৫টি লিড)। আরও যোগ করতে আপগ্রেড করুন।",t_prem:"এই ওয়ার্কফ্লো প্রিমিয়াম সুবিধা",t_up:"প্রিমিয়াম চালু হয়েছে",t_dn:"ফ্রি প্ল্যানে ফিরে এসেছেন",t_rs:"ডেমো রিস্টার্ট: নতুন ৭ দিনের ট্রায়াল",
     g_t:"প্রিমিয়াম রিপোর্ট",g_s:"ইনসাইট, সুপারিশ ও চার্ট খুলতে আপগ্রেড করুন।",usage_f:"ফ্রি প্ল্যানে {n}/১৫টি লিড ব্যবহৃত",usage_p:"সীমাহীন লিড",pl_free:"ফ্রি",
     m_201:"লিড সফলভাবে সংরক্ষিত হয়েছে",m_409:"এই ইমেইল আগে থেকেই আছে। অন্য ইমেইল দিন।",m_422:"ডেটা সঠিক নয়। ফর্ম দেখে আবার চেষ্টা করুন।",m_net:"ব্যাকএন্ডে পৌঁছানো যাচ্ছে না। cd backend, তারপর uvicorn main:app --reload চালু করুন।",m_err:"সার্ভার অপ্রত্যাশিত উত্তর দিয়েছে",foot_live:"ব্যাকএন্ড থেকে আসল ডেটা",foot_demo:"ডেমো ডেটা · ব্যাকএন্ড বন্ধ",m_off:"ব্যাকএন্ড বন্ধ। ডেমো ডেটা দেখানো হচ্ছে।",t_demo:"ডেমো ফিচার",m_pf:"স্ট্যাটাস আপডেট করা যায়নি",m_404:"লিড পাওয়া যায়নি",rb_live:"ব্যাকএন্ড থেকে AI রিপোর্ট",m_rep_off:"ব্যাকএন্ডে এখনো রিপোর্ট নেই। ডেমো রিপোর্ট দেখানো হচ্ছে।",dl:"রিপোর্ট ডাউনলোড",rc_print:"ছাপা হচ্ছে {p}%",rc_done:"রিপোর্ট প্রস্তুত",rc_sub:"প্রিন্টার থেকে ছিঁড়ে নেওয়া হয়েছে। ডাউনলোড বা প্রিন্ট করুন।",rc_dl:"ডাউনলোড",rc_pr:"প্রিন্ট / PDF সেভ",rc_cl:"বন্ধ করুন",rc_off:"অফিশিয়াল রিপোর্ট",rc_no:"রিপোর্ট নং",rc_dt:"তারিখ",rc_ty:"ধরন",rc_sr:"ডেটা",rc_m:"মেট্রিক",rc_v:"মান",rc_top:"সেরা উৎস",rc_thx:"SmartBiz AI ব্যবহারের জন্য ধন্যবাদ",rc_saved:"রিপোর্ট ডাউনলোড হয়েছে",tab5:"গ্রাহক",tab6:"নোটিফিকেশন",cu_s:"ব্যাকএন্ড থেকে গ্রাহকের তালিকা",no_s:"সাম্প্রতিক নোটিফিকেশন",cu_empty:"এখনো কোনো গ্রাহক নেই",no_empty:"কোনো নোটিফিকেশন নেই",load_err:"ডেটা আনা যায়নি। ব্যাকএন্ড চালু আছে কি?",retry:"আবার চেষ্টা",no_unread:"{n}টি অপঠিত",read:"পড়া হয়েছে",t_read:"পড়া হিসেবে চিহ্নিত হয়েছে",m_nr:"পড়া হিসেবে চিহ্নিত করা যায়নি",lh_v:"ডিলের মূল্য",f_v:"ডিলের মূল্য (৳)",v_val:"সঠিক অঙ্ক দিন",lh_td:"মোট ডিল",no_data:"কোনো ডেটা পাওয়া যায়নি",loading:"লোড হচ্ছে…",no_report:"এখনো কোনো AI রিপোর্ট নেই",rec_t:"সাম্প্রতিক লিড",va:"সবগুলো দেখুন",pl_lbl:"ফ্রি প্ল্যান",cu_empty:"কোনো ডেটা পাওয়া যায়নি",no_empty:"কোনো ডেটা পাওয়া যায়নি",foot_demo:"ব্যাকএন্ড বন্ধ · ডেটা পাওয়া যায়নি",m_off:"ব্যাকএন্ডে পৌঁছানো যায়নি।"}};
-  var lang="en";
+  var lang="en",TZ="Asia/Dhaka";
   var API_HOST=(location.search.indexOf("api=local")>-1)?"http://127.0.0.1:8000":"https://smartbiz-ai-backend-8b8k.onrender.com",USE_BACKEND=true,API_URL=API_HOST+"/api/leads",SEND_SOURCE=true,live=false; // SEND_SOURCE=true once backend accepts "source" // set USE_BACKEND=false for offline demo
   try{var sv=localStorage.getItem("sb-lang");if(sv==="bn")lang="bn"}catch(e){}
   var _d=document.createElement("input");var $=function(i){return document.getElementById(i)||_d};
   var tx=function(k){return T[lang][k]};
   var BN="০১২৩৪৫৬৭৮৯";
+  var TOK="";try{TOK=localStorage.getItem("sb-token")||""}catch(e){}
+  var _fetch=window.fetch.bind(window);
+  function signOut(){TOK="";try{localStorage.removeItem("sb-token")}catch(e){}location.reload()}
+  window.fetch=function(u,o){u=String(u);if(u.indexOf(API_HOST+"/api")!==0)return _fetch(u,o);
+    var lg=/\/auth\/login$/.test(u),pub=lg||((o&&o.method)==="POST"&&/\/api\/leads$/.test(u));
+    if(!TOK&&!pub)return Promise.resolve(new Response("{}",{status:401}));
+    o=Object.assign({},o);o.headers=Object.assign({},o.headers);if(TOK&&!pub)o.headers["Authorization"]="Bearer "+TOK;
+    return _fetch(u,o).then(function(r){if(r.status===401&&TOK&&!pub)signOut();return r})};
+  if(!TOK)$("lg").hidden=false;
+  $("lgOut").onclick=signOut;
+  $("lgF").onsubmit=async function(e){e.preventDefault();var em=$("lgE").value.trim(),pw=$("lgP").value,m=$("lgM");m.textContent="";
+    if(!em||!pw){m.textContent=tx("lg_req");return}
+    $("lgB").disabled=true;$("vt").classList.add("busy");var wt=setTimeout(function(){m.textContent=tx("lg_wait")},3500),ac=new AbortController(),to=setTimeout(function(){ac.abort()},70000);
+    try{var r=await fetch(API_HOST+"/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,password:pw}),signal:ac.signal});clearTimeout(wt);clearTimeout(to);m.textContent="";
+      if(r.status===400||r.status===401||r.status===422)m.textContent=tx("lg_bad");
+      else if(!r.ok){m.textContent=tx("lg_srv")+" ("+r.status+")";console.error("login failed",r.status)}
+      else{var d=await r.json();if(!d.access_token)throw new Error("no token");TOK=d.access_token;try{localStorage.setItem("sb-token",TOK)}catch(x){}$("vt").classList.remove("busy");$("vt").classList.add("open");setTimeout(function(){location.reload()},matchMedia("(prefers-reduced-motion:reduce)").matches?250:1900);return}}
+    catch(x){clearTimeout(wt);clearTimeout(to);m.textContent=tx("lg_net");console.error("login error",x)}
+    var v=$("vt");v.classList.remove("busy");v.classList.remove("shake");void v.offsetWidth;v.classList.add("shake");$("lgB").disabled=false};
   function N(n){var s=String(n);return lang==="bn"?s.replace(/\d/g,function(d){return BN[d]}):s}
   var wfs=[{k:"w1",c:98,on:true},{k:"w2",c:84,on:true},{k:"w3",c:95,on:true},{k:"w4",c:99,on:true},{k:"w5",c:100,on:true},{k:"w6",c:92,on:false}];
   var logs=[
@@ -532,9 +609,9 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     document.documentElement.lang=lang;
     document.querySelectorAll("[data-i]").forEach(function(e){e.textContent=tx(e.dataset.i)});
     document.querySelectorAll("[data-p]").forEach(function(e){e.placeholder=tx(e.dataset.p)});
-    var h=new Date().getHours();
+    var h=(+new Intl.DateTimeFormat("en-US",{timeZone:TZ,hour:"numeric",hour12:false}).format(new Date()))%24;
     $("greet").textContent=tx(h<12?"gm":h<17?"ga":"ge");
-    $("date").textContent=new Date().toLocaleDateString(lang==="bn"?"bn-BD":"en-US",{weekday:"long",month:"long",day:"numeric"});
+    $("date").textContent=new Date().toLocaleDateString(lang==="bn"?"bn-BD":"en-US",{weekday:"long",month:"long",day:"numeric",timeZone:TZ});
     $("bEn").setAttribute("aria-pressed",lang==="en");$("bBn").setAttribute("aria-pressed",lang==="bn");
     document.querySelectorAll("[data-to]").forEach(function(e){if(!e.dataset.anim)e.textContent=N(e.id==="kRuns"?runs:e.dataset.to)});
   }
@@ -566,7 +643,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
       return "<tr><td><strong>"+tx(l.w)+"</strong></td><td>"+tx(l.t)+"</td><td>"+ago(l.m)+"</td><td class='num'>"+(l.d===null?"—":N(l.d.toFixed(1))+tx("sec"))+"</td><td><span class='pill "+cl+"'>"+tx(l.s)+"</span></td></tr>";
     }).join(""):"<tr><td colspan='5' class='mut'>"+tx("none")+"</td></tr>";
   }
-  var VS=["dash","leads","reports","customers","notifications","workflows"];
+  var VS=["dash","leads","reports","customers","notifications","workflows","assistant"];
   var SO=["so_web","so_fb","so_gf","so_li","so_ref","so_em","so_oth"],IN=["i_aut","i_ai","i_dash","i_cons","i_dm","i_web","i_oth"],ST=["sn","sc","sq","sw","sl"],IN_EN=["Business Automation","AI Services","Dashboard","Consulting","Digital Marketing","Web Development","Other"],SRC_KEYS=["website","facebook","google_forms","linkedin","referral","email","other"];
   var AT=["Website · Facebook · Google Forms","Name · Email · Phone · Interest","FastAPI · Python","SQLite · PostgreSQL","Leads · Conversion · Revenue · Charts"];
   var leads=[["Rafia Ahmed","rafia@boutique.com","01712345601",0,1,0,0,0],["Tanvir Hasan","tanvir@thelec.com","01812345602",1,0,1,0,0],["Nusrat Jahan","nusrat@bakery.com","01912345603",0,2,3,28000,1],["Sakib Rahman","sakib@traders.com","01612345604",2,1,0,0,1],["Mita Das","mita@fashion.com","01512345605",3,0,2,0,2],["Imran Hossain","imran@shop.com","01712345606",0,0,3,45000,2],["Farhana Akter","farhana@mail.com","01812345607",1,1,1,0,3],["Rakib Islam","rakib@store.com","01912345608",2,2,3,18500,4],["Sadia Khan","sadia@mail.com","01612345609",0,0,2,0,4],["Arif Chowdhury","arif@agro.com","01512345610",3,1,0,0,5],["Tasnia Noor","tasnia@mail.com","01712345611",1,2,3,32000,5],["Jamal Uddin","jamal@mail.com","01812345612",0,0,1,0,6]].map(function(a,i){return{id:i+1,n:a[0],e:a[1],p:a[2],i:a[3],s:a[4],t:a[5],v:a[6],d:a[7]}});
@@ -593,7 +670,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     leads.forEach(function(l){if(l.d<7)cnt[6-l.d]++});
     var mx=Math.max.apply(null,cnt.concat(3));
     for(var i=0;i<7;i++){var dt=new Date(Date.now()-(6-i)*864e5),bh=cnt[i]/mx*115,x=14+i*58;
-      h+="<rect x='"+x+"' y='"+(150-bh)+"' width='34' height='"+bh+"' rx='7' fill='"+(cnt[i]===Math.max.apply(null,cnt)?"var(--amber)":"var(--pill)")+"'/><text x='"+(x+17)+"' y='"+(144-bh)+"' text-anchor='middle' font-weight='600'>"+N(cnt[i])+"</text><text x='"+(x+17)+"' y='170' text-anchor='middle'>"+dt.toLocaleDateString(loc,{weekday:"short"})+"</text>";}
+      h+="<rect x='"+x+"' y='"+(150-bh)+"' width='34' height='"+bh+"' rx='7' fill='"+(cnt[i]===Math.max.apply(null,cnt)?"var(--amber)":"var(--pill)")+"'/><text x='"+(x+17)+"' y='"+(144-bh)+"' text-anchor='middle' font-weight='600'>"+N(cnt[i])+"</text><text x='"+(x+17)+"' y='170' text-anchor='middle'>"+dt.toLocaleDateString(loc,{weekday:"short",timeZone:TZ})+"</text>";}
     $("hb").innerHTML=(leadsLoading?LDR():!leads.length?"<div class='ldr'>"+esc(tx("no_data"))+"</div>":"<svg viewBox='0 0 420 180' class='chart' role='img' aria-label='"+tx("sr")+"'>"+h+"<line x1='6' x2='414' y1='150' y2='150' stroke='var(--line)'/></svg>");
   }
   function fillSel(id,keys,first){var s=$(id),v=s.value;s.innerHTML=(first?"<option value=''>"+tx(first)+"</option>":"")+keys.map(function(k,i){return "<option value='"+i+"'>"+tx(k)+"</option>"}).join("");if(v!=="")s.value=v}
@@ -642,9 +719,9 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     }else{r.style.whiteSpace="pre-wrap";r.textContent=st.content!=null?st.content:JSON.stringify(d,null,2)}
     $("rIns").innerHTML=st.insights.map(function(x){return "<li>"+esc(x)+"</li>"}).join("");
     $("rRec").innerHTML=st.recs.map(function(x){return "<li>"+esc(x)+"</li>"}).join("");
-    var dt=dOf(st.when);if(dt)$("rTime").textContent=dt.toLocaleString(lang==="bn"?"bn-BD":"en-US",{dateStyle:"medium",timeStyle:"short"});
+    var dt=dOf(st.when);if(dt)$("rTime").textContent=fmtDT(dt);
   }
-  function repTs(x){var c=String(x.created_at||""),t=new Date(/Z|[+-]\d\d:?\d\d$/.test(c)?c:c+"Z").getTime();return isNaN(t)?(+x.id||0):t}
+  function repTs(x){var d=dOf(x.created_at);return d?d.getTime():(+x.id||0)}
   async function loadReport(){
     try{
       var r=await fetch(REP_URL);if(!r.ok)throw new Error(r.status);
@@ -667,7 +744,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     }
     $("rSrc").innerHTML=bars(SO,cs,s.n);$("rSt").innerHTML=bars(ST,ct,s.n);
   }
-  function stamp(){$("rTime").textContent=new Date().toLocaleTimeString(lang==="bn"?"bn-BD":"en-US",{hour:"2-digit",minute:"2-digit"})}
+  function stamp(){$("rTime").textContent=new Date().toLocaleTimeString(lang==="bn"?"bn-BD":"en-US",{hour:"2-digit",minute:"2-digit",timeZone:TZ})}
   function runWf(w){logs.unshift({w:w.k,t:"tr3",m:0,d:1.0,s:"ok"});runs++;$("kRuns").textContent=N(runs);drawLog();var fr=$("log").rows[0];if(fr)fr.classList.add("new");say(tx(w.k)+tx("t_run"))}
   function drawWfView(){
     $("arch").innerHTML=AT.map(function(t,i){return "<div class='card'><span class='no'>"+N(i+1)+"</span><h2 style='margin:10px 0 8px'>"+tx("ar"+(i+1)+"t")+"</h2><span class='tech'>"+t+"</span><p class='mut' style='margin:10px 0 0'>"+tx("ar"+(i+1)+"d")+"</p></div>"}).join("");
@@ -708,7 +785,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     if(USE_BACKEND&&live){
       sel.disabled=true;
       try{
-        var r=await fetch(API_URL+"/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status:["new","contacted","qualified","converted","lost"][idx]})});
+        var r=await fetch(API_URL+"/"+id+"/status",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status:["new","contacted","qualified","converted","lost"][idx]})});
         if(!r.ok){all();say(tx(r.status===404?"m_404":r.status===422?"m_422":"m_pf")+" ("+r.status+")");return}
       }catch(err){all();say(tx("m_net"));return}
     }
@@ -821,15 +898,50 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     $("wkDet").innerHTML=h+"</div>";
   }
   $("wkDet").onclick=function(e){var r=e.target.closest("tr[data-ix]");if(r){wkExec=+r.dataset.ix;drawWk()}};
+  var AI_PATH="/api/ai/chat",aiMsgs=[],aiBusy=false,aiLast="";
+  var AI_SUG=[["How many leads did we get this week?","এই সপ্তাহে আমরা কতটি লিড পেয়েছি?"],["Which lead source brings the most leads?","কোন সোর্স থেকে সবচেয়ে বেশি লিড আসে?"],["Which leads need follow-up today?","আজ কোন লিডগুলোতে ফলো-আপ দরকার?"],["What is our conversion rate?","আমাদের কনভার্সন রেট কত?"],["Summarize this month's business performance.","এই মাসের ব্যবসার পারফরম্যান্স সংক্ষেপে বলুন।"],["What can I do to convert more leads?","আরও লিড কনভার্ট করতে কী করা যায়?"]];
+  function aiFmt(t){var h=[],ul=false;esc(String(t)).split("\n").forEach(function(l){var m=/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/.exec(l);l=(m?m[1]:l).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");if(m){if(!ul){h.push("<ul>");ul=true}h.push("<li>"+l+"</li>")}else{if(ul){h.push("</ul>");ul=false}if(l.trim())h.push("<p style='margin:0 0 6px'>"+l+"</p>")}});if(ul)h.push("</ul>");return h.join("")}
+  function aiText(d){if(d==null)return"";if(typeof d==="string")return d;if(Array.isArray(d))return d.map(aiText).join("\n");var k=["response","answer","reply","message","content","text","result","output"];for(var i=0;i<k.length;i++)if(d[k[i]]!=null&&d[k[i]]!==""){var v=aiText(d[k[i]]);if(v)return v}return d.data?aiText(d.data):""}
+  function aiGrow(){var t=$("aiQ");t.style.height="auto";t.style.height=Math.min(t.scrollHeight,140)+"px"}
+  function drawAI(){
+    var L=lang==="bn"?1:0;$("aiQ").placeholder=tx("as_ph");$("aiQ").setAttribute("aria-label",tx("as_ph"));
+    $("aiSug").innerHTML=AI_SUG.map(function(q,i){return "<button type='button' data-q='"+i+"'"+(aiBusy?" disabled":"")+">"+esc(q[L])+"</button>"}).join("");
+    var h=aiMsgs.length||aiBusy?"":"<div class='aib a'>"+esc(tx("as_wel"))+"</div>";
+    aiMsgs.forEach(function(m){
+      if(m.r==="u")h+="<div class='aib u'>"+esc(m.t)+"</div>";
+      else if(m.r==="a")h+="<div class='aib a'>"+aiFmt(m.t)+"</div>";
+      else h+="<div class='aib e' role='alert'>"+esc(tx(m.k)+(m.c?" ("+m.c+")":""))+" <button class='mini' type='button' data-retry='1'>"+tx("as_retry")+"</button></div>"});
+    if(aiBusy)h+="<div class='aib a'><span class='dots' role='status' aria-label='"+esc(tx("as_think"))+"'><i></i><i></i><i></i></span></div>";
+    var box=$("aiMsgs");box.innerHTML=h;box.scrollTop=box.scrollHeight;$("aiB").disabled=aiBusy;$("aiClr").hidden=!aiMsgs.length;
+  }
+  async function aiAsk(q,retry){
+    q=String(q||"").trim();if(!q||aiBusy)return;aiLast=q;
+    aiMsgs=aiMsgs.filter(function(m){return m.r!=="e"});
+    if(retry&&aiMsgs.length&&aiMsgs[aiMsgs.length-1].r==="u")aiMsgs.pop();
+    aiMsgs.push({r:"u",t:q});aiBusy=true;$("aiQ").value="";aiGrow();drawAI();
+    var ac=new AbortController(),to=setTimeout(function(){ac.abort()},60000);
+    try{var r=await fetch(API_HOST+AI_PATH,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:q}),signal:ac.signal});
+      var d=null;try{d=await r.json()}catch(e){}
+      if(!r.ok)aiMsgs.push({r:"e",k:r.status===404?"as_e404":r.status===422?"as_e422":r.status===429?"as_e429":r.status>=500?"as_e5":"as_ex",c:r.status});
+      else{var t=aiText(d).trim();aiMsgs.push(t?{r:"a",t:t}:{r:"e",k:"as_eempty"})}}
+    catch(e){aiMsgs.push({r:"e",k:"as_enet"})}
+    clearTimeout(to);aiBusy=false;drawAI();
+  }
+  $("aiF").onsubmit=function(e){e.preventDefault();aiAsk($("aiQ").value)};
+  $("aiQ").onkeydown=function(e){if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();aiAsk($("aiQ").value)}};
+  $("aiQ").oninput=aiGrow;
+  $("aiSug").onclick=function(e){var b=e.target.closest("button[data-q]");if(b)aiAsk(AI_SUG[+b.dataset.q][lang==="bn"?1:0])};
+  $("aiMsgs").onclick=function(e){if(e.target.closest("[data-retry]"))aiAsk(aiLast,true)};
+  $("aiClr").onclick=function(){aiMsgs=[];drawAI()};
   var rcCur=null,rcRaf=0;
-  function fmtDT(d){var lc=lang==="bn"?"bn-BD":"en-US";return d.toLocaleDateString(lc,{year:"numeric",month:"short",day:"numeric"})+", "+d.toLocaleTimeString(lc,{hour:"2-digit",minute:"2-digit"})}
+  function fmtDT(d){return d.toLocaleString(lang==="bn"?"bn-BD":"en-GB",{timeZone:TZ})}
   function rcModel(){
     var s=stats(),cs=SO.map(function(){return 0}),ct=ST.map(function(){return 0});
     leads.forEach(function(l){cs[l.s]++;ct[l.t]++});
     var ts=cs.indexOf(Math.max.apply(null,cs)),txt;
     if(repData)txt=repText(repData);else txt=$("rSum").textContent;
-    var ca=repData&&repData.created_at?String(repData.created_at):"",when=ca?new Date(/Z|[+-]\d\d:?\d\d$/.test(ca)?ca:ca+"Z"):new Date();
-    return{s:s,ct:ct,top:cs[ts]?tx(SO[ts]):"\u2014",txt:txt,no:repData?"SB-"+String(repData.id).padStart(4,"0"):"SB-DEMO",type:repData&&repData.report_type?repData.report_type:"summary",when:isNaN(when)?new Date():when,src:(live||repData)?"foot_live":"foot_demo"};
+    var ca=repData&&repData.created_at?String(repData.created_at):"",when=ca?dOf(ca):new Date();
+    return{s:s,ct:ct,top:cs[ts]?tx(SO[ts]):"\u2014",txt:txt,no:repData?"SB-"+String(repData.id).padStart(4,"0"):"SB-DEMO",type:repData&&repData.report_type?repData.report_type:"summary",when:when||new Date(),src:(live||repData)?"foot_live":"foot_demo"};
   }
   function rcPaperHTML(m){
     var s=m.s,row=function(a,b){return "<div class='rc-r'><span>"+a+"</span><b>"+b+"</b></div>"};
@@ -851,7 +963,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   }
   function rcDownload(m){
     var b=new Blob(["\ufeff"+rcText(m)],{type:"text/plain;charset=utf-8"}),a=document.createElement("a");
-    a.href=URL.createObjectURL(b);a.download="SmartBiz_Report_"+new Date().toISOString().slice(0,10)+".txt";
+    a.href=URL.createObjectURL(b);a.download="SmartBiz_Report_"+new Intl.DateTimeFormat("en-CA",{timeZone:TZ}).format(new Date())+".txt";
     document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000);say(tx("rc_saved"));
   }
   var RC_PCSS="body{margin:0;background:#fff}.rc-paper{max-width:420px;margin:0 auto;padding:22px;color:#000;font:12.5px/1.55 ui-monospace,Menlo,Consolas,monospace;-webkit-print-color-adjust:exact;print-color-adjust:exact}.rc-ban{height:72px;border-radius:6px;margin-bottom:12px;background:linear-gradient(135deg,#F0A94E,#C9792A 60%,#7A3F12);display:grid;place-items:center;color:#fff;font-weight:700;letter-spacing:.16em;font-size:11px}.rc-t{text-align:center;font-weight:700;font-size:17px}.rc-s{text-align:center;color:#555;font-size:10px;letter-spacing:.2em;text-transform:uppercase}.rc-sep{border-top:1px dashed #777;margin:10px 0}.rc-r{display:flex;justify-content:space-between;gap:12px}.rc-r span{color:#555}.rc-h{display:flex;justify-content:space-between;color:#555;font-size:10px;text-transform:uppercase;margin-bottom:3px}.rc-p{margin:0;white-space:pre-wrap;word-break:break-word;font-family:inherit}.rc-tot{display:flex;justify-content:space-between;font-size:15px;font-weight:700}.rc-bc{height:28px;margin:12px 0 5px;background:repeating-linear-gradient(90deg,#000 0 2px,transparent 2px 4px,#000 4px 5px,transparent 5px 8px,#000 8px 11px,transparent 11px 13px)}.rc-f{text-align:center;color:#555;font-size:10px}";
@@ -886,7 +998,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   $("rcDl").onclick=function(){rcDownload(rcCur)};$("rcPr").onclick=function(){rcPrint(rcCur)};
   document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("rcOv").hidden)closeRc()});
   var API_BASE=API_URL.replace(/\/leads$/,""),cuData=[],noData=[],cuErr=null,noErr=null,cuLoaded=false,noLoaded=false;
-  function dOf(c){var t=String(c||"");if(!t)return null;var d=new Date(/Z|[+-]\d\d:?\d\d$/.test(t)?t:t+"Z");return isNaN(d)?null:d}
+  function dOf(c){var t=String(c||"");if(!t)return null;var d=new Date(t);return isNaN(d)?null:d}
   function pretty(k){return k.replace(/_/g," ").replace(/^./,function(c){return c.toUpperCase()})}
   var CU_PREF=["name","email","phone","company","status","source","value","total_value","total_deals","created_at"],CU_LBL={total_deals:"lh_td",name:"lh1",email:"f_e",phone:"f_p",company:"f_c",status:"lh5",created_at:"lh6",value:"lh_v",total_value:"lh_v",source:"f_s"};
   function cell2(k,v){
@@ -961,7 +1073,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
   }
   $("offMsg").onclick=function(e){if(e.target.closest("[data-retry]")){leadsLoading=true;repLoaded=false;all();loadLeads();loadReport().then(function(){drawReport()})}};
   $("vaBtn").onclick=function(){location.hash="leads";setTimeout(function(){showPanel("rec")},120)};
-  function all(){drawStatic();drawBars();drawStats();drawLeads();drawReport();drawPlan();drawCustomers();drawNotifs();drawRecent();drawState();drawWk()}
+  function all(){drawStatic();drawBars();drawStats();drawLeads();drawReport();drawPlan();drawCustomers();drawNotifs();drawRecent();drawState();drawWk();drawAI()}
   applyPlan();
   stamp();route();
   all();
@@ -970,7 +1082,7 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var st=String(o.status||"new").toLowerCase(),sr=String(o.source||"").toLowerCase().replace(/[\s_-]/g,"");
     var t=/lost/.test(st)?4:/convert|won|closed/.test(st)?3:/qualif/.test(st)?2:/contact/.test(st)?1:0;
     var s=sr.indexOf("face")>-1?1:sr.indexOf("google")>-1?2:sr.indexOf("linked")>-1?3:sr.indexOf("refer")>-1?4:sr==="email"?5:(sr==="website"||sr==="web")?0:6;
-    var ca=String(o.created_at||""),dt=new Date(/Z|[+-]\d\d:?\d\d$/.test(ca)?ca:ca+"Z"),d=isNaN(dt)?0:Math.max(0,Math.floor((Date.now()-dt)/864e5));
+    var dt=dOf(o.created_at),d=!dt?0:Math.max(0,Math.floor((Date.now()-dt)/864e5));
     var nm=function(x){return String(x||"").toLowerCase().replace(/[^a-z0-9]/g,"")},ii=-1;IN_EN.forEach(function(x,k){if(nm(x)===nm(o.interest))ii=k});
     return{id:o.id,n:o.name||"",e:String(o.email||"").toLowerCase(),p:String(o.phone||""),c:o.company||"",i:ii,ir:o.interest||"",s:s,t:t,v:+(o.value||o.amount||0)||0,d:d};
   }
