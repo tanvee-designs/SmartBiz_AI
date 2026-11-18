@@ -1,17 +1,18 @@
+
 import os
 import requests
 
-# n8n Webhook URL এনভায়রনমেন্ট ভ্যারিয়েবল থেকে নেবে
 N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL", "")
 
+
 def send_lead_to_n8n(lead):
-    """n8n-এ নতুন লিডের ডেটা পাঠায়।"""
+    """Send a new lead to the existing n8n Lead Automation webhook."""
+
     if not N8N_WEBHOOK_URL:
         print("N8N_WEBHOOK_URL is not set. Skipping n8n.")
         return
 
     try:
-        # SQLAlchemy অবজেক্টকে JSON সিরিয়ালাইজেবল ডিকশনারিতে কনভার্ট করা
         lead_data = {
             "id": lead.id,
             "name": lead.name,
@@ -21,17 +22,26 @@ def send_lead_to_n8n(lead):
             "interest": lead.interest,
             "value": lead.value,
             "status": lead.status,
+            "source": lead.source,
+            "message": lead.message,
         }
 
-        # n8n-এ POST রিকোয়েস্ট পাঠানো
         response = requests.post(
-            N8N_WEBHOOK_URL, 
-            json=lead_data, 
-            headers={"ngrok-skip-browser-warning": "true"}, 
-            timeout=10
+            N8N_WEBHOOK_URL,
+            json=lead_data,
+            headers={
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
+            },
+            timeout=10,
         )
+
         response.raise_for_status()
+
         print(f"Successfully sent lead {lead.id} to n8n.")
-        
-    except Exception as e:
-        print(f"Could not send lead to n8n: {e}")
+
+    except requests.RequestException as exc:
+        print(f"Could not send lead to n8n: {exc}")
+
+    except Exception as exc:
+        print(f"Unexpected n8n integration error: {exc}")

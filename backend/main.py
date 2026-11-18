@@ -1,6 +1,8 @@
+
 import json
 import logging
 import os
+
 import httpx
 import requests
 
@@ -18,15 +20,13 @@ from fastapi import (
     Header,
     HTTPException,
     Query,
-    Request,
     status,
 )
-from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.security import APIKeyHeader          # ✅ NEW
-from pydantic import BaseModel, EmailStr
-from sqlalchemy import func, or_
+from fastapi.security import APIKeyHeader
+
+from sqlalchemy import func, or_, inspect, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -40,7 +40,6 @@ from database import Base, engine, get_db
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(PROJECT_ROOT / ".env")
-
 
 from auth import (
     authenticate_admin,
@@ -75,6 +74,40 @@ except Exception:
 Base.metadata.create_all(bind=engine)
 
 
+def migrate_execution_log_columns():
+    """
+    Add new nullable columns to existing execution_logs tables.
+    Existing execution records are preserved.
+    """
+
+    inspector = inspect(engine)
+
+    if "execution_logs" not in inspector.get_table_names():
+        return
+
+    existing_columns = {
+        column["name"]
+        for column in inspector.get_columns("execution_logs")
+    }
+
+    migrations = {
+        "workflow_id": "ALTER TABLE execution_logs ADD COLUMN workflow_id VARCHAR(100)",
+        "error_message": "ALTER TABLE execution_logs ADD COLUMN error_message TEXT",
+    }
+
+    with engine.begin() as connection:
+        for column_name, statement in migrations.items():
+            if column_name not in existing_columns:
+                connection.execute(text(statement))
+                logger.info(
+                    "Added execution_logs.%s",
+                    column_name,
+                )
+
+
+migrate_execution_log_columns()
+
+
 # ---------------- FASTAPI APP ----------------
 
 TAGS_METADATA = [
@@ -82,96 +115,72 @@ TAGS_METADATA = [
     {"name": "Auth", "description": "Admin login (JWT)."},
     {
         "name": "Leads",
-        "description": "Lead collection and management. "
-        "`POST /api/leads` is public; everything else needs admin JWT.",
+        "description": "Lead collection and management. POST /api/leads is public.",
     },
-    {"name": "Customers", "description": "Customers (created manually or when a lead is converted)."},
-    {"name": "Dashboard", "description": "Summary numbers for the dashboard."},
+    {"name": "Customers", "description": "Customer management."},
+    {"name": "Dashboard", "description": "Dashboard statistics."},
     {"name": "Reports", "description": "AI business reports."},
     {"name": "Notifications", "description": "System notifications."},
     {"name": "Email Logs", "description": "Generated and sent email records."},
     {"name": "Automation", "description": "AI email automation."},
     {"name": "Follow-ups", "description": "Customer follow-up logic used by n8n."},
-    {"name": "n8n Integration", "description": "Webhook, health check and execution logs for n8n."},
+    {"name": "n8n Integration", "description": "n8n webhooks and execution logs."},
 ]
+
 
 app = FastAPI(
     title="SmartBiz_AI Backend",
     description=(
         "SmartBiz_AI CRM Backend API.\n\n"
-        "**Authentication**\n"
-        "- Admin endpoints: login at `/api/auth/login`, then send "
-        "`Authorization: Bearer <token>`.\n"
-        "- n8n endpoints: send the `X-API-Key` header.\n"
-        "- `POST /api/leads` is public (website forms, Facebook, Google Forms)."
+        "Admin endpoints use JWT Bearer authentication. "
+        "n8n endpoints use the X-API-Key header. "
+        "POST /api/leads is public."
     ),
     version="1.0.0",
     openapi_tags=TAGS_METADATA,
 )
 
+
+# ---------------- CORS ----------------
+
+ALLOWED_ORIGINS = [
+    "https://smartbiz-automation-official.netlify.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-API-Key"],
 )
 
 
 # ---------------- ERROR HANDLERS ----------------
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(
-    request: Request,
-    exc: RequestValidationError,
-):
-    errors = []
-
-    for err in exc.errors():
-        location = [
-            str(part)
-            for part in err.get("loc", [])
-            if part != "body"
-        ]
-
-        errors.append(
-            {
-                "field": ".".join(location),
-                "message": err.get("msg", "Invalid value"),
-            }
-        )
-
-    return JSONResponse(
-        status_code=422,
-        content={
-            "detail": "Validation failed",
-            "errors": errors,
-        },
-    )
+# FastAPI's built-in RequestValidationError handler is intentionally
+# preserved. It returns the standard 422 format:
+# {"detail": [{"loc": ["body", "field"], "msg": "..."}]}
 
 
 @app.exception_handler(IntegrityError)
-async def integrity_exception_handler(
-    request: Request,
-    exc: IntegrityError,
-):
+async def integrity_exception_handler(request, exc):
     logger.warning("Database integrity error: %s", exc)
 
     return JSONResponse(
         status_code=409,
         content={
-            "detail": (
-                "Database conflict: duplicate value or "
-                "invalid reference."
-            )
+            "detail": "Database conflict: duplicate value or invalid reference."
         },
     )
 
 
 @app.exception_handler(Exception)
-async def unhandled_exception_handler(
-    request: Request,
-    exc: Exception,
-):
+async def unhandled_exception_handler(request, exc):
     logger.exception("Unhandled server error: %s", exc)
 
     return JSONResponse(
@@ -190,7 +199,8 @@ N8N_BASE_URL = os.getenv(
 N8N_API_KEY = os.getenv("N8N_API_KEY", "")
 
 N8N_NOTIFICATION_WEBHOOK_URL = os.getenv(
-    "N8N_NOTIFICATION_WEBHOOK_URL", ""
+    "N8N_NOTIFICATION_WEBHOOK_URL",
+    "",
 )
 
 N8N_WEBHOOK_HEALTH_URL = os.getenv(
@@ -205,8 +215,6 @@ BST = timezone(timedelta(hours=6))
 
 
 def to_bst_iso(dt: Optional[datetime]) -> Optional[str]:
-    """Convert datetime to BST ISO string."""
-
     if dt is None:
         return None
 
@@ -216,26 +224,39 @@ def to_bst_iso(dt: Optional[datetime]) -> Optional[str]:
     return dt.astimezone(BST).isoformat()
 
 
+def to_utc_naive(dt: Optional[datetime]) -> Optional[datetime]:
+    """
+    Store execution timestamps as UTC-naive values because the existing
+    SQLAlchemy DateTime columns are timezone-naive.
+    """
+
+    if dt is None:
+        return None
+
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=BST)
+
+    return dt.astimezone(timezone.utc).replace(tzinfo=None)
+
+
 # ---------------- N8N API KEY AUTHENTICATION ----------------
 
-api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)   # ✅ NEW
+api_key_header = APIKeyHeader(
+    name="X-API-Key",
+    auto_error=False,
+)
 
 
 def verify_n8n_api_key(
-    x_api_key: Optional[str] = Depends(api_key_header),              # ✅ CHANGED
+    x_api_key: Optional[str] = Depends(api_key_header),
 ):
-    """Verify API key for incoming n8n-to-backend requests."""
-
     if not N8N_API_KEY:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="n8n API key is not configured on the backend.",
         )
 
-    if not x_api_key or not compare_digest(
-        x_api_key,
-        N8N_API_KEY,
-    ):
+    if not x_api_key or not compare_digest(x_api_key, N8N_API_KEY):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing n8n API key.",
@@ -246,6 +267,9 @@ def verify_n8n_api_key(
 
 # ---------------- AUTH SCHEMAS ----------------
 
+from pydantic import BaseModel, EmailStr
+
+
 class AdminLoginRequest(BaseModel):
     email: EmailStr
     password: str
@@ -254,7 +278,7 @@ class AdminLoginRequest(BaseModel):
 # ---------------- HELPER FUNCTIONS ----------------
 
 def send_notification_to_n8n(payload: dict):
-    """Send notification to n8n Notification Workflow."""
+    """Send a new-lead notification to the separate n8n Notification workflow."""
 
     if not N8N_NOTIFICATION_WEBHOOK_URL:
         print("N8N_NOTIFICATION_WEBHOOK_URL is not set. Skipping.")
@@ -271,16 +295,16 @@ def send_notification_to_n8n(payload: dict):
         response.raise_for_status()
 
         print(
-            f"Notification sent to n8n for lead_id: "
+            "Notification sent to n8n for lead_id: "
             f"{payload.get('lead_id')}"
         )
 
-    except Exception as e:
-        print(f"Failed to send notification to n8n: {e}")
+    except Exception as exc:
+        logger.error("Failed to send notification to n8n: %s", exc)
 
 
 def convert_lead_to_customer(db: Session, lead: models.Lead):
-    """Create (or update) a Customer when a lead becomes converted."""
+    """Create or update a Customer when a lead becomes converted."""
 
     email = lead.email.lower()
 
@@ -307,12 +331,22 @@ def convert_lead_to_customer(db: Session, lead: models.Lead):
 
     db.add(
         models.Notification(
-            message=(
-                f"Lead converted to customer: "
-                f"{lead.name} ({lead.email})"
-            ),
+            message=f"Lead converted to customer: {lead.name} ({lead.email})",
             is_read="false",
         )
+    )
+
+
+def duplicate_email_exception():
+    raise HTTPException(
+        status_code=409,
+        detail=[
+            {
+                "loc": ["body", "email"],
+                "msg": "email already exists",
+                "type": "value_error",
+            }
+        ],
     )
 
 
@@ -322,8 +356,6 @@ def convert_lead_to_customer(db: Session, lead: models.Lead):
 
 @app.get("/", tags=["Health"])
 def home():
-    """Root endpoint."""
-
     return {
         "message": "SmartBiz_AI Backend is running",
         "status": "success",
@@ -332,8 +364,6 @@ def home():
 
 @app.get("/health", tags=["Health"])
 def health_check():
-    """Simple health check."""
-
     return {
         "status": "ok",
         "message": "Backend is healthy",
@@ -346,8 +376,6 @@ def health_check():
 
 @app.post("/api/auth/login", tags=["Auth"])
 def admin_login(payload: AdminLoginRequest):
-    """Admin login. Returns a JWT access token (valid for 30 minutes)."""
-
     is_authenticated = authenticate_admin(
         payload.email,
         payload.password,
@@ -355,7 +383,7 @@ def admin_login(payload: AdminLoginRequest):
 
     if not is_authenticated:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=401,
             detail="Invalid email or password.",
         )
 
@@ -383,13 +411,7 @@ def create_lead(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
-    """
-    Collect a new lead (public endpoint).
-
-    If a lead with the same email already exists, no duplicate is
-    created. The existing lead is updated with any new details and
-    returned.
-    """
+    """Create a new public lead. Duplicate email returns HTTP 409."""
 
     email = str(lead.email).lower()
 
@@ -400,30 +422,7 @@ def create_lead(
     )
 
     if existing:
-        existing.name = (
-            lead.name.strip() if lead.name else existing.name
-        )
-        existing.phone = lead.phone if lead.phone else existing.phone
-        existing.company = (
-            lead.company if lead.company else existing.company
-        )
-        existing.interest = (
-            lead.interest if lead.interest else existing.interest
-        )
-        existing.value = (
-            lead.value if lead.value else existing.value
-        )
-        existing.message = (
-            lead.message if lead.message else existing.message
-        )
-        existing.source = (
-            lead.source if lead.source else existing.source
-        )
-
-        db.commit()
-        db.refresh(existing)
-
-        return existing
+        duplicate_email_exception()
 
     new_lead = models.Lead(
         name=lead.name.strip(),
@@ -468,13 +467,10 @@ def create_lead(
         )
 
     if send_lead_to_n8n:
-        try:
-            background_tasks.add_task(
-                send_lead_to_n8n,
-                new_lead,
-            )
-        except Exception:
-            pass
+        background_tasks.add_task(
+            send_lead_to_n8n,
+            new_lead,
+        )
 
     return new_lead
 
@@ -488,21 +484,12 @@ def list_leads(
     lead_status: Optional[schemas.LeadStatus] = Query(
         default=None,
         alias="status",
-        description="Filter by lead status.",
     ),
-    source: Optional[str] = Query(
-        default=None,
-        description="Filter by lead source.",
-    ),
-    search: Optional[str] = Query(
-        default=None,
-        description="Search in name, email or company.",
-    ),
+    source: Optional[str] = Query(default=None),
+    search: Optional[str] = Query(default=None),
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """List all leads (newest first). Optional filters supported."""
-
     query = db.query(models.Lead)
 
     if lead_status:
@@ -513,7 +500,6 @@ def list_leads(
 
     if search and search.strip():
         pattern = f"%{search.strip()}%"
-
         query = query.filter(
             or_(
                 models.Lead.name.ilike(pattern),
@@ -528,7 +514,6 @@ def list_leads(
 @app.get(
     "/api/leads/{lead_id}",
     response_model=schemas.LeadResponse,
-    responses={404: {"description": "Lead not found"}},
     tags=["Leads"],
 )
 def get_lead(
@@ -536,8 +521,6 @@ def get_lead(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Get a single lead by id."""
-
     lead = (
         db.query(models.Lead)
         .filter(models.Lead.id == lead_id)
@@ -553,7 +536,6 @@ def get_lead(
 @app.patch(
     "/api/leads/{lead_id}/status",
     response_model=schemas.LeadResponse,
-    responses={404: {"description": "Lead not found"}},
     tags=["Leads"],
 )
 def update_lead_status(
@@ -562,14 +544,6 @@ def update_lead_status(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """
-    Change a lead's status.
-
-    When the status becomes `converted`, a Customer is created
-    automatically (or `total_deals` is increased if the customer
-    already exists).
-    """
-
     lead = (
         db.query(models.Lead)
         .filter(models.Lead.id == lead_id)
@@ -594,11 +568,6 @@ def update_lead_status(
 @app.put(
     "/api/leads/{lead_id}",
     response_model=schemas.LeadResponse,
-    responses={
-        400: {"description": "No fields to update"},
-        404: {"description": "Lead not found"},
-        409: {"description": "Another lead with this email already exists"},
-    },
     tags=["Leads"],
 )
 def update_lead(
@@ -607,8 +576,6 @@ def update_lead(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Update a lead. Only the fields you send are changed."""
-
     lead = (
         db.query(models.Lead)
         .filter(models.Lead.id == lead_id)
@@ -642,7 +609,13 @@ def update_lead(
         if duplicate:
             raise HTTPException(
                 409,
-                "Another lead with this email already exists",
+                detail=[
+                    {
+                        "loc": ["body", "email"],
+                        "msg": "email already exists",
+                        "type": "value_error",
+                    }
+                ],
             )
 
     if "name" in data:
@@ -665,7 +638,6 @@ def update_lead(
 @app.delete(
     "/api/leads/{lead_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    responses={404: {"description": "Lead not found"}},
     tags=["Leads"],
 )
 def delete_lead(
@@ -673,8 +645,6 @@ def delete_lead(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Delete a lead together with its follow-ups and email logs."""
-
     lead = (
         db.query(models.Lead)
         .filter(models.Lead.id == lead_id)
@@ -699,14 +669,13 @@ def delete_lead(
 
 
 # ==================================================
-# CUSTOMER APIs - ADMIN ONLY
+# CUSTOMER APIs
 # ==================================================
 
 @app.post(
     "/api/customers",
     response_model=schemas.CustomerResponse,
     status_code=201,
-    responses={409: {"description": "Customer with this email already exists"}},
     tags=["Customers"],
 )
 def create_customer(
@@ -714,8 +683,6 @@ def create_customer(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Create a customer manually."""
-
     email = str(customer.email).lower()
 
     existing = (
@@ -754,8 +721,6 @@ def list_customers(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """List all customers (newest first)."""
-
     return (
         db.query(models.Customer)
         .order_by(models.Customer.created_at.desc())
@@ -764,7 +729,7 @@ def list_customers(
 
 
 # ==================================================
-# DASHBOARD APIs - ADMIN ONLY
+# DASHBOARD APIs
 # ==================================================
 
 LEAD_STATUSES = ["new", "contacted", "qualified", "converted", "lost"]
@@ -775,8 +740,6 @@ def get_dashboard_stats(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Summary numbers for the dashboard."""
-
     total_leads = db.query(func.count(models.Lead.id)).scalar() or 0
 
     leads_by_status = {name: 0 for name in LEAD_STATUSES}
@@ -808,7 +771,9 @@ def get_dashboard_stats(
     converted = leads_by_status["converted"]
 
     conversion_rate = (
-        round(converted / total_leads * 100, 1) if total_leads else 0
+        round(converted / total_leads * 100, 1)
+        if total_leads
+        else 0
     )
 
     pipeline_value = (
@@ -871,7 +836,7 @@ def get_dashboard_stats(
 
 
 # ==================================================
-# REPORT APIs - ADMIN ONLY
+# REPORT APIs
 # ==================================================
 
 @app.post(
@@ -885,20 +850,16 @@ def create_report(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Save a report manually."""
-
     new_report = models.Report(
         report_type=(report.report_type or "ai_report").strip(),
         title=report.title.strip(),
         summary=report.summary,
-        insights=json.dumps(
-            report.insights,
-            ensure_ascii=False,
-        ),
+        insights=json.dumps(report.insights, ensure_ascii=False),
         recommendations=json.dumps(
             report.recommendations,
             ensure_ascii=False,
         ),
+        content=report.content,
     )
 
     db.add(new_report)
@@ -917,8 +878,6 @@ def list_reports(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """List all reports (newest first)."""
-
     return (
         db.query(models.Report)
         .order_by(models.Report.created_at.desc())
@@ -936,8 +895,6 @@ def generate_ai_report(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Generate an AI business report from leads and email logs."""
-
     if generate_business_report is None:
         raise HTTPException(
             500,
@@ -949,11 +906,11 @@ def generate_ai_report(
 
     try:
         result = generate_business_report(leads, logs)
-
-    except Exception as e:
+    except Exception as exc:
+        logger.exception("Report generation failed")
         raise HTTPException(
             500,
-            f"Report generation failed: {e}",
+            f"Report generation failed: {exc}",
         )
 
     new_report = models.Report(
@@ -983,7 +940,7 @@ def generate_ai_report(
 
 
 # ==================================================
-# NOTIFICATION APIs - ADMIN ONLY
+# NOTIFICATION APIs
 # ==================================================
 
 @app.post(
@@ -995,9 +952,9 @@ def generate_ai_report(
 def create_notification(
     notification: schemas.NotificationCreate,
     db: Session = Depends(get_db),
-    current_admin: dict = Depends(get_current_admin),
+    n8n_authenticated: bool = Depends(verify_n8n_api_key),
 ):
-    """Create a notification (also forwarded to n8n if configured)."""
+    """Create a notification from n8n. This endpoint is not for dashboard use."""
 
     new_notification = models.Notification(
         message=notification.message.strip(),
@@ -1007,20 +964,6 @@ def create_notification(
     db.add(new_notification)
     db.commit()
     db.refresh(new_notification)
-
-    if N8N_NOTIFICATION_WEBHOOK_URL:
-        try:
-            requests.post(
-                N8N_NOTIFICATION_WEBHOOK_URL,
-                json={
-                    "id": new_notification.id,
-                    "message": new_notification.message,
-                },
-                timeout=5,
-            )
-
-        except Exception as e:
-            print(f"Could not send notification to n8n: {e}")
 
     return new_notification
 
@@ -1034,8 +977,6 @@ def list_notifications(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """List all notifications (newest first)."""
-
     return (
         db.query(models.Notification)
         .order_by(models.Notification.created_at.desc())
@@ -1043,16 +984,11 @@ def list_notifications(
     )
 
 
-@app.patch(
-    "/api/notifications/read-all",
-    tags=["Notifications"],
-)
+@app.patch("/api/notifications/read-all", tags=["Notifications"])
 def mark_all_notifications_read(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Mark every unread notification as read."""
-
     updated = (
         db.query(models.Notification)
         .filter(models.Notification.is_read == "false")
@@ -1067,7 +1003,6 @@ def mark_all_notifications_read(
 @app.patch(
     "/api/notifications/{notification_id}/read",
     response_model=schemas.NotificationResponse,
-    responses={404: {"description": "Notification not found"}},
     tags=["Notifications"],
 )
 def mark_notification_read(
@@ -1075,8 +1010,6 @@ def mark_notification_read(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Mark one notification as read."""
-
     notification = (
         db.query(models.Notification)
         .filter(models.Notification.id == notification_id)
@@ -1095,7 +1028,7 @@ def mark_notification_read(
 
 
 # ==================================================
-# EMAIL LOG APIs - ADMIN ONLY
+# EMAIL LOG APIs
 # ==================================================
 
 @app.get(
@@ -1107,8 +1040,6 @@ def list_email_logs(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """List all email logs (newest first)."""
-
     return (
         db.query(models.EmailLog)
         .order_by(models.EmailLog.created_at.desc())
@@ -1119,7 +1050,6 @@ def list_email_logs(
 @app.patch(
     "/email-logs/{log_id}/status",
     response_model=schemas.EmailLogResponse,
-    responses={404: {"description": "Log not found"}},
     tags=["Email Logs"],
 )
 def update_email_status(
@@ -1130,8 +1060,6 @@ def update_email_status(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Change an email log's status (pending, sent or failed)."""
-
     log = (
         db.query(models.EmailLog)
         .filter(models.EmailLog.id == log_id)
@@ -1150,12 +1078,11 @@ def update_email_status(
 
 
 # ==================================================
-# WELCOME EMAIL AUTOMATION - ADMIN ONLY
+# WELCOME EMAIL AUTOMATION
 # ==================================================
 
 @app.post(
     "/automation/welcome-email/{lead_id}",
-    responses={404: {"description": "Lead not found"}},
     tags=["Automation"],
 )
 def create_welcome_email(
@@ -1163,8 +1090,6 @@ def create_welcome_email(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Generate a welcome email for a lead and save it as an email log."""
-
     lead = (
         db.query(models.Lead)
         .filter(models.Lead.id == lead_id)
@@ -1189,11 +1114,10 @@ def create_welcome_email(
                 "phone": lead.phone,
             }
         )
-
-    except Exception as e:
+    except Exception as exc:
         raise HTTPException(
             500,
-            f"Email generation failed: {e}",
+            f"Email generation failed: {exc}",
         )
 
     log = models.EmailLog(
@@ -1222,10 +1146,7 @@ def create_welcome_email(
 FOLLOW_UP_INTERVAL_DAYS = 3
 
 
-def get_last_contact(
-    db: Session,
-    lead: models.Lead,
-) -> datetime:
+def get_last_contact(db: Session, lead: models.Lead) -> datetime:
     times = [lead.created_at]
 
     last_email = (
@@ -1261,16 +1182,10 @@ def list_due_follow_ups(
         default=FOLLOW_UP_INTERVAL_DAYS,
         ge=0,
         le=90,
-        description="Leads with no contact for this many days.",
     ),
     db: Session = Depends(get_db),
     n8n_authenticated: bool = Depends(verify_n8n_api_key),
 ):
-    """
-    Leads (status new/contacted) that have not been contacted
-    for the given number of days. Used by the n8n follow-up workflow.
-    """
-
     now = datetime.now(timezone.utc)
     cutoff = now - timedelta(days=days)
 
@@ -1286,9 +1201,7 @@ def list_due_follow_ups(
         last_contact = get_last_contact(db, lead) or lead.created_at
 
         if last_contact.tzinfo is None:
-            last_contact = last_contact.replace(
-                tzinfo=timezone.utc
-            )
+            last_contact = last_contact.replace(tzinfo=timezone.utc)
 
         if last_contact <= cutoff:
             due.append(
@@ -1298,19 +1211,16 @@ def list_due_follow_ups(
                     "email": lead.email,
                     "company": lead.company,
                     "status": lead.status,
-                    # ✅ Timezone fix — consistent BST (+06:00)
                     "created_at": to_bst_iso(lead.created_at),
-                    "last_contacted_at": to_bst_iso(lead.last_contacted_at),
+                    "last_contacted_at": to_bst_iso(
+                        lead.last_contacted_at
+                    ),
                     "last_contact_at": to_bst_iso(last_contact),
-                    "days_since_contact": (
-                        now - last_contact
-                    ).days,
+                    "days_since_contact": (now - last_contact).days,
                 }
             )
 
-    due.sort(
-        key=lambda entry: entry["last_contact_at"]
-    )
+    due.sort(key=lambda entry: entry["last_contact_at"])
 
     return {
         "count": len(due),
@@ -1323,10 +1233,6 @@ def list_due_follow_ups(
     "/api/follow-ups",
     response_model=schemas.FollowUpResponse,
     status_code=201,
-    responses={
-        404: {"description": "Lead not found"},
-        409: {"description": "A follow-up was already sent recently"},
-    },
     tags=["Follow-ups"],
 )
 def create_follow_up(
@@ -1334,12 +1240,6 @@ def create_follow_up(
     db: Session = Depends(get_db),
     n8n_authenticated: bool = Depends(verify_n8n_api_key),
 ):
-    """
-    Record a follow-up sent (or failed) by n8n.
-
-    A second successful follow-up within 3 days is rejected (409).
-    """
-
     lead = (
         db.query(models.Lead)
         .filter(models.Lead.id == payload.lead_id)
@@ -1351,9 +1251,10 @@ def create_follow_up(
 
     if payload.status == "sent":
         window_start = (
-            datetime.now(timezone.utc)
-            - timedelta(days=FOLLOW_UP_INTERVAL_DAYS)
-        )
+            datetime.now(timezone.utc) - timedelta(
+                days=FOLLOW_UP_INTERVAL_DAYS
+            )
+        ).replace(tzinfo=None)
 
         recent = (
             db.query(models.FollowUp)
@@ -1421,14 +1322,10 @@ def list_follow_ups(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """List follow-ups (newest first). Optionally filter by lead_id."""
-
     query = db.query(models.FollowUp)
 
     if lead_id is not None:
-        query = query.filter(
-            models.FollowUp.lead_id == lead_id
-        )
+        query = query.filter(models.FollowUp.lead_id == lead_id)
 
     return (
         query.order_by(models.FollowUp.created_at.desc())
@@ -1443,11 +1340,6 @@ def list_follow_ups(
 
 @app.post(
     "/api/webhooks/n8n",
-    responses={
-        400: {"description": "Missing required fields for the event"},
-        401: {"description": "Invalid or missing n8n API key"},
-        404: {"description": "Lead or email log not found"},
-    },
     tags=["n8n Integration"],
 )
 def n8n_webhook(
@@ -1455,16 +1347,6 @@ def n8n_webhook(
     db: Session = Depends(get_db),
     n8n_authenticated: bool = Depends(verify_n8n_api_key),
 ):
-    """
-    Receive events from n8n workflows.
-
-    Events:
-    - `ping`: connection test
-    - `email_sent`: needs `email_log_id`
-    - `email_failed`: needs `email_log_id` (optional `message`)
-    - `lead_status_changed`: needs `lead_id` and `status`
-    """
-
     if payload.event == "ping":
         return {"status": "ok", "event": "ping"}
 
@@ -1554,22 +1436,21 @@ def n8n_webhook(
 
 
 # ==================================================
-# N8N HEALTH CHECK API - ADMIN ONLY
+# N8N HEALTH CHECK
 # ==================================================
 
-@app.get("/api/integrations/n8n/health", tags=["n8n Integration"])
+@app.get(
+    "/api/integrations/n8n/health",
+    tags=["n8n Integration"],
+)
 async def n8n_health_check(
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Check whether n8n Cloud is reachable."""
-
     try:
         async with httpx.AsyncClient() as client:
             response = await client.head(
                 N8N_WEBHOOK_HEALTH_URL,
-                headers={
-                    "ngrok-skip-browser-warning": "true"
-                },
+                headers={"ngrok-skip-browser-warning": "true"},
                 timeout=5.0,
             )
 
@@ -1605,23 +1486,31 @@ def log_execution(
     db: Session = Depends(get_db),
     n8n_authenticated: bool = Depends(verify_n8n_api_key),
 ):
-    """Store an n8n workflow execution record (idempotent)."""
+    """Create or update an n8n execution record."""
+
+    data = payload.model_dump()
+
+    data["started_at"] = to_utc_naive(data.get("started_at"))
+    data["finished_at"] = to_utc_naive(data.get("finished_at"))
 
     existing = (
         db.query(models.ExecutionLog)
         .filter(
-            models.ExecutionLog.execution_id
-            == payload.execution_id
+            models.ExecutionLog.execution_id == payload.execution_id
         )
         .first()
     )
 
     if existing:
+        for field, value in data.items():
+            setattr(existing, field, value)
+
+        db.commit()
+        db.refresh(existing)
+
         return existing
 
-    new_log = models.ExecutionLog(
-        **payload.model_dump()
-    )
+    new_log = models.ExecutionLog(**data)
 
     db.add(new_log)
     db.commit()
@@ -1630,37 +1519,76 @@ def log_execution(
     return new_log
 
 
-@app.get("/api/workflows/executions", tags=["n8n Integration"])
+@app.get(
+    "/api/workflows/executions",
+    tags=["n8n Integration"],
+)
 def get_workflow_executions(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """Return latest execution logs in BST timezone."""
-
     logs = (
         db.query(models.ExecutionLog)
         .order_by(models.ExecutionLog.created_at.desc())
-        .limit(10)
+        .limit(50)
         .all()
     )
 
-    return [
-        {
-            "id": log.execution_id,
-            "workflow_name": log.workflow_name,
-            "status": log.status,
-            "started_at": to_bst_iso(log.started_at),
-            "time_saved": "N/A",
-        }
-        for log in logs
-    ]
+    results = []
+
+    for log in logs:
+        raw_status = (log.status or "").lower()
+
+        if raw_status in ("success", "succeeded", "completed"):
+            display_status = "success"
+        else:
+            display_status = "error"
+
+        duration_ms = None
+
+        if log.started_at and log.finished_at:
+            start = log.started_at
+            finish = log.finished_at
+
+            if start.tzinfo is None:
+                start = start.replace(tzinfo=timezone.utc)
+
+            if finish.tzinfo is None:
+                finish = finish.replace(tzinfo=timezone.utc)
+
+            duration_ms = max(
+                0,
+                int((finish - start).total_seconds() * 1000),
+            )
+
+        results.append(
+            {
+                "id": log.execution_id,
+                "execution_id": log.execution_id,
+                "workflow_name": log.workflow_name,
+                "workflow_id": log.workflow_id,
+                "status": display_status,
+                "started_at": to_bst_iso(log.started_at),
+                "finished_at": to_bst_iso(log.finished_at),
+                "duration_ms": duration_ms,
+                "error_message": log.error_message,
+            }
+        )
+
+    return results
 
 
-@app.get("/api/workflows", tags=["n8n Integration"])
+@app.get(
+    "/api/workflows",
+    tags=["n8n Integration"],
+)
 def get_workflows(
     current_admin: dict = Depends(get_current_admin),
 ):
-    """List the n8n workflows used by SmartBiz_AI."""
+    """
+    Stable dashboard workflow IDs are retained for compatibility.
+    Actual n8n workflow names are supplied by n8n in execution logs.
+    """
 
     return [
         {
@@ -1668,7 +1596,6 @@ def get_workflows(
             "name": "SmartBiz AI - Lead Automation",
             "active": True,
             "nodes": ["Webhook", "HTTP Request", "Gmail", "IF"],
-            "connections": "Live n8n Data",
         },
         {
             "id": 2,
@@ -1680,13 +1607,11 @@ def get_workflows(
                 "Split Out",
                 "Gmail",
             ],
-            "connections": "Live n8n Data",
         },
         {
             "id": 3,
             "name": "SmartBiz AI - Notification Workflow",
             "active": True,
             "nodes": ["Webhook", "HTTP Request"],
-            "connections": "Live n8n Data",
         },
     ]

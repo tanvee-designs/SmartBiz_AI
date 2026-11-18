@@ -1,3 +1,4 @@
+
 from datetime import datetime, timezone
 
 from sqlalchemy import (
@@ -13,7 +14,6 @@ from sqlalchemy import (
 from database import Base
 
 
-# Timezone-aware helper
 def utc_now():
     return datetime.now(timezone.utc)
 
@@ -116,7 +116,7 @@ class EmailLog(Base):
 
 
 # ============================================================
-# EXECUTION LOG (n8n Cloud Webhook Callback)
+# EXECUTION LOG (n8n Cloud)
 # ============================================================
 class ExecutionLog(Base):
     __tablename__ = "execution_logs"
@@ -124,7 +124,13 @@ class ExecutionLog(Base):
     id = Column(Integer, primary_key=True, index=True)
     execution_id = Column(String(100), unique=True, index=True)
     workflow_name = Column(String(150), nullable=False)
+
+    # Actual n8n workflow ID, when supplied by n8n
+    workflow_id = Column(String(100), nullable=True, index=True)
+
     status = Column(String(50), nullable=False)
     started_at = Column(DateTime, nullable=True)
     finished_at = Column(DateTime, nullable=True)
+    error_message = Column(Text, nullable=True)
+
     created_at = Column(DateTime, default=utc_now)

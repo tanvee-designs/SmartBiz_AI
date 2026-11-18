@@ -7,3 +7,4 @@ email-validator
 httpx
 PyJWT>=2.10,<3
 pwdlib[argon2]>=0.2,<1
+requests

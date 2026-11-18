@@ -1,23 +1,57 @@
+
 import json
+import re
+
 from datetime import datetime, timezone, timedelta
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, field_serializer
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    field_validator,
+    field_serializer,
+)
 
 
 LeadStatus = Literal["new", "contacted", "qualified", "converted", "lost"]
+
 LeadSource = Literal[
     "website",
     "facebook",
     "google_forms",
+    "manual",
     "linkedin",
     "referral",
     "email",
     "other",
 ]
 
-# BST Timezone (UTC+6)
 BST = timezone(timedelta(hours=6))
+
+
+# ---------------- PHONE NORMALIZATION ----------------
+
+def normalize_bd_phone(value):
+    if value is None:
+        return None
+
+    phone = re.sub(r"[\s()-]", "", str(value))
+
+    if not phone:
+        return None
+
+    if re.fullmatch(r"01[3-9]\d{8}", phone):
+        return "+88" + phone
+
+    if re.fullmatch(r"\+8801[3-9]\d{8}", phone):
+        return phone
+
+    raise ValueError(
+        "Enter a valid Bangladesh mobile number: "
+        "01XXXXXXXXX or +8801XXXXXXXXX."
+    )
 
 
 # ---------------- LEAD SCHEMAS ----------------
@@ -31,6 +65,11 @@ class LeadCreate(BaseModel):
     source: LeadSource = "website"
     interest: Optional[str] = Field(default=None, max_length=200)
     value: float = Field(default=0, ge=0)
+
+    @field_validator("phone", mode="before")
+    @classmethod
+    def validate_phone(cls, value):
+        return normalize_bd_phone(value)
 
 
 class LeadStatusUpdate(BaseModel):
@@ -47,6 +86,11 @@ class LeadUpdate(BaseModel):
     interest: Optional[str] = Field(default=None, max_length=200)
     value: Optional[float] = Field(default=None, ge=0)
     status: Optional[LeadStatus] = None
+
+    @field_validator("phone", mode="before")
+    @classmethod
+    def validate_phone(cls, value):
+        return normalize_bd_phone(value)
 
 
 class LeadResponse(BaseModel):
@@ -66,7 +110,7 @@ class LeadResponse(BaseModel):
     created_at: datetime
 
     @field_serializer("created_at", "last_contacted_at")
-    def serialize_datetime(self, value: Optional[datetime]):
+    def serialize_datetime(self, value):
         if value is None:
             return None
         if value.tzinfo is None:
@@ -96,7 +140,7 @@ class CustomerResponse(BaseModel):
     created_at: datetime
 
     @field_serializer("created_at")
-    def serialize_datetime(self, value: Optional[datetime]):
+    def serialize_datetime(self, value):
         if value is None:
             return None
         if value.tzinfo is None:
@@ -112,6 +156,7 @@ class ReportCreate(BaseModel):
     insights: List[str] = Field(default_factory=list)
     recommendations: List[str] = Field(default_factory=list)
     report_type: Optional[str] = Field(default="ai_report", max_length=50)
+    content: Optional[str] = None
 
 
 class ReportResponse(BaseModel):
@@ -119,10 +164,11 @@ class ReportResponse(BaseModel):
 
     id: int
     report_type: Optional[str] = None
-    title: str
-    summary: str
+    title: Optional[str] = None
+    summary: Optional[str] = None
     insights: List[str] = Field(default_factory=list)
     recommendations: List[str] = Field(default_factory=list)
+    content: Optional[str] = None
     created_at: datetime
 
     @field_validator("insights", "recommendations", mode="before")
@@ -130,16 +176,19 @@ class ReportResponse(BaseModel):
     def parse_json_list(cls, value):
         if value is None:
             return []
+
         if isinstance(value, str):
             try:
                 parsed = json.loads(value)
             except ValueError:
                 return [value] if value.strip() else []
+
             return parsed if isinstance(parsed, list) else [str(parsed)]
+
         return value
 
     @field_serializer("created_at")
-    def serialize_datetime(self, value: Optional[datetime]):
+    def serialize_datetime(self, value):
         if value is None:
             return None
         if value.tzinfo is None:
@@ -162,7 +211,7 @@ class NotificationResponse(BaseModel):
     created_at: datetime
 
     @field_serializer("created_at")
-    def serialize_datetime(self, value: Optional[datetime]):
+    def serialize_datetime(self, value):
         if value is None:
             return None
         if value.tzinfo is None:
@@ -185,7 +234,7 @@ class EmailLogResponse(BaseModel):
     created_at: datetime
 
     @field_serializer("created_at")
-    def serialize_datetime(self, value: Optional[datetime]):
+    def serialize_datetime(self, value):
         if value is None:
             return None
         if value.tzinfo is None:
@@ -215,7 +264,7 @@ class FollowUpResponse(BaseModel):
     created_at: datetime
 
     @field_serializer("created_at")
-    def serialize_datetime(self, value: Optional[datetime]):
+    def serialize_datetime(self, value):
         if value is None:
             return None
         if value.tzinfo is None:
@@ -238,20 +287,23 @@ class DueFollowUpList(BaseModel):
 # ---------------- EXECUTION LOG SCHEMAS ----------------
 
 class ExecutionLogCreate(BaseModel):
-    execution_id: str
-    workflow_name: str
-    status: str
+    execution_id: str = Field(min_length=1, max_length=100)
+    workflow_name: str = Field(min_length=1, max_length=150)
+    workflow_id: Optional[str] = Field(default=None, max_length=100)
+    status: Literal["success", "error"]
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
+    error_message: Optional[str] = None
 
 
 class ExecutionLogResponse(ExecutionLogCreate):
     id: int
     created_at: datetime
+
     model_config = ConfigDict(from_attributes=True)
 
     @field_serializer("created_at", "started_at", "finished_at")
-    def serialize_datetime(self, value: Optional[datetime]):
+    def serialize_datetime(self, value):
         if value is None:
             return None
         if value.tzinfo is None:
