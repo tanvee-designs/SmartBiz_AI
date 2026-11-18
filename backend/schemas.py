@@ -37,6 +37,18 @@ class LeadStatusUpdate(BaseModel):
     status: LeadStatus
 
 
+class LeadUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=2, max_length=100)
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = Field(default=None, max_length=30)
+    company: Optional[str] = Field(default=None, max_length=150)
+    message: Optional[str] = None
+    source: Optional[LeadSource] = None
+    interest: Optional[str] = Field(default=None, max_length=200)
+    value: Optional[float] = Field(default=None, ge=0)
+    status: Optional[LeadStatus] = None
+
+
 class LeadResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -245,3 +257,21 @@ class ExecutionLogResponse(ExecutionLogCreate):
         if value.tzinfo is None:
             value = value.replace(tzinfo=timezone.utc)
         return value.astimezone(BST).isoformat()
+
+
+# ---------------- N8N WEBHOOK SCHEMAS ----------------
+
+N8nEvent = Literal[
+    "ping",
+    "email_sent",
+    "email_failed",
+    "lead_status_changed",
+]
+
+
+class N8nWebhookPayload(BaseModel):
+    event: N8nEvent
+    lead_id: Optional[int] = None
+    email_log_id: Optional[int] = None
+    status: Optional[LeadStatus] = None
+    message: Optional[str] = Field(default=None, max_length=255)
