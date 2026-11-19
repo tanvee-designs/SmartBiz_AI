@@ -582,16 +582,23 @@ td select{background:var(--soft);border:1px solid var(--bd);border-radius:99px;p
     var lg=/\/auth\/login$/.test(u),pub=lg||((o&&o.method)==="POST"&&/\/api\/leads$/.test(u));
     if(!TOK&&!pub)return Promise.resolve(new Response("{}",{status:401}));
     o=Object.assign({},o);o.headers=Object.assign({},o.headers);if(TOK&&!pub)o.headers["Authorization"]="Bearer "+TOK;
-    return _fetch(u,o).then(function(r){if(r.status===401&&TOK&&!pub)signOut();return r})};
+    return _fetch(u,o).then(function(r){if(!r.ok)console.warn("[API]",(o.method||"GET"),u.replace(API_HOST,""),"->",r.status);if(r.status===401&&TOK&&!pub&&!/\/integrations\//.test(u))signOut();return r})};
   if(!TOK)$("lg").hidden=false;
   $("lgOut").onclick=signOut;
   $("lgF").onsubmit=async function(e){e.preventDefault();var em=$("lgE").value.trim(),pw=$("lgP").value,m=$("lgM");m.textContent="";
     if(!em||!pw){m.textContent=tx("lg_req");return}
     $("lgB").disabled=true;$("vt").classList.add("busy");var wt=setTimeout(function(){m.textContent=tx("lg_wait")},3500),ac=new AbortController(),to=setTimeout(function(){ac.abort()},70000);
-    try{var r=await fetch(API_HOST+"/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,password:pw}),signal:ac.signal});clearTimeout(wt);clearTimeout(to);m.textContent="";
+    try{var post=function(b,ct){return fetch(API_HOST+"/api/auth/login",{method:"POST",headers:{"Content-Type":ct},body:b,signal:ac.signal})};
+    var r=await post(JSON.stringify({email:em,password:pw}),"application/json");
+    if(r.status===422)r=await post("username="+encodeURIComponent(em)+"&password="+encodeURIComponent(pw),"application/x-www-form-urlencoded");
+    clearTimeout(wt);clearTimeout(to);m.textContent="";
+      if(!r.ok){var bt="";try{bt=await r.clone().text()}catch(z){}console.error("[login] failed:",r.status,bt)}
       if(r.status===400||r.status===401||r.status===422)m.textContent=tx("lg_bad");
       else if(!r.ok){m.textContent=tx("lg_srv")+" ("+r.status+")";console.error("login failed",r.status)}
-      else{var d=await r.json();if(!d.access_token)throw new Error("no token");TOK=d.access_token;try{localStorage.setItem("sb-token",TOK)}catch(x){}$("vt").classList.remove("busy");$("vt").classList.add("open");setTimeout(function(){location.reload()},matchMedia("(prefers-reduced-motion:reduce)").matches?250:1900);return}}
+      else{var d=await r.json(),tk=d&&(d.access_token||d.token||d.accessToken);
+        if(!tk){m.textContent=tx("lg_srv")+" (no token)";console.error("login: no token in response",d)}
+        else{TOK=tk;console.info("[login] OK, token received");try{localStorage.setItem("sb-token",TOK)}catch(x){console.warn("[login] localStorage blocked, token kept in memory only")}$("lgP").value="";$("vt").classList.remove("busy");$("vt").classList.add("open");
+          setTimeout(function(){$("lg").hidden=true;leadsLoading=true;repLoaded=false;all();loadLeads();loadReport().then(function(){drawReport()});loadNotifs();route()},matchMedia("(prefers-reduced-motion:reduce)").matches?250:1900);return}}}
     catch(x){clearTimeout(wt);clearTimeout(to);m.textContent=tx("lg_net");console.error("login error",x)}
     var v=$("vt");v.classList.remove("busy");v.classList.remove("shake");void v.offsetWidth;v.classList.add("shake");$("lgB").disabled=false};
   function N(n){var s=String(n);return lang==="bn"?s.replace(/\d/g,function(d){return BN[d]}):s}
