@@ -24,6 +24,7 @@ def send_lead_to_n8n(lead):
             "status": lead.status,
             "source": lead.source,
             "message": lead.message,
+            "event_origin": "backend",
         }
 
         response = requests.post(
